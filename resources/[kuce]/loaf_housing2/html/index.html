@@ -1,0 +1,22 @@
+<html>
+<body>
+	<audio loop id="playa">
+	  <source src="kosilica.mp3" type="audio/ogg">
+	</audio>
+<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+<script>
+window.addEventListener('message', function(event) {
+            var item = event.data;
+			var x = document.getElementById("playa");
+			if (item.start) {
+				x.volume = 0.2;
+				x.play();
+			}
+			if (item.stop) {
+				x.pause();
+				x.currentTime = 0;
+			}
+        });
+</script>
+</body>
+</html>

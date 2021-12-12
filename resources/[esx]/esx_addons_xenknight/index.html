@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="assets/plugins/jquery/jquery-3.2.1.min.js"></script>
+	<link rel="stylesheet" href="assets/plugins/bootstrap-3.3.7-dist/css/bootstrap.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Centrala</title>
+	<style>
+		html {
+		  font-size: 14px;
+		}
+		@media (min-width: 768px) {
+		  html {
+			font-size: 16px;
+		  }
+		}
+
+		.vertical-center {
+		  margin: 0;
+		  position: absolute;
+		  top: 50%;
+		  -ms-transform: translateY(-50%);
+		  transform: translateY(-50%);
+		  text-align: center;
+		}
+		#unutarnji{	
+			background-color: #969696b3;
+			width: 220px;
+			border-radius: 0px 0px 15px 15px;
+			padding: 15px;
+		}
+		#naslov{
+			background-color: #a7a7a7;
+			border-radius: 15px 15px 0px 0px;
+			padding: 15px;
+			font-weight: bold;
+			font-size: 20px;
+		}
+		
+		.container2 {
+			background-color: #c3c3c3;
+			padding: 15px;
+			border-radius: 15px;
+		}
+
+		.pricing-header {
+		  max-width: 700px;
+		}
+
+		.card-deck .card {
+			margin-right: 0px;
+			margin-top: 11px;
+			margin-bottom: 11px;
+			background-color: #00000017;
+		}
+		
+		#tijelo {
+			background-color: transparent;
+			display: none;
+		}
+
+		.border-top { border-top: 1px solid #e5e5e5; }
+		.border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+		.box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+		
+		.btn-danger {
+			float: right;
+			position: absolute;
+			top: 0;
+			right: 0;
+			border-radius: 0px 15px 0px 0px;
+		}
+
+		::-webkit-scrollbar {
+			width: 12px;
+		}
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+		}
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			background: rgba(51,122,183,0.8); 
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(51,122,183,0.8);
+		}
+		#bdodaj{
+			margin-top: 10px;
+		}
+		#glavni
+		{
+			width:800px;
+			max-height: 500px;
+			overflow: auto;
+			margin: 0;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		html, 
+		body {
+			height: 100%;
+		}
+	</style>
+</head>
+	<body id = "tijelo">
+		<div id="glavni">
+				<div id="prvi" class="container2" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;margin-bottom: -12px;">
+				  <div class="card-deck mb-3 text-center">
+					<font style="font-size: 25px">Call centar</font>
+					<button type="button" class="btn btn-danger" onclick="Zatvori()">X</button>
+				  </div>
+				</div>
+				
+				<hr style="margin-top: 0px; margin-bottom: 0px;border: 0;border-top: 1px solid #eee;">
+				<div class="container2" style="border-top-left-radius: 0px;border-top-right-radius: 0px;"></div>
+		</div>
+		<script src="assets/plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		<script>
+			var Prikazan = false;
+			var Zabrani = false;
+			window.addEventListener('message', function(event) {
+				var item = event.data;
+				if (item.salji) {
+					var broj = item.broj;
+					var tekst = item.tekst;
+					var koord = item.koord;
+					var maindiv = document.getElementById('prvi');
+					var div2 = document.createElement('div');
+					div2.className = 'container2';
+					div2.setAttribute("style", 'border-radius: 0px;');
+					div2.innerHTML = '\
+					<hr style="margin-top: 0px; margin-bottom: 0px;border: 0;border-top: 1px solid #eee;">\
+					<div class="card-deck mb-3 text-center">\
+					<font id="tekst">'+tekst+'</font><br><br>\
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 140px; margin-top:0px;font-size: 16px;" onclick="Posalji(this, `'+broj+'`,`'+tekst+'`,`'+koord.x+'`,`'+koord.y+'`,`'+koord.z+'`)">Pošalji</button>\
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 140px; margin-top:0px;font-size: 16px;" onclick="Odbij(this)">Odbij</button>\
+					</div>';
+					insertAfter(maindiv, div2);
+				}
+				else if (item.prikazi) {
+					var x = document.getElementById("tijelo");
+					if(Prikazan == false)
+					{
+						x.style.display = "block";
+						Prikazan = true;
+					}
+					else
+					{
+						x.style.display = "none";
+						Prikazan = false;
+					}
+				}
+			});
+			function Posalji(nest, br, tekst, x, y, z)
+			{
+				$.post("http://esx_addons_xenknight/salji", JSON.stringify({
+					broj: br,
+					tekst: tekst,
+					x: x,
+					y: y,
+					z: z
+				}));
+				$(nest).parent().parent().remove();
+			}
+			function Odbij(nest)
+			{
+				$(nest).parent().parent().remove();
+			}
+			function insertAfter(referenceNode, newNode) {
+				referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+			}
+			function Zatvori()
+			{
+				var x = document.getElementById("tijelo");
+				x.style.display = "none";
+				Prikazan = false;
+				$.post("http://esx_addons_xenknight/zatvori", JSON.stringify({}));
+			}
+		</script>
+	</body>
+</html>

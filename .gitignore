@@ -1,0 +1,9 @@
+cache/*
+*.txt
+*.yft
+*.ydt
+*.ydr
+*.ytd
+*.webm
+*.log
+resources/t-loadingscreen/loading.mp4

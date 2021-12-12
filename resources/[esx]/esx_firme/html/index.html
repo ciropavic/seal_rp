@@ -1,0 +1,217 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+    <style>
+        #main{
+            height: 676px;
+            width: 486px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-55%);
+            right: 185px;
+            background-color: #e3e5e6b5;
+            box-shadow: -1px 0px 25px #888888;
+            display: none;
+        }
+        #container{
+            width: 486;
+            overflow: auto;
+            height: 554px;
+        }
+        #naslov{
+            width: 100%;
+            display: block;
+            text-align: center;
+            padding: 25px 0px 25px 0px;
+            font-size: 20px;
+            color: white;
+            background-color: #404448;
+            font-family: "Open Sans";
+            font-weight: bold;
+        }
+        #zatvori{
+            background-color: #6c6c6c;
+            height: 700px;
+            width: 500px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 0;
+        }
+        #close:hover{
+            background-color: #b8b9b9;
+        }
+        #kupi:hover{
+            background-color: #57b552;
+        }
+        #artikl{
+            width: 100%;
+            height: 80px;
+        }
+        #kupi{
+            position: relative;
+            width: 70px;
+            height: 37px;
+            top: 9px;
+            background-color: #56c750;
+            border: 0;
+            color: white;
+            font-weight: bold;
+            right: 15px;    
+            font-family: "Open Sans";
+        }
+        img{
+            width: 55px;
+            height: 55px;
+            margin-top: 10px;
+            margin-left: 40px;
+        }
+        .desni{
+            float: right;
+            right: 20px;
+            top: 9px;
+            position: relative;
+            text-align: center;
+        }
+        .lijevi{
+            float: left;
+        }
+        #ltekst{
+            float: right;
+            color: black;
+            margin-top: 15px;
+            font-size: 18px;
+            margin-left: 20px;
+            font-family: "Open Sans";
+        }
+        #close{
+            margin: 0 auto;
+            display: block;
+            width: 400px;
+            height: 30px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            background-color: #c7cbce;
+            border: 0px;
+            color: #56595d;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        hr{
+            border: none;
+            height: 2px;
+            color: #939393;
+            background-color: #939393;
+            margin-top: -5px;
+            width: 450px;
+            margin-bottom: -5px;
+        }
+        #napusti{
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+        ::-webkit-scrollbar {
+            width: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <font id="naslov">Market</font>
+        <div id="container">
+            
+        </div>
+        <div id="napusti">
+            <hr>
+            <button id="close" onclick="Zatvori()">NAPUSTI MARKET</button>
+        </div>
+    </div>
+    <script src=nui://game/ui/jquery.js type=text/javascript></script>
+    <script>
+        let brojac = 0;
+        window.addEventListener('message', function(event) {
+			var item = event.data;
+            if (item.ocisti) {
+                var maindiv = document.getElementById('container');
+                maindiv.innerHTML = "";
+                brojac = 0;
+            }
+            if (item.dodajitem) {
+                DodajItem(item.naziv, item.cijena, item.ime, item.trg, item.zone, item.stanje);
+            }
+            if (item.updateitem) {
+                var maindiv = document.getElementById(item.br);
+                if(maindiv){
+                    maindiv.innerHTML = item.label.toUpperCase();
+                }
+            }
+            if (item.prikazi) {
+                var maindiv = document.getElementById('main');
+                maindiv.style.display = "block";
+            }
+        });
+        function DodajItem(naz, cij, ime, trg, zone, stanje){
+            var maindiv = document.getElementById('container');
+            var div = document.createElement('div');
+            div.id = "artikl";
+            maindiv.appendChild(div);
+
+            var div2 = document.createElement('div');
+            div2.className = "lijevi";
+            div.appendChild(div2);
+
+            var img = document.createElement('img');
+            img.src = "items/"+ime+".png";
+            div2.appendChild(img);
+
+            var div3 = document.createElement('div');
+            div3.id = "ltekst";
+            div2.appendChild(div3);
+
+            var font = document.createElement('font');
+            font.style = "font-weight: bold;";
+            font.id = "a"+brojac;
+            font.innerHTML = naz.toUpperCase();
+            div3.appendChild(font);
+
+            var br = document.createElement('br');
+            div3.appendChild(br);
+
+            var font2 = document.createElement('font');
+            font2.innerHTML = cij+"$";
+            div3.appendChild(font2);
+
+            var divd = document.createElement('div');
+            divd.className = "desni";
+            div.appendChild(divd);
+
+            var butt = document.createElement('button');
+            butt.id = "kupi";
+            butt.innerHTML = "KUPI";
+            let brojcic = "a"+brojac;
+            butt.onclick = function() { Kupi(ime, trg, zone, stanje, brojcic); };
+            divd.appendChild(butt);
+
+            var hr = document.createElement('hr');
+            maindiv.appendChild(hr);
+            brojac++;
+        }
+        function Kupi(ime, trg, zone, stanje, bra){
+            $.post("http://esx_firme/kupi", JSON.stringify({
+                ime: ime,
+                trg: trg,
+                zone: zone,
+                stanje: stanje,
+                br: bra
+            }));
+        }
+        function Zatvori(){
+            var maindiv = document.getElementById('main');
+            maindiv.style.display = "none";
+            $.post("http://esx_firme/zatvori", JSON.stringify({
+                
+            }));
+        }
+    </script>
+</body>
