@@ -25,9 +25,9 @@ RegisterServerEvent('policija:OtpustiIgraca')
 AddEventHandler('policija:OtpustiIgraca', function(id)
 	local xPlayer = ESX.GetPlayerFromDbId(id)
 	if xPlayer then
-		xPlayer.setJob(0, 0)
+		xPlayer.setJob(1, 0)
 	else
-		MySQL.Async.execute('update users set job = 0, job_grade = 0 where ID = @id', {
+		MySQL.Async.execute('update users set job = 1, job_grade = 0 where ID = @id', {
 			['@id'] = id
         })
 	end
@@ -46,19 +46,27 @@ AddEventHandler('policija:PostaviRank', function(id, posao, rank)
 	end
 end)
 
+RegisterServerEvent('policija:PostaviPlacu')
+AddEventHandler('policija:PostaviPlacu', function(id, placa)
+	MySQL.Async.execute('update job_grades set salary=@sal where id = @id', {
+		['@sal'] = placa,
+		['@id'] = id
+	})
+end)
+
 ESX.RegisterServerCallback('policija:getOnlinePlayers', function(source, cb, job)
 	local xPlayers = ESX.GetPlayers()
 	local players  = {}
 
 	for i=1, #xPlayers, 1 do
 		local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
-		if tonumber(xPlayer.getJob().id) ~= tonumber(job) then
+		--if tonumber(xPlayer.getJob().id) ~= tonumber(job) then
 			table.insert(players, {
 				value      = xPlayer.source,
 				identifier = xPlayer.id,
 				label      = xPlayer.getRPName()
 			})
-		end
+		--end
 		Wait(100)
 	end
 	cb(players)
@@ -66,6 +74,14 @@ end)
 
 RegisterServerEvent('policija:Zaposli')
 AddEventHandler('policija:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_policejob", "Upit za posao", "Pozvani ste da se zaposlite kao policajac. Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('policija:Zaposli2')
+AddEventHandler('policija:Zaposli2', function(posao, id)
 	local xPlayer = ESX.GetPlayerFromId(id)
 	if xPlayer ~= nil then
 		xPlayer.setJob(posao, 0)
@@ -162,13 +178,28 @@ ESX.RegisterServerCallback('esx_policejob:dohvatiRankove', function(source, cb, 
 	end)
 end)
 
+ESX.RegisterServerCallback('esx_policejob:dohvatiPlace', function(source, cb, posao)
+	MySQL.Async.fetchAll('SELECT id, salary, label FROM job_grades WHERE job_name = @job', {
+		['@job'] = posao
+	}, function(grades)
+		local data = {}
+		for i=1, #grades, 1 do
+			table.insert(data, {label = grades[i].label.." ($"..grades[i].salary..")", value=grades[i].id})
+		end
+		cb(data)
+	end)
+end)
+
 ESX.RegisterServerCallback('esx_policejob:dohvatiZaposlene', function(source, cb, posao)
-	MySQL.Async.fetchAll('SELECT ID, firstname, lastname FROM users WHERE job = @job', {
+	MySQL.Async.fetchAll('SELECT users.ID, firstname, lastname, job_grades.label FROM users \
+	inner join jobs on jobs.pID = users.job \
+	inner join job_grades on job_grades.grade = users.job_grade and job_grades.job_name = jobs.name \
+	WHERE job = @job', {
 		['@job'] = posao
 	}, function(users)
 		local data = {}
 		for i=1, #users, 1 do
-			table.insert(data, {label = users[i].firstname.." "..users[i].lastname, value=users[i].ID})
+			table.insert(data, {label = users[i].firstname.." "..users[i].lastname.." ["..users[i].label.."]", value=users[i].ID})
 		end
 		cb(data)
 	end)

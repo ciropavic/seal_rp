@@ -1071,8 +1071,8 @@ function OtvoriListuZaposlenih()
 				elements = {
 					{label = "Rank", value = 'rank'},
 					{label = "Otpusti", value = 'otpusti'}
-			}}, function(data, menu)
-				if data.current.value == 'rank' then
+			}}, function(data3, menu3)
+				if data3.current.value == 'rank' then
 					ESX.TriggerServerCallback('esx_policejob:dohvatiRankove', function(data2)
 						ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_rankova', {
 							title    = "Odaberite rank",
@@ -1085,15 +1085,32 @@ function OtvoriListuZaposlenih()
 							menu2.close()
 						end)
 					end, PlayerData.job.name)
-				elseif data.current.value == 'otpusti' then
+				elseif data3.current.value == 'otpusti' then
 					TriggerServerEvent("policija:OtpustiIgraca", user)
+					menu3.close()
+					menu.close()
+					ESX.UI.Menu.CloseAll()
+					OtvoriBossMenu()
 				end
-			end, function(data, menu)
-				menu.close()
+			end, function(data3, menu3)
+				menu3.close()
 			end)
+		end, function(data, menu)
+			menu.close()
 		end)
 	end, PlayerData.job.id)
 end
+
+RegisterNUICallback(
+    "zatvoriupit",
+    function(data, cb)
+		local br = data.br
+		local args = data.args
+		if br == 1 then
+			TriggerServerEvent("policija:Zaposli2", args.posao, args.id)
+		end
+    end
+)
 
 function OtvoriZaposljavanje()
 	ESX.TriggerServerCallback('policija:getOnlinePlayers', function(rad)
@@ -1107,6 +1124,8 @@ function OtvoriZaposljavanje()
 			function(datalr2, menulr2)
 				TriggerServerEvent("policija:Zaposli", PlayerData.job.id, datalr2.current.value)
 				menulr2.close()
+				ESX.UI.Menu.CloseAll()
+				OtvoriBossMenu()
 			end,
 			function(datalr2, menulr2)
 				menulr2.close()
@@ -1117,7 +1136,6 @@ end
 
 function OtvoriBossMenu()
 	ESX.UI.Menu.CloseAll()
-
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'police_boss', {
 		title    = 'Boss menu',
 		align    = 'top-left',
@@ -1147,77 +1165,37 @@ function OtvoriBossMenu()
 				menu2.close()
 			end)
 		elseif data.current.value == 'place' then
-			local elements  = {}
-
-			table.insert(elements, {label = _U('search_database'), value = 'search_database'})
-
-			ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'vehicle_interaction', {
-				title    = _U('vehicle_interaction'),
-				align    = 'top-left',
-				elements = elements
-			}, function(data2, menu2)
-				local coords  = GetEntityCoords(playerPed)
-				vehicle = ESX.Game.GetVehicleInDirection()
-				action  = data2.current.value
-
-				if action == 'search_database' then
-					LookupVehicle()
-				elseif DoesEntityExist(vehicle) then
-					if action == 'vehicle_infos' then
-						local vehicleData = ESX.Game.GetVehicleProperties(vehicle)
-						OpenVehicleInfosMenu(vehicleData)
-					elseif action == 'hijack_vehicle' then
-						if IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, 3.0) then
-							TaskStartScenarioInPlace(playerPed, 'WORLD_HUMAN_WELDING', 0, true)
-							Citizen.Wait(20000)
-							ClearPedTasksImmediately(playerPed)
-
-							SetVehicleDoorsLocked(vehicle, 1)
-							SetVehicleDoorsLockedForAllPlayers(vehicle, false)
-							ESX.ShowNotification(_U('vehicle_unlocked'))
+			ESX.TriggerServerCallback('esx_policejob:dohvatiPlace', function(data2)
+				ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_rankovaplace', {
+					title    = "Odaberite rank",
+					align    = 'top-left',
+					elements = data2
+				}, function(data2, menu2)
+					local rankid = data2.current.value
+					ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'place_broj', {
+						title = "Unesite novu placu ranka"
+					}, function(data3, menu3)
+						local count = tonumber(data3.value)
+						if count == nil then
+							ESX.ShowNotification(_U('quantity_invalid'))
+						else
+							menu3.close()
+							menu2.close()
+							TriggerServerEvent("policija:PostaviPlacu", rankid, count)
 						end
-					elseif action == 'impound' then
-						-- is the script busy?
-						if currentTask.busy then
-							return
-						end
-
-						ESX.ShowHelpNotification(_U('impound_prompt'))
-						TaskStartScenarioInPlace(playerPed, 'CODE_HUMAN_MEDIC_TEND_TO_DEAD', 0, true)
-
-						currentTask.busy = true
-						currentTask.task = ESX.SetTimeout(10000, function()
-							ClearPedTasks(playerPed)
-							ImpoundVehicle(vehicle)
-							Citizen.Wait(100) -- sleep the entire script to let stuff sink back to reality
-						end)
-
-						-- keep track of that vehicle!
-						Citizen.CreateThread(function()
-							while currentTask.busy do
-								Citizen.Wait(1000)
-
-								vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 3.0, 0, 71)
-								if not DoesEntityExist(vehicle) and currentTask.busy then
-									ESX.ShowNotification(_U('impound_canceled_moved'))
-									ESX.ClearTimeout(currentTask.task)
-									ClearPedTasks(playerPed)
-									currentTask.busy = false
-									break
-								end
-							end
-						end)
-					end
-				else
-					ESX.ShowNotification(_U('no_vehicles_nearby'))
-				end
-
-			end, function(data2, menu2)
-				menu2.close()
-			end)
+					end, function(data3, menu3)
+						menu3.close()
+					end)
+				end, function(data2, menu2)
+					menu2.close()
+				end)
+			end, PlayerData.job.name)
 		end
 	end, function(data, menu)
 		menu.close()
+		CurrentAction     = 'menu_boss_actions'
+		CurrentActionMsg  = _U('open_bossmenu')
+		CurrentActionData = {}
 	end)
 end
 
