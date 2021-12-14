@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vijesti</title>
+    <script src="assets/plugins/jquery/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="assets/plugins/bootstrap-3.3.7-dist/css/bootstrap.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		html {
+		  font-size: 14px;
+		}
+		@media (min-width: 768px) {
+		  html {
+			font-size: 16px;
+		  }
+		}
+
+		.container {
+			max-width: 401px;
+			max-height: 800px;
+			min-height: 800px;
+			overflow: scroll;
+			overflow-x: hidden;
+			overflow-y: auto;
+			position: relative;
+			left: 0;
+			margin: 0;
+			padding-top: 10px;
+			background-color: #c3c3c3;
+			top: 100px;
+			border-radius: 15px;
+		}
+
+		.pricing-header {
+		  max-width: 700px;
+		}
+
+		.card-deck .card {
+			margin-right: 0px;
+			margin-top: 11px;
+			margin-bottom: 11px;
+			background-color: #00000017;
+		}
+		
+		.jumbotron {
+			margin-bottom: 0px;
+			padding-top: 15px;
+			padding-bottom: 15px;
+		}
+		
+		#tijelo {
+			display: none;
+			background-color: transparent;
+		}
+		
+		#telefon{
+			background-image: url(s8.png);
+			background-position: top;
+			background-repeat: no-repeat;
+			height: 950px;
+		}
+
+		.border-top { border-top: 1px solid #e5e5e5; }
+		.border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+		.box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+		
+		.btn-danger {
+			float: right;
+		}
+
+		::-webkit-scrollbar {
+			width: 12px;
+		}
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+		}
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			background: rgba(51,122,183,0.8); 
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(51,122,183,0.8);
+		}
+		.modal{
+			top: 120px !important;
+		}
+		.modal-dialog{
+			width: 400px !important;
+		}
+		#bdodaj{
+			margin-top: 10px;
+		}
+		img{
+			max-width: 30px;
+		}
+	</style>
+</head>
+	<body id = "tijelo">
+		<center>
+		<div id="telefon">
+			<div class="container">
+			<button type="button" class="btn btn-danger" onclick="Zatvori()">X</button>
+			<div class="jumbotron text-center"><h2>Weazel News</h2></div>
+			  <div class="card-deck mb-3 text-center">
+				<button type="button" id="bdodaj" class="btn btn-lg btn-block btn-primary" data-toggle="modal" data-target="#dodaj"><i class="fa fa-plus-circle"></i></button>
+			  </div>
+			</div>
+			<div class="modal" id="prikazi" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">  
+						<div class="modal-header" style="background-color:#2a7ec5;">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" style="color:white" id="naslov"></h4>
+						</div>			
+						<div class="modal-body">
+							<form class="form-horizontal">
+								<font id="opis" style="white-space: pre-wrap"></font>
+							</form>
+						</div>
+						<div class="modal-footer" id="mfooter">
+							<button type="button" class="btn btn-success btn-s" data-dismiss="modal">Uredu</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal" id="dodaj" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">  
+						<div class="modal-header" style="background-color:#2a7ec5;">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" style="color:white"> Novi clanak</h4>
+						</div>			
+						<div class="modal-body">
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Naziv clanka</label>
+									<div class="col-md-8">
+										<input type="text" id="nazivc" placeholder="Unesite naziv clanka" class="form-control" >
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="control-label col-md-3 col-sm-3">Clanak</label>
+									<div class="col-md-8">
+										<textarea id="clanak" name="clanak" rows="4" cols="30"></textarea>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer" id="mfooter">
+							<button type="button" class="btn btn-success btn-s" onclick="Dodaj()" data-dismiss="modal">Dodaj</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Odustani</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</center>
+		<script src="assets/plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		<script>
+			var Prikazan = false;
+			window.addEventListener('message', function(event) {
+				var item = event.data;
+				if (item.salji) {
+					var autor = item.autor;
+					var naslov = item.naslov;
+					var clanak = item.opis;
+					var maindiv = document.getElementById('bdodaj');
+					var div = document.createElement('div');
+					div.className = 'card mb-4 box-shadow';
+					insertAfter(maindiv, div);
+					var div2 = document.createElement('div');
+					div2.className = 'card-header';
+					div2.innerHTML = '<h4 class="my-0 font-weight-normal">Vijest</h4>';
+					div.appendChild(div2);
+					var div3 = document.createElement('div');
+					div3.className = 'card-body';
+					div3.innerHTML = '<h1 class="card-title pricing-card-title">'+naslov+'</h1><ul class="list-unstyled mt-3 mb-4"><li>Autor: <small class="text-muted">'+autor+'</small></li></ul><button type="button" class="btn btn-lg btn-block btn-primary" onclick="OtvoriModal(`'+naslov+'`, `'+clanak+'`)">Procitaj</button>';
+					div.appendChild(div3);
+				}
+				if (item.prikazi) {
+					var x = document.getElementById("tijelo");
+					if(Prikazan == false)
+					{
+						if(item.posao != "reporter")
+						{
+							var z = document.getElementById("bdodaj");
+							z.style.display = "none";
+						}
+						else
+						{
+							var z = document.getElementById("bdodaj");
+							z.style.display = "block";
+						}
+						x.style.display = "block";
+						Prikazan = true;
+					}
+					else
+					{
+						x.style.display = "none";
+						Prikazan = false;
+					}
+				}
+			});
+			function insertAfter(referenceNode, newNode) {
+				referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+			}
+			function OtvoriModal(naslov, opis)
+			{
+				var nasl = document.getElementById('naslov');
+				nasl.innerHTML = naslov;
+				var op = document.getElementById('opis');
+				op.innerHTML = opis;
+				$('#prikazi').modal
+				({
+					show: true
+				});
+			}
+			function Dodaj()
+			{
+				var naslov = $("#nazivc").val();
+				var tekst = $("#clanak").val();
+				$.post("http://esx_reporter/dodaj", JSON.stringify({
+					naziv: naslov,
+					clanak: tekst
+				}));
+			}
+			function Test(broj)
+			{
+				$.post("http://esx_reporter/zovi", JSON.stringify({
+					br: broj
+				}));
+			}
+			function Zatvori()
+			{
+				$.post("http://esx_reporter/zatvori", JSON.stringify({}));
+			}
+		</script>
+	</body>
+</html>

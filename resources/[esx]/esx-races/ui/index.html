@@ -1,0 +1,60 @@
+<html>
+<head>
+<style>
+#container
+{
+    position: absolute;
+    width: 230px;
+    height: 140px;
+    background: #063;
+    bottom: 0px;
+    right: 25%;
+    left: 50%;
+    margin-left: 210px;
+	display: none;
+}
+</style
+</head>
+<body>
+<div id = "container">
+<img src="ikona.png" style="width: 262px;height: 140px;position: relative;top: -100px;left: -16px; margin-bottom: -124px;">
+<div id = "vrijeme" align="center">
+<img src="vrijeme.png" style="width: 12%;">
+<font id="vrijemetekst" size="6" style="position: relative;top: -4px;">00:00:00</font>
+</div>
+<div id = "cp" align="center">
+<img src="cp.png" style="width: 12%;">
+<font id="cptekst" size="6" style="position: relative;top: -4px;">1/200</font>
+</div>
+<div id = "poz" align="center">
+<img src="pozicija.png" style="width: 12%;">
+<font id="poztekst" size="6" style="position: relative;top: -4px;">1/10</font>
+</div>
+</div>
+<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+<script>
+window.addEventListener('message', function(event) {
+            var item = event.data;
+			var x = document.getElementById("container");
+			if (item.updatevrijeme) {
+				var y = document.getElementById("vrijemetekst");
+				y.innerHTML = item.vrijeme;
+			}
+			if (item.updatecp) {
+				var y = document.getElementById("cptekst");
+				y.innerHTML = item.cp;
+			}
+			if (item.updatepoz) {
+				var y = document.getElementById("poztekst");
+				y.innerHTML = item.poz;
+			}
+            if (item.prikazirace) {
+				x.style.display = "block";
+            }
+			else if (item.zatvorirace) {
+				x.style.display = "none";
+            }
+        });
+</script>
+</body>
+</html>

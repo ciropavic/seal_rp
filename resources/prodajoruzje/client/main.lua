@@ -104,6 +104,42 @@ function ProvjeriPosao()
 	end)
 end
 
+RegisterCommand("tpm", function(source)
+    TeleportToWaypoint()
+end)
+
+TeleportToWaypoint = function()
+    ESX.TriggerServerCallback("esx_marker:fetchUserRank", function(playerRank)
+        if playerRank == "admin" or playerRank == "superadmin" or playerRank == "mod" then
+            local WaypointHandle = GetFirstBlipInfoId(8)
+
+            if DoesBlipExist(WaypointHandle) then
+                local waypointCoords = GetBlipInfoIdCoord(WaypointHandle)
+
+                for height = 1, 1000 do
+                    SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+                    local foundGround, zPos = GetGroundZFor_3dCoord(waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+                    if foundGround then
+                        SetPedCoordsKeepVehicle(PlayerPedId(), waypointCoords["x"], waypointCoords["y"], height + 0.0)
+
+                        break
+                    end
+
+                    Citizen.Wait(5)
+                end
+
+                ESX.ShowNotification("Teleportiran.")
+            else
+                ESX.ShowNotification("Stavite vas marker prvo.")
+            end
+        else
+            ESX.ShowNotification("Nemate ovlasti za ovu komandu.")
+        end
+    end)
+end
+
 AddEventHandler("playerSpawned", function()
 	SetPedComponentVariation(PlayerPedId(), 1, 0 ,0, 2)
 	--StatSetInt(GetHashKey('MP0_STAMINA'), 20, true)

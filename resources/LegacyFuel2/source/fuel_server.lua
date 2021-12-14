@@ -72,7 +72,7 @@ end)
 function GetRPName(ident, data)
 	local Identifier = ident
 
-	MySQL.Async.fetchAll("SELECT firstname, lastname FROM users WHERE identifier = @identifier", { ["@identifier"] = Identifier }, function(result)
+	MySQL.Async.fetchAll("SELECT firstname, lastname FROM users WHERE ID = @identifier", { ["@identifier"] = Identifier }, function(result)
 		data(result[1].firstname, result[1].lastname)
 	end)
 end
@@ -312,7 +312,7 @@ AddEventHandler('pumpe:KupiPumpu', function(ime)
 			if tonumber(Pumpe[i].Cijena) <= xPlayer.getMoney() then
 				xPlayer.removeMoney(tonumber(Pumpe[i].Cijena))
 				Pumpe[i].Vlasnik = xPlayer.getID()
-				GetRPName(xPlayer.identifier, function(Firstname, Lastname)
+				GetRPName(xPlayer.getID(), function(Firstname, Lastname)
 					local im = Firstname.." "..Lastname
 					Pumpe[i].VlasnikIme = im
 					TriggerClientEvent("pumpe:SaljiPumpe", -1, Pumpe)
@@ -350,7 +350,7 @@ AddEventHandler('pumpe:PrihvatioProdaju', function(ime, cijena, pid)
 				xPlayer.removeMoney(cijena)
 				tPlayer.addMoney(cijena)
 				Pumpe[i].Vlasnik = xPlayer.getID()
-				GetRPName(xPlayer.identifier, function(Firstname, Lastname)
+				GetRPName(xPlayer.getID(), function(Firstname, Lastname)
 					local im = Firstname.." "..Lastname
 					Pumpe[i].VlasnikIme = im
 					TriggerClientEvent("pumpe:SaljiPumpe", -1, Pumpe)

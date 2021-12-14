@@ -460,10 +460,10 @@ end
 ESX.RegisterServerCallback('minute:DohvatiSate', function(source, cb)
 	local elements = {}
 	MySQL.Async.fetchAll('SELECT identifier, minute FROM minute ORDER BY minute DESC', {}, function(result)
-		MySQL.Async.fetchAll('SELECT identifier, name FROM users', {}, function(result2)
+		MySQL.Async.fetchAll('SELECT ID, name FROM users', {}, function(result2)
 			for i=1, #result, 1 do
 				for j=1, #result2, 1 do
-					if result[i].identifier == result2[j].identifier then
+					if result[i].identifier == result2[j].ID then
 						local str
 						local ime = "Glupo ime"
 						if result[i].minute < 60 then
@@ -486,6 +486,22 @@ ESX.RegisterServerCallback('minute:DohvatiSate', function(source, cb)
 			cb(elements)
 		end)
 	end)
+end)
+
+ESX.RegisterServerCallback("esx_marker:fetchUserRank", function(source, cb)
+    local player = ESX.GetPlayerFromId(source)
+
+    if player ~= nil then
+        local playerGroup = player.getGroup()
+
+        if playerGroup ~= nil then 
+            cb(playerGroup)
+        else
+            cb("user")
+        end
+    else
+        cb("user")
+    end
 end)
 
 function getIdentity(source)

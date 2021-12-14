@@ -123,6 +123,13 @@ ESX.GetPlayers = function()
 	return sources
 end
 
+ESX.GetPlayerFromDbId = function(id)
+	for k,v in pairs(ESX.Players) do
+		if v.id == id then
+			return v
+		end
+	end
+end
 
 ESX.GetPlayerFromId = function(source)
 	return ESX.Players[tonumber(source)]
