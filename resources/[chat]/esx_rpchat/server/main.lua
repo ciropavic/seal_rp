@@ -25,8 +25,8 @@ ESX.RegisterServerCallback('rpchat:DohvatiMute', function(source, cb)
 	end
 end)
 
-function getIdentity(source, cb, id)
-	local identifier = GetPlayerIdentifiers(id)[1]
+function getIdentity(source, cb)
+	local identifier = GetPlayerIdentifiers(source)[1]
 	MySQL.Async.fetchAll("SELECT firstname, lastname FROM users WHERE identifier = @identifier", {['@identifier'] = identifier}, function (result)
         if result[1] ~= nil then
 			local identity = result[1]

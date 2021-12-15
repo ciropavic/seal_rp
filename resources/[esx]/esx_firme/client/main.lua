@@ -1227,7 +1227,8 @@ function OpenShopMenu()
 			cijena = item.price,
 			ime = item.item,
 			trg = st,
-			zone = zone
+			zone = zone,
+			stanje = br
 		})
 	end
 	Wait(500)
