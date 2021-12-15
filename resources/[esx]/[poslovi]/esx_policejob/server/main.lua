@@ -31,6 +31,8 @@ AddEventHandler('policija:OtpustiIgraca', function(id)
 			['@id'] = id
         })
 	end
+	local xPlayer2 = ESX.GetPlayerFromId(source)
+	xPlayer2.showNotification("Uspjesno otpusten zaposlenik!")
 end)
 
 RegisterServerEvent('policija:PostaviRank')
@@ -44,6 +46,8 @@ AddEventHandler('policija:PostaviRank', function(id, posao, rank)
 			['@id'] = id
         })
 	end
+	local xPlayer2 = ESX.GetPlayerFromId(source)
+	xPlayer2.showNotification("Uspjesno postavljen rank zaposleniku!")
 end)
 
 RegisterServerEvent('policija:PostaviPlacu')
@@ -52,6 +56,8 @@ AddEventHandler('policija:PostaviPlacu', function(id, placa)
 		['@sal'] = placa,
 		['@id'] = id
 	})
+	local xPlayer = ESX.GetPlayerFromId(source)
+	xPlayer.showNotification("Uspjesno postavljena placa ranku!")
 end)
 
 ESX.RegisterServerCallback('policija:getOnlinePlayers', function(source, cb, job)

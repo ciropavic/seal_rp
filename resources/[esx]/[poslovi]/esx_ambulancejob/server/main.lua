@@ -23,6 +23,27 @@ AddEventHandler('ambu:ozivi', function(target)
 	end
 end)
 
+RegisterServerEvent('bolnica:Zaposli')
+AddEventHandler('bolnica:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_ambulancejob", "Upit za posao", "Pozvani ste da se zaposlite kao bolnicar. Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('bolnica:Zaposli2')
+AddEventHandler('bolnica:Zaposli2', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		xPlayer.setJob(posao, 0)
+		xPlayer.showNotification("Zaposleni ste u bolnicare!")
+		MySQL.Async.execute('UPDATE users SET `job` = @job, `job_grade` = 0 WHERE ID = @id', {
+			['@id'] = xPlayer.getID(),
+			['@job'] = tonumber(posao)
+		})
+	end
+end)
+
 RegisterServerEvent('ambu:ozivi2')
 AddEventHandler('ambu:ozivi2', function(target)
 	local xPlayer = ESX.GetPlayerFromId(source)

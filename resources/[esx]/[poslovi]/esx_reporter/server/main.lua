@@ -17,6 +17,27 @@ AddEventHandler('esx_reporter:giveWeapon', function(weapon, ammo)
   xPlayer.addWeapon(weapon, ammo)
 end)
 
+RegisterServerEvent('reporter:Zaposli')
+AddEventHandler('reporter:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_reporter", "Upit za posao", "Pozvani ste da se zaposlite kao reporter. Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('reporter:Zaposli2')
+AddEventHandler('reporter:Zaposli2', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		xPlayer.setJob(posao, 0)
+		xPlayer.showNotification("Zaposleni ste u reportere!")
+		MySQL.Async.execute('UPDATE users SET `job` = @job, `job_grade` = 0 WHERE ID = @id', {
+			['@id'] = xPlayer.getID(),
+			['@job'] = tonumber(posao)
+		})
+	end
+end)
+
 RegisterServerEvent('reporter:DajImPare')
 AddEventHandler('reporter:DajImPare', function(br)
 	local src = source

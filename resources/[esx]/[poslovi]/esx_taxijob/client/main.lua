@@ -272,6 +272,149 @@ function DeleteJobVehicle()
 	end
 end
 
+function OtvoriListuZaposlenih()
+	ESX.TriggerServerCallback('esx_policejob:dohvatiZaposlene', function(datae)
+		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'police_bossa', {
+			title    = 'Lista zaposlenih',
+			align    = 'top-left',
+			elements = datae
+		}, function(data, menu)
+			local user = data.current.value
+			ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_akc', {
+				title    = 'Boss menu',
+				align    = 'top-left',
+				elements = {
+					{label = "Rank", value = 'rank'},
+					{label = "Otpusti", value = 'otpusti'}
+			}}, function(data3, menu3)
+				if data3.current.value == 'rank' then
+					ESX.TriggerServerCallback('esx_policejob:dohvatiRankove', function(data2)
+						ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_rankova', {
+							title    = "Odaberite rank",
+							align    = 'top-left',
+							elements = data2
+						}, function(data2, menu2)
+							local action = data2.current.value
+							TriggerServerEvent("policija:PostaviRank", user, ESX.PlayerData.job.id, action)
+							menu2.close()
+						end, function(data2, menu2)
+							menu2.close()
+						end)
+					end, ESX.PlayerData.job.name)
+				elseif data3.current.value == 'otpusti' then
+					TriggerServerEvent("policija:OtpustiIgraca", user)
+					menu3.close()
+					menu.close()
+					ESX.UI.Menu.CloseAll()
+					OtvoriBossMenu()
+				end
+			end, function(data3, menu3)
+				menu3.close()
+			end)
+		end, function(data, menu)
+			menu.close()
+		end)
+	end, ESX.PlayerData.job.id)
+end
+
+RegisterNUICallback(
+    "zatvoriupit",
+    function(data, cb)
+		local br = data.br
+		local args = data.args
+		if br == 1 then
+			TriggerServerEvent("taxi:Zaposli2", args.posao, args.id)
+		end
+    end
+)
+
+function OtvoriZaposljavanje()
+	ESX.TriggerServerCallback('policija:getOnlinePlayers', function(rad)
+		ESX.UI.Menu.Open(
+			'default', GetCurrentResourceName(), 'fdsfae',
+			{
+				title    = "Popis igraca",
+				align    = 'bottom-right',
+				elements = rad,
+			},
+			function(datalr2, menulr2)
+				TriggerServerEvent("taxi:Zaposli", ESX.PlayerData.job.id, datalr2.current.value)
+				menulr2.close()
+				ESX.UI.Menu.CloseAll()
+				OtvoriBossMenu()
+			end,
+			function(datalr2, menulr2)
+				menulr2.close()
+			end
+		)
+	end, ESX.PlayerData.job.id)
+end
+
+function OtvoriBossMenu()
+	ESX.UI.Menu.CloseAll()
+	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'meh_boss', {
+		title    = 'Lider menu',
+		align    = 'top-left',
+		elements = {
+			{label = "Zaposlenici", value = 'zaposlenici'},
+			{label = "Place", value = 'place'}
+	}}, function(data, menu)
+		if data.current.value == 'zaposlenici' then
+			local elements = {
+				{label = "Lista zaposlenika", value = 'lista'},
+				{label = "Zaposli", value = 'zaposli'}
+			}
+
+			ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_zap', {
+				title    = "Zaposlenici",
+				align    = 'top-left',
+				elements = elements
+			}, function(data2, menu2)
+				local action = data2.current.value
+
+				if action == 'lista' then
+					OtvoriListuZaposlenih()
+				elseif action == 'zaposli' then
+					OtvoriZaposljavanje()
+				end
+			end, function(data2, menu2)
+				menu2.close()
+			end)
+		elseif data.current.value == 'place' then
+			ESX.TriggerServerCallback('esx_policejob:dohvatiPlace', function(data2)
+				ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'lista_rankovaplace', {
+					title    = "Odaberite rank",
+					align    = 'top-left',
+					elements = data2
+				}, function(data2, menu2)
+					local rankid = data2.current.value
+					ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'place_broj', {
+						title = "Unesite novu placu ranka"
+					}, function(data3, menu3)
+						local count = tonumber(data3.value)
+						if count == nil then
+							ESX.ShowNotification(_U('quantity_invalid'))
+						else
+							menu3.close()
+							menu2.close()
+							TriggerServerEvent("policija:PostaviPlacu", rankid, count)
+						end
+					end, function(data3, menu3)
+						menu3.close()
+					end)
+				end, function(data2, menu2)
+					menu2.close()
+				end)
+			end, ESX.PlayerData.job.name)
+		end
+	end, function(data, menu)
+		menu.close()
+		CurrentAction     = 'taxi_actions_menu'
+		CurrentActionMsg  = _U('press_to_open')
+		CurrentActionData = {}
+	end)
+end
+
 function OpenTaxiActionsMenu()
 	local elements = {
 		{label = _U('deposit_stock'), value = 'put_stock'},
@@ -295,9 +438,7 @@ function OpenTaxiActionsMenu()
 		elseif data.current.value == 'get_stock' then
 			OpenGetStocksMenu()
 		elseif data.current.value == 'boss_actions' then
-			TriggerEvent('esx_society:openBossMenu', 'taxi', function(data, menu)
-				menu.close()
-			end)
+			OtvoriBossMenu()
 		end
 
 	end, function(data, menu)

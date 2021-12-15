@@ -1081,6 +1081,7 @@ function OtvoriListuZaposlenih()
 						}, function(data2, menu2)
 							local action = data2.current.value
 							TriggerServerEvent("policija:PostaviRank", user, PlayerData.job.id, action)
+							menu2.close()
 						end, function(data2, menu2)
 							menu2.close()
 						end)

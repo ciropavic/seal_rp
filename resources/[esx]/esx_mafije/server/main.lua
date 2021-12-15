@@ -31,6 +31,27 @@ AddEventHandler('mafije:giveWeapon', function(weapon, ammo)
   xPlayer.addWeapon(weapon, ammo)
 end)
 
+RegisterServerEvent('mafija:Zaposli')
+AddEventHandler('mafija:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_mafije", "Upit za posao", "Pozvani ste da se zaposlite u mafiju "..posao.label..". Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('mafija:Zaposli2')
+AddEventHandler('mafija:Zaposli2', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		xPlayer.setJob(posao.id, 0)
+		xPlayer.showNotification("Zaposleni ste u "..posao.label.."!")
+		MySQL.Async.execute('UPDATE users SET `job` = @job, `job_grade` = 0 WHERE ID = @id', {
+			['@id'] = xPlayer.getID(),
+			['@job'] = tonumber(posao.id)
+		})
+	end
+end)
+
 function UcitajMafije()
 	Mafije = {}
 	Rankovi = {}

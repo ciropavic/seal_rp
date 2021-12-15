@@ -30,6 +30,27 @@ AddEventHandler('esx_tuljotaxi:uspijeh;', function()
 	TriggerClientEvent('esx:showNotification', xPlayer.source, _U('have_earned', total/2))
 end)
 
+RegisterServerEvent('taxi:Zaposli')
+AddEventHandler('taxi:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_taxijob", "Upit za posao", "Pozvani ste da se zaposlite kao taksist. Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('taxi:Zaposli2')
+AddEventHandler('taxi:Zaposli2', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		xPlayer.setJob(posao, 0)
+		xPlayer.showNotification("Zaposleni ste kao taksist!")
+		MySQL.Async.execute('UPDATE users SET `job` = @job, `job_grade` = 0 WHERE ID = @id', {
+			['@id'] = xPlayer.getID(),
+			['@job'] = tonumber(posao)
+		})
+	end
+end)
+
 RegisterServerEvent('esx_taxijob:getStockItem')
 AddEventHandler('esx_taxijob:getStockItem', function(itemName, count)
 	local xPlayer = ESX.GetPlayerFromId(source)

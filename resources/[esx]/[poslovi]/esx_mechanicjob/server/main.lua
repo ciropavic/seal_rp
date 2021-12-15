@@ -33,6 +33,27 @@ local function Harvest(source)
 	end)
 end
 
+RegisterServerEvent('mehanicar:Zaposli')
+AddEventHandler('mehanicar:Zaposli', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		TriggerClientEvent("upit:OtvoriPitanje", id, "esx_mechanicjob", "Upit za posao", "Pozvani ste da se zaposlite kao mehanicar. Prihvacate?", {posao = posao, id = id})
+	end
+end)
+
+RegisterServerEvent('mehanicar:Zaposli2')
+AddEventHandler('mehanicar:Zaposli2', function(posao, id)
+	local xPlayer = ESX.GetPlayerFromId(id)
+	if xPlayer ~= nil then
+		xPlayer.setJob(posao, 0)
+		xPlayer.showNotification("Zaposleni ste u mehanicare!")
+		MySQL.Async.execute('UPDATE users SET `job` = @job, `job_grade` = 0 WHERE ID = @id', {
+			['@id'] = xPlayer.getID(),
+			['@job'] = tonumber(posao)
+		})
+	end
+end)
+
 RegisterServerEvent('esx_mechanicjob:startHarvest')
 AddEventHandler('esx_mechanicjob:startHarvest', function()
 	local _source = source
