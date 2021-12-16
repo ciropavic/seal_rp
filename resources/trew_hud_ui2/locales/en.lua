@@ -68,5 +68,6 @@ Locales['en'] = {
 	['month_11'] = 'Prosican',
 
 	['toggleui'] = 'Prikazuje/sakriva dijelove HUD-a',
-
+	['used_bread'] = 'pojeli ste ~y~1x~s~ ~b~kruh~s~',
+    ['used_water'] = 'popili ste ~y~1x~s~ ~b~vodu~s~'
 }

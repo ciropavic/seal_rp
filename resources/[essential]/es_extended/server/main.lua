@@ -13,7 +13,8 @@ AddEventHandler('es:playerLoaded', function(source, _player)
 		loadout      = {},
 		playerName   = GetPlayerName(_source),
 		lastPosition = nil,
-		number 		 = nil
+		number 		 = nil,
+		status 		 = {}
 	}
 
 	TriggerEvent('es:getPlayerFromId', _source, function(player)
@@ -112,7 +113,7 @@ AddEventHandler('es:playerLoaded', function(source, _player)
 			-- Get job name, grade and last position
 			table.insert(tasks2, function(cb2)
 
-				MySQL.Async.fetchAll('SELECT ID, job, job_grade, posao, loadout, position, phone_number, firstname, lastname, firma FROM `users` WHERE `identifier` = @identifier', {
+				MySQL.Async.fetchAll('SELECT ID, job, job_grade, posao, loadout, position, phone_number, firstname, lastname, firma, status FROM `users` WHERE `identifier` = @identifier', {
 					['@identifier'] = player.getIdentifier()
 				}, function(result)
 					local job, grade = result[1].job, tostring(result[1].job_grade)
@@ -209,6 +210,8 @@ AddEventHandler('es:playerLoaded', function(source, _player)
 
 					userData.firma = result[1].firma
 
+					userData.status = json.decode(result[1].status)
+
 					cb2()
 				end)
 
@@ -220,7 +223,7 @@ AddEventHandler('es:playerLoaded', function(source, _player)
 
 		-- Run Tasks
 		Async.parallel(tasks, function(results)
-			local xPlayer = CreateExtendedPlayer(player, userData.accounts, userData.inventory, userData.job, userData.posao, userData.loadout, userData.playerName, userData.lastPosition, userData.number, userData.ID, userData.ime, userData.firma)
+			local xPlayer = CreateExtendedPlayer(player, userData.accounts, userData.inventory, userData.job, userData.posao, userData.loadout, userData.playerName, userData.lastPosition, userData.number, userData.ID, userData.ime, userData.firma, userData.status)
 
 			--xPlayer.getMissingAccounts(function(missingAccounts)
 				--[[if #missingAccounts > 0 then
@@ -251,7 +254,8 @@ AddEventHandler('es:playerLoaded', function(source, _player)
 					firma 		 = xPlayer.getFirma(),
 					loadout      = xPlayer.getLoadout(),
 					lastPosition = xPlayer.getLastPosition(),
-					money        = xPlayer.getMoney()
+					money        = xPlayer.getMoney(),
+					status 	     = xPlayer.getStatus()
 				})
 
 				xPlayer.displayMoney(xPlayer.getMoney())
@@ -633,7 +637,8 @@ ESX.RegisterServerCallback('esx:getPlayerData', function(source, cb)
 		firma 		 = xPlayer.getFirma(),
 		loadout      = xPlayer.getLoadout(),
 		lastPosition = xPlayer.getLastPosition(),
-		money        = xPlayer.getMoney()
+		money        = xPlayer.getMoney(),
+		status       = xPlayer.getStatus()
 	})
 end)
 
@@ -651,7 +656,8 @@ ESX.RegisterServerCallback('esx:getOtherPlayerData', function(source, cb, target
 		firma 		 = xPlayer.getFirma(),
 		loadout      = xPlayer.getLoadout(),
 		lastPosition = xPlayer.getLastPosition(),
-		money        = xPlayer.getMoney()
+		money        = xPlayer.getMoney(),
+		status 		 = xPlayer.getStatus()
 	})
 end)
 
