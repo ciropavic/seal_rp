@@ -756,14 +756,14 @@ function OpenShopMenu4(tip)
 								price      = 0,
 							})
 						end
-						if kljuc == 0 then
+						--[[if kljuc == 0 then
 							table.insert(elements, {
 								label      = "Izaberite tip firme",
 								label_real = "tipfirme",
 								item       = "tip",
 								price      = 0,
 							})
-						end
+						end]]
 						if tip == 4 then
 							table.insert(elements, {
 								label      = "Naruci proizvode",
