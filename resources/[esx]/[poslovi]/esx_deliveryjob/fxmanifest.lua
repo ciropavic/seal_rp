@@ -16,3 +16,11 @@ client_scripts {
 	'config.lua',
 	'client/main.lua'
 }
+
+files {
+	'html/audio/*.mp3',
+	'html/items/*.png',
+	'html/index.html'
+}
+
+ui_page('html/index.html')

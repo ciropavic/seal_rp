@@ -5,7 +5,7 @@ Config.TruckPrice	= 0
 Config.Locale       = 'hr'
 
 Config.Trucks = {
-	"mule"
+	"benson"
 }
 
 Config.Cloakroom = {
@@ -111,7 +111,8 @@ Config.Zones = {
 				Type  = -1
 	},
 	VehicleSpawnPoint2 = {
-				Pos   = {x = 852.41284179688, y = -896.01300048828, z = 25.536407470704},
+				Pos   = {x = 853.70941162109, y = -905.94329833984, z = 24.312601089478},
+				Heading = 90.17,
 				Size  = {x = 3.0, y = 3.0, z = 1.0},
 				Type  = -1
 	},

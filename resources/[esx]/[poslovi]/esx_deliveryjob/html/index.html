@@ -1,0 +1,241 @@
+<head>
+    <style>
+        body{
+            background:orange;
+        }
+        #main{
+            display:none;
+        }
+        .machine{
+            margin: 0 auto;
+            width: 640px;
+            position: absolute;
+            bottom: 95px;
+            left: 50%;
+            margin-left: -320px;
+        }
+        .belt{
+            width:640px;
+            height:2px;
+            background:black;
+            box-shadow:0px 29px 0 black;
+            /* box-shadow: 105px 0px 0 black, 210px 0px 0 black, 315px 0px 0 black, 0px 29px 0 black, 105px 29px 0 black, 210px 29px 0 black, 315px 29px 0 black;
+            */
+            position:relative;
+            margin:0 auto;
+        }
+
+        .belt:before{
+            content:'';
+            width: 70px;
+            height: 42px;
+            border: 3px solid black;
+            border-radius: 50%;
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            position: absolute;
+            top: -8px;
+            left: -9px;
+        }
+        .belt:after{
+            content:'';
+            width: 70px;
+            height: 42px;
+            border: 3px solid black;
+            border-radius: 50%;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            border-bottom-color: transparent;
+            position: absolute;
+            top: -8px;
+            right: -9px;
+        }
+
+        .TheseAreTheBreaks{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+            top: -5px;
+            left: 0;
+            z-index: 10;
+            box-shadow: -80px 0px 0 orange, -160px 0px 0 orange, -240px 0px 0 orange, -320px 0px 0 orange, -400px 0px 0 orange, -480px 0px 0 orange, -560px 0px 0 orange, 80px 0px 0 orange, 160px 0px 0 orange, 240px 0px 0 orange, 320px 0px 0 orange, 400px 0px 0 orange, 480px 0px 0 orange, 560px 0px 0 orange, 640px 0px 0 orange;
+            animation: roll 10s linear infinite;
+            z-index:10;
+        }
+        .TheseAreTheBreaks_Again{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+            top: 15px;
+            right: 0;
+            z-index: 11;
+            box-shadow: 80px 0px 0 orange, 160px 0px 0 orange, 240px 0px 0 orange, 320px 0px 0 orange, 400px 0px 0 orange, 480px 0px 0 orange, 560px 0px 0 orange, 640px 0px 0 orange, 720px 0px 0 orange, 800px 0px 0 orange, 880px 0px 0 orange, 960px 0px 0 orange, 1040px 0px 0 orange, 1120px 0px 0 orange, 1200px 0px 0 orange, 1280px 0px 0 orange, 1360px 0px 0 orange;
+            animation: rollback 10s linear infinite;
+            z-index:11;
+        }
+
+        #pack{
+            display:block;
+            width:255px;
+            z-index:40;
+            position:relative;
+            transform-origin:100% 100%;
+        }
+
+        .gear{
+            float:left;
+            display:inline-block;
+            border:5px solid black;
+            border-radius:50%;
+            width:10px;
+            height:10px;
+            position:relative;
+            top: 5px;
+            animation: load 3s linear infinite;
+            z-index:20;
+        }
+        .gear:before{
+            background:black;
+            width: 5px;
+            height: 5px;
+            position:absolute;
+            content:'';
+            top:-6px;
+            left:10px;
+            box-shadow: 12px 10px 0 black, 0px 23px 0 black, -11px 10px 0 black;
+            -webkit-transform: rotate(45deg);
+        }
+        .gear:after{
+            background: black;
+            width: 5px;
+            height: 5px;
+            position: absolute;
+            content: '';
+            top: -9px;
+            left: 2px;
+            box-shadow: 12px 10px 0 black, 0px 23px 0 black, -11px 10px 0 black;
+        }
+        #info{
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            position: absolute;
+            width: 305px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+        }
+        #imginfo{
+            width:100px;
+        }
+        .right{float:right;}
+        @keyframes load {
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes roll {
+            100% { left:100%; }
+        }
+        @keyframes rollback {
+            100% { right:100%; }
+        }
+        @keyframes rollandfall {
+            47.5% { left:95%; top:0; transform:rotate(0deg);}
+            50% { left:100%; top:0; transform:rotate(25deg);}
+            55% { left:110%; top:100px; transform:rotate(720deg);}
+        }
+        @keyframes move { 0%{ left: 0px; } 100%{ left: 60%; }}
+    </style>
+</head>
+<body id="main">
+<div id="info">
+    <font style="font-size:25px">Skinite ovaj proizvod s trake:</font>
+    <img id="imginfo" src="items/bread.png">
+</div>
+<div class="machine">
+<div class="package" id="pack">
+
+</div>
+<div class="belt">  
+  <div class="gear"></div>
+  <div class="gear right"></div>
+  <div class="TheseAreTheBreaks"></div>
+  <div class="TheseAreTheBreaks_Again"></div>
+</div>
+</div>
+<script src=nui://game/ui/jquery.js type=text/javascript></script>
+<script>
+    var itemi = Array("beer", "bread", "bolchips", "burek", "chocolate", "cocacola", "cupcake", "energy", "fixkit", "grand_cru", "icetea", "jus_raisin", "kola", "milk", "vodka");
+    Reset();
+    var element = document.getElementById('pack');
+    let brojac = 0;
+    
+    element.addEventListener('animationend', function(){
+        Reset();
+        element.style.visibility = "unset";
+        element.style.WebkitAnimation = "";
+        setTimeout(() => {
+            element.style.WebkitAnimation = "move 6s linear";
+        }, 1);
+    });
+    function Reset(){
+        var randItem = Math.floor(Math.random()*itemi.length);
+        var randMjesto = Math.floor(Math.random()*5);
+        console.log(itemi[randItem]);
+        console.log(randMjesto);
+        var img = document.getElementById('imginfo');
+        img.src = "items/"+itemi[randItem]+".png";
+        var element = document.getElementById('pack');
+        element.innerHTML = "";
+        for (let i = 0; i < 5; i++) {
+            const newImg = document.createElement("img");
+            newImg.id = "item";
+            newImg.style = "width: 50px;";
+            if(randMjesto == i){
+                newImg.src = "items/"+itemi[randItem]+".png";
+                newImg.setAttribute('item', itemi[randItem]);
+            }else{
+                let itemcic = itemi[Math.floor(Math.random()*itemi.length)];
+                while (itemcic == itemi[randItem]) {
+                    itemcic = itemi[Math.floor(Math.random()*itemi.length)];
+                }
+                newImg.src = "items/"+itemcic+".png";
+                newImg.setAttribute('item', itemcic);
+            }
+            newImg.onclick = function () {
+                element.style.visibility = "hidden";
+                if(newImg.getAttribute('item') == itemi[randItem]){
+                    var audio = new Audio('audio/valja.mp3');
+                    audio.play();
+                    brojac++;
+                    if(brojac == 5){
+                        $.post("http://esx_deliveryjob/gotov", JSON.stringify({}));
+                        var maindiv = document.getElementById('main');
+                        maindiv.style.display = "none";
+                        brojac = 0;
+                    }
+                }else{
+                    var audio = new Audio('audio/error.mp3');
+                    audio.play();
+                }
+            };
+            element.appendChild(newImg);
+        }
+        element.style.WebkitAnimation = "move 6s linear";
+    }
+
+    window.addEventListener('message', function(event) {
+        var item = event.data;
+        if (item.prikazi) {
+            var maindiv = document.getElementById('main');
+            maindiv.style.display = "block";
+            brojac = 0;
+            var element = document.getElementById('pack');
+            element.style.visibility = "unset";
+        }
+    });
+</script>
+</body>

@@ -1,10 +1,3 @@
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- ORIGINAL SCRIPT BY Marcio FOR CFX-ESX
--- Script serveur No Brain 
--- www.nobrain.org
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 ESX = nil
 local blip = nil
 
@@ -140,15 +133,20 @@ function MenuVehicleSpawner()
 			elements = elements
 		},
 		function(data, menu)
-		if data.current.value == "mule" then
-				ESX.Game.SpawnVehicle(data.current.value, Config.Zones.VehicleSpawnPoint2.Pos, 270.0, function(vehicle)
+		if data.current.value == "benson" then
+			--[[ESX.Game.SpawnVehicle(data.current.value, Config.Zones.VehicleSpawnPoint2.Pos, 270.0, function(vehicle)
 				platenum = math.random(10000, 99999)
 				SetVehicleNumberPlateText(vehicle, "WAL"..platenum)             
                 MissionLivraisonSelect()
 				plaquevehicule = "WAL"..platenum		
 				vozilo = vehicle
 				TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)   
-			end)
+			end)]]
+			ESX.ShowNotification("Pritisnite na tražene artikle na traci!")
+			SendNUIMessage({
+				prikazi = true
+			})
+			SetNuiFocus(true, true)
 		end
 
 			menu.close()
@@ -158,6 +156,83 @@ function MenuVehicleSpawner()
 		end
 	)
 end
+
+RegisterNUICallback('gotov', function()
+	SetNuiFocus(false)
+	vozilo = nil
+	ESX.Game.SpawnVehicle("benson", Config.Zones.VehicleSpawnPoint2.Pos, Config.Zones.VehicleSpawnPoint2.Heading, function(vehicle)
+		platenum = math.random(10000, 99999)
+		SetVehicleNumberPlateText(vehicle, "WAL"..platenum)            
+		FreezeEntityPosition(vehicle, true) 
+		--MissionLivraisonSelect()
+		plaquevehicule = "WAL"..platenum		
+		vozilo = vehicle
+		SetVehicleDoorOpen(vehicle,5,false, false)
+		--TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)   
+	end)
+	while vozilo == nil do
+		Wait(100)
+	end
+	SetEntityCoords(PlayerPedId(), 892.65356445312, -889.45477294922, 26.994806289673, true, false, false, false)
+	local prop_ent = nil
+	if prop_ent ~= nil then
+		DeleteObject(prop_ent)
+	end
+	ESX.Streaming.RequestAnimDict("anim@heists@box_carry@", function()
+		TaskPlayAnim(PlayerPedId(),"anim@heists@box_carry@", "idle", 8.0, 8.0, -1, 50)
+	end)
+	local modele = "prop_flattruck_01a"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), false, false, false)
+	AttachEntityToEntityPhysically(prop_ent, PlayerPedId(), 0, GetEntityBoneIndexByName(PlayerPedId(), "SKEL_Pelvis"), -0.03, 1.16, -1.1, -0.03, 0.05, 1.9, 0.0, -0.95, 178.8, 10000.0, true, true, true, false, 2)
+	SetModelAsNoLongerNeeded(modele)
+
+	local kut, kut2, kut3, kut4, kut5, kut6
+	modele = "ng_proc_box_01a"
+	ESX.Streaming.RequestModel(modele)
+	--Doljnji red
+	kut = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut, prop_ent, -1, 0, 0.4, 0.28, 0.0, 0, 90.0, false, false, false, false, 0, true)
+
+	kut2 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut2, prop_ent, -1, 0, 0.0, 0.28, 0.0, 0, 90.0, false, false, false, false, 0, true)
+
+	kut3 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut3, prop_ent, -1, 0, -0.4, 0.28, 0.0, 0, 90.0, false, false, false, false, 0, true)
+
+	--Gornji red
+	kut4 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut4, prop_ent, -1, 0, 0.4, 0.62, 0.0, 0, 90.0, false, false, false, false, 0, true)
+
+	kut5 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut5, prop_ent, -1, 0, 0.0, 0.62, 0.0, 0, 90.0, false, false, false, false, 0, true)
+
+	kut6 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), true, false, false)--z
+	AttachEntityToEntity(kut6, prop_ent, -1, 0, -0.4, 0.62, 0.0, 0, 90.0, false, false, false, false, 0, true)
+	SetModelAsNoLongerNeeded(modele)
+	local kordara = GetOffsetFromEntityInWorldCoords(vozilo, 0.0, -8.0, -1.0)
+	local zavrsio = false
+	while not zavrsio do
+		Wait(0)
+		DrawMarker(1, kordara, 0, 0, 0, 0, 0, 0, 1.25, 1.25, 1.0001, 0, 128, 0, 200, 0, 0, 0, 0)
+		if #(GetEntityCoords(PlayerPedId())-kordara) <= 2.0 then
+			zavrsio = true
+			ESX.Game.DeleteObject(prop_ent)
+			ESX.Game.DeleteObject(kut)
+			ESX.Game.DeleteObject(kut2)
+			ESX.Game.DeleteObject(kut3)
+			ESX.Game.DeleteObject(kut4)
+			ESX.Game.DeleteObject(kut5)
+			ESX.Game.DeleteObject(kut6)
+			ESX.ShowNotification("Utovarili ste robu!")
+			ClearPedSecondaryTask(PlayerPedId())
+		end
+	end
+	FreezeEntityPosition(vozilo, false) 
+	SetVehicleDoorShut(vozilo, 5, true)
+	MissionLivraisonSelect()
+	TaskWarpPedIntoVehicle(GetPlayerPed(-1), vozilo, -1)
+end)
 
 function setUniform(playerPed)
 	TriggerEvent('skinchanger:getSkin', function(skin)
@@ -540,7 +615,7 @@ end
 
 function PostaviCPIzaKamiona()
 	ESX.ShowNotification("Izadjite iz kamiona, te odite iza da istovarite robu!")
-	local trunk = GetWorldPositionOfEntityBone(vozilo, GetEntityBoneIndexByName(vozilo, "platelight"))
+	local trunk = GetWorldPositionOfEntityBone(vozilo, GetEntityBoneIndexByName(vozilo, "boot"))
 	LokCPa = trunk
 	PrviDio = 0
 	Citizen.CreateThread(function()
@@ -548,7 +623,7 @@ function PostaviCPIzaKamiona()
 			Wait(0)
 			--DrawMarker(20, trunkpos, 0,0,0, 0,0,0, arrowSize, 150, 255, 128, 0, true, true, true)	
 			--plyCoords = GetEntityCoords(GetPlayerPed(-1), false)
-			DrawMarker(27, trunk.x , trunk.y, trunk.z, 0, 0, 0, 0, 0, 0, 1.25, 1.25, 1.0001, 0, 128, 0, 200, 0, 0, 0, 0)
+			DrawMarker(27, trunk.x , trunk.y, trunk.z-1.0, 0, 0, 0, 0, 0, 0, 1.25, 1.25, 1.0001, 0, 128, 0, 200, 0, 0, 0, 0)
 		end
 	end)
 end
@@ -665,7 +740,7 @@ Citizen.CreateThread(function()
 				if IsControlJustReleased(0, 38) then
 
 					if CurrentAction == 'delivery' then
-						SetVehicleDoorOpen(GetVehiclePedIsIn(PlayerPedId(), false),5,false, false)
+						--SetVehicleDoorOpen(GetVehiclePedIsIn(PlayerPedId(), false),5,false, false)
 						PostaviCPIzaKamiona()
 						FreezeEntityPosition(vozilo, true)
 						MiciCP = 1
@@ -680,7 +755,7 @@ Citizen.CreateThread(function()
 						prop_ent = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0))
 						AttachEntityToEntity(prop_ent, PlayerPedId(), GetEntityBoneIndexByName(PlayerPedId(), "SKEL_Pelvis"), -0.075, 0.90, -0.86, -20.0, 0.5, 181.0, true, false, false, true, 1, true)
 						SetModelAsNoLongerNeeded(modele)
-						SetVehicleDoorOpen(vozilo,5,false, false)
+						--SetVehicleDoorOpen(vozilo,5,false, false)
 						FreezeEntityPosition(vozilo, false)
 						PritisoTipku = 1
 						IstovarioTo = 0
