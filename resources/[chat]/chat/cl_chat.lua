@@ -186,47 +186,53 @@ RegisterNUICallback('loaded', function(data, cb)
   cb('ok')
 end)
 
+RegisterCommand('-chat', function()
+  if not chatInputActive then
+      chatInputActive = true
+      chatInputActivating = true
+
+      SendNUIMessage({
+        type = 'ON_OPEN'
+      })
+
+      Citizen.CreateThread(function()
+      
+        while chatInputActive do
+          Citizen.Wait(0)
+      
+          if chatInputActivating then
+            if not IsControlPressed(0, 245) then
+              SetNuiFocus(true)
+      
+              chatInputActivating = false
+            end
+          end
+      
+          if chatLoaded then
+            local shouldBeHidden = false
+      
+            if IsScreenFadedOut() or IsPauseMenuActive() then
+              shouldBeHidden = true
+            end
+      
+            if (shouldBeHidden and not chatHidden) or (not shouldBeHidden and chatHidden) then
+              chatHidden = shouldBeHidden
+      
+              SendNUIMessage({
+                type = 'ON_SCREEN_STATE_CHANGE',
+                shouldHide = shouldBeHidden
+              })
+            end
+          end
+        end
+      end)
+  end
+end, false)
+RegisterKeyMapping('-chat', 'Otvori chat', 'keyboard', 't')
+
 Citizen.CreateThread(function()
   SetTextChatEnabled(false)
   SetNuiFocus(false)
 
-  while true do
-    Citizen.Wait(0)
-
-    if not chatInputActive then
-      if IsControlPressed(0, 245) --[[ INPUT_MP_TEXT_CHAT_ALL ]] then
-        chatInputActive = true
-        chatInputActivating = true
-
-        SendNUIMessage({
-          type = 'ON_OPEN'
-        })
-      end
-    end
-
-    if chatInputActivating then
-      if not IsControlPressed(0, 245) then
-        SetNuiFocus(true)
-
-        chatInputActivating = false
-      end
-    end
-
-    if chatLoaded then
-      local shouldBeHidden = false
-
-      if IsScreenFadedOut() or IsPauseMenuActive() then
-        shouldBeHidden = true
-      end
-
-      if (shouldBeHidden and not chatHidden) or (not shouldBeHidden and chatHidden) then
-        chatHidden = shouldBeHidden
-
-        SendNUIMessage({
-          type = 'ON_SCREEN_STATE_CHANGE',
-          shouldHide = shouldBeHidden
-        })
-      end
-    end
-  end
+  
 end)
