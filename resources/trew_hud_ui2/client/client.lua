@@ -1317,6 +1317,7 @@ end)
 RegisterNetEvent('baseevents:enteredVehicle')
 AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSeat, modelName, netId)
 	UVozilu = true
+	print("zvao")
 	Vozilo = currentVehicle
 	Klasa = GetVehicleClass(currentVehicle)
 	Sjedalo = currentSeat
@@ -1326,6 +1327,7 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 	end, Tablica)
 	ZadnjaPoz = GetEntityCoords(Vozilo)
 	Citizen.CreateThread(function()
+		local zadnjikm = 0
 		while UVozilu do
 			Citizen.Wait(1000)
 			if ZabraniHud == false then
@@ -1337,7 +1339,10 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 						dist = 0
 					end
 					Kilometri = Kilometri + math.floor(dist*1.33)/1000
-					TriggerServerEvent('vozilo:dodajKm', Tablica, Kilometri)
+					if Kilometri-zadnjikm >= 1 then
+						zadnjikm = Kilometri
+						TriggerServerEvent('vozilo:dodajKm', Tablica, Kilometri)
+					end
 					ZadnjaPoz = curPos
 				end
 			end

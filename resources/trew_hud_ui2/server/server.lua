@@ -1,4 +1,5 @@
 ESX = nil
+local KVozila = {}
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
@@ -36,7 +37,21 @@ end)
 
 RegisterServerEvent('vozilo:dodajKm')
 AddEventHandler('vozilo:dodajKm', function(plate, km)
-    MySQL.Async.execute('UPDATE owned_vehicles SET kilometri = @kms WHERE plate = @plate', {['@plate'] = plate, ['@kms'] = km})
+    MySQL.Async.execute('UPDATE owned_vehicles SET kilometri = @kms WHERE plate = @plate', {['@plate'] = plate, ['@kms'] = km}, function(affectedRows)
+		if affectedRows == 0 then
+			local naso = false
+			for i=1, #KVozila, 1 do
+				if KVozila[i] ~= nil and KVozila[i].plate == plate then
+					naso = true
+					KVozila[i].km = km
+					break
+				end
+			end
+			if not naso then
+				table.insert(KVozila, {plate = plate, km = km})
+			end
+		end
+	end)
 end)
 
 ESX.RegisterServerCallback('vozilo:dajKilometre', function(source, cb, plate)
@@ -49,7 +64,17 @@ ESX.RegisterServerCallback('vozilo:dajKilometre', function(source, cb, plate)
 			if #result > 0 then
 				cb(result[1].kilometri)
 			else
-				cb(0)
+				local naso = false
+				for i=1, #KVozila, 1 do
+					if KVozila[i] ~= nil and KVozila[i].plate == plate then
+						naso = true
+						cb(KVozila[i].km)
+						break
+					end
+				end
+				if not naso then
+					cb(0)
+				end
 			end
 		end
 	)
