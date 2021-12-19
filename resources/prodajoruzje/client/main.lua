@@ -281,6 +281,9 @@ RegisterCommand("prebaci", function()
 					TriggerEvent("EoTiIzSalona", mj)
 				end, globalplate)
 			end
+			UVozilu = false
+			Wait(200)
+			UVozilu = true
 		end
     end)
 end)
