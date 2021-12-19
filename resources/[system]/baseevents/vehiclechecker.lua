@@ -15,7 +15,6 @@ local zvao = false
 
 AddEventHandler('gameEventTriggered', function (name, data)
     if name == "CEventNetworkPlayerEnteredVehicle" and not zvao then
-		print("uso")
 		if data[1] == 128 then
 			zvao = true
 			isInVehicle = true
