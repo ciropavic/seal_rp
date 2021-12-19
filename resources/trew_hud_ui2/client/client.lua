@@ -962,6 +962,17 @@ Citizen.CreateThread(function()
 	end
 end)
 
+function toggleEngine()
+    if UVozilu and Sjedalo == -1 then
+        SetVehicleEngineOn(Vozilo, (not GetIsVehicleEngineRunning(Vozilo)), false, true)
+    end
+end
+
+RegisterCommand('motor', function()
+    toggleEngine()
+end, false)
+RegisterKeyMapping('motor', 'Paljenje/gasenje motora', 'keyboard', 'k')
+
 RegisterCommand('+pojas', function()
     local vehicle = Vozilo
 	local vehicleClass = Klasa
