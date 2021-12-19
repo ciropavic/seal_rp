@@ -3,8 +3,7 @@ game 'gta5'
 
 files {
     'edit.html',
-    'keks.css',
-	'loading.mp4'
+    'keks.css'
 }
 
 loadscreen 'edit.html'
