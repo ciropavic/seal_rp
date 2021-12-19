@@ -31,6 +31,50 @@ local CurrentActionMsg          = ''
 local CurrentActionData         = {}
 local aduty 					= false
 
+local defaultScale = 0.5 -- Text scale
+local color = { r = 230, g = 230, b = 230, a = 255 } -- Text color
+local font = 0 -- Text font
+local displayTime = 5000 -- Duration to display the text (in ms)
+local distToDraw = 250 -- Min. distance to draw 
+local pedDisplaying = {}
+
+local disabled            = false
+local UVozilu 			  = false
+local Sjedalo 			  = nil
+local Vozilo = nil
+
+local zones = {
+	{ ['x'] = -265.00201416016, ['y'] = -963.61010742188, ['z'] = 31.218370437622 },
+	{ ['x'] = -1021.9768676758, ['y'] = -2711.5302734375, ['z'] = 13.80286026001 },
+	{ ['x'] = -33.46459197998, ['y'] = -1102.023071289, ['z'] = 26.422609329224 },
+	{ ['x'] = 1799.8345947266, ['y'] = 2489.1350097656, ['z'] = -119.02998352051 },
+	{ ['x'] = 1009.6475830078, ['y'] = -3100.6489257813, ['z'] = -38.999870300293 },
+	{ ['x'] = 2406.6475830078, ['y'] = 4984.6489257813, ['z'] = 46.999870300293 },
+	{ ['x'] = 2319.6475830078, ['y'] = 5043.6489257813, ['z'] = 45.999870300293 },
+	{ ['x'] = 2316.6475830078, ['y'] = 5139.6489257813, ['z'] = 50.999870300293 },
+	{ ['x'] = 2241.6475830078, ['y'] = 5169.6489257813, ['z'] = 59.999870300293 },
+	{ ['x'] = 2148.6475830078, ['y'] = 5191.6489257813, ['z'] = 57.999870300293 },
+	{ ['x'] = 2070.6475830078, ['y'] = 5187.6489257813, ['z'] = 53.999870300293 },
+	{ ['x'] = 2149.6475830078, ['y'] = 5125.6489257813, ['z'] = 47.999870300293 },
+	{ ['x'] = 2210.6475830078, ['y'] = 5063.6489257813, ['z'] = 46.999870300293 },
+	{ ['x'] = 2217.6475830078, ['y'] = 5059.6489257813, ['z'] = 47.999870300293 },
+	{ ['x'] = 2277.6475830078, ['y'] = 5000.6489257813, ['z'] = 42.999870300293 },
+	{ ['x'] = 2345.6475830078, ['y'] = 4955.6489257813, ['z'] = 42.999870300293 },
+	{ ['x'] = 2428.6475830078, ['y'] = 5032.6489257813, ['z'] = 46.999870300293 },
+	{ ['x'] = 2384.6475830078, ['y'] = 5076.6489257813, ['z'] = 47.999870300293 },
+	{ ['x'] = 2312.6475830078, ['y'] = 5121.6489257813, ['z'] = 49.999870300293 },
+	{ ['x'] = 2182.6475830078, ['y'] = 5212.6489257813, ['z'] = 60.999870300293 },
+	{ ['x'] = 203.6475830078, ['y'] = -911.6489257813, ['z'] = 30.999870300293 },
+	{ ['x'] = 181.6475830078, ['y'] = -969.6489257813, ['z'] = 30.999870300293 },
+	{ ['x'] = 251.6475830078, ['y'] = -740.6489257813, ['z'] = 32.999870300293 },
+	{ ['x'] = 305.6403503418, ['y'] = -591.42596435546, ['z'] = 43.291831970214 },
+	{ ['x'] = 917.81231689454, ['y'] = 51.503299713134, ['z'] = 80.898887634278 },
+	{ ['x'] = 218.20721435547, ['y'] = -882.64978027344, ['z'] = 18.319725036621}
+}
+local notifIn = false
+local notifOut = false
+local closestZone = 1
+
 ESX                             = nil
 
 Citizen.CreateThread(function()
@@ -71,6 +115,380 @@ Citizen.CreateThread(function()
 		TriggerServerEvent("prodajoruzje:PlatiPorez", porez)
 	end
   end
+end)
+
+Citizen.CreateThread(function()
+	while not NetworkIsPlayerActive(PlayerId()) do
+		Citizen.Wait(0)
+	end
+	
+	while true do
+		local playerPed = GetPlayerPed(-1)
+		local x, y, z = table.unpack(GetEntityCoords(playerPed, true))
+		local minDistance = 100000
+		for i = 1, #zones, 1 do
+			dist = Vdist(zones[i].x, zones[i].y, zones[i].z, x, y, z)
+			if dist < minDistance then
+				minDistance = dist
+				closestZone = i
+			end
+		end
+		Citizen.Wait(15000)
+	end
+end)
+
+Citizen.CreateThread(function()
+	while not NetworkIsPlayerActive(PlayerId()) do
+		Citizen.Wait(0)
+	end
+	local waitara = 500
+	while true do
+		Citizen.Wait(waitara)
+		local naso = 0
+		local player = GetPlayerPed(-1)
+		local x,y,z = table.unpack(GetEntityCoords(player, true))
+		local dist = Vdist(zones[closestZone].x, zones[closestZone].y, zones[closestZone].z, x, y, z)
+	
+		if dist <= 50.0 then  ------------------------------------------------------------------------------ Here you can change the RADIUS of the Safe Zone. Remember, whatever you put here will DOUBLE because 
+			naso = 1
+			waitara = 0
+			if not notifIn then																			  -- it is a sphere. So 50 will actually result in a diameter of 100. I assume it is meters. No clue to be honest.
+				NetworkSetFriendlyFireOption(false)
+				ClearPlayerWantedLevel(PlayerId())
+				SetCurrentPedWeapon(player,GetHashKey("WEAPON_UNARMED"),true)
+				TriggerEvent("pNotify:SendNotification",{
+					text = "<b style='color:#1E90FF'>Vi ste u safe zoni</b>",
+					type = "success",
+					timeout = (3000),
+					layout = "bottomcenter",
+					queue = "global"
+				})
+				notifIn = true
+				notifOut = false
+			end
+		else
+			if not notifOut then
+				NetworkSetFriendlyFireOption(true)
+				TriggerEvent("pNotify:SendNotification",{
+					text = "<b style='color:#1E90FF'>Napustili ste safe zonu</b>",
+					type = "error",
+					timeout = (3000),
+					layout = "bottomcenter",
+					queue = "global"
+				})
+				notifOut = true
+				notifIn = false
+			end
+		end
+		if notifIn then
+			naso = 1
+			waitara = 0
+			DisableControlAction(2, 37, true) -- disable weapon wheel (Tab)
+			DisablePlayerFiring(player,true) -- Disables firing all together if they somehow bypass inzone Mouse Disable
+			DisableControlAction(0, 106, true) -- Disable in-game mouse controls
+			DisableControlAction(0, 167, true)
+			DisableControlAction(0, 45, true)
+			DisableControlAction(0, 140, true)
+			DisableControlAction(0, 263, true)
+			if IsDisabledControlJustPressed(2, 37) then --if Tab is pressed, send error message
+				SetCurrentPedWeapon(player,GetHashKey("WEAPON_UNARMED"),true) -- if tab is pressed it will set them to unarmed (this is to cover the vehicle glitch until I sort that all out)
+				TriggerEvent("pNotify:SendNotification",{
+					text = "<b style='color:#1E90FF'>Ne mozete koristiti oruzja u safe zoni</b>",
+					type = "error",
+					timeout = (3000),
+					layout = "bottomcenter",
+					queue = "global"
+				})
+			end
+			if IsDisabledControlJustPressed(0, 106) then --if LeftClick is pressed, send error message
+				SetCurrentPedWeapon(player,GetHashKey("WEAPON_UNARMED"),true) -- If they click it will set them to unarmed
+				TriggerEvent("pNotify:SendNotification",{
+					text = "<b style='color:#1E90FF'>Ne mozete to raditi u safe zoni</b>",
+					type = "error",
+					timeout = (3000),
+					layout = "bottomcenter",
+					queue = "global"
+				})
+			end
+		end
+		if naso == 0 then
+			waitara = 500
+		end
+		-- Comment out lines 142 - 145 if you dont want a marker.
+		--if DoesEntityExist(player) then	      --The -1.0001 will place it on the ground flush		-- SIZING CIRCLE |  x    y    z | R   G    B   alpha| *more alpha more transparent*
+			--DrawMarker(1, zones[closestZone].x, zones[closestZone].y, zones[closestZone].z-1.0001, 0, 0, 0, 0, 0, 0, 100.0, 100.0, 2.0, 13, 232, 255, 155, 0, 0, 2, 0, 0, 0, 0) -- heres what all these numbers are. Honestly you dont really need to mess with any other than what isnt 0.
+			--DrawMarker(type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, int red, int green, int blue, int alpha, BOOL bobUpAndDown, BOOL faceCamera, int p19(LEAVE AS 2), BOOL rotate, char* textureDict, char* textureName, BOOL drawOnEnts)
+		--end
+	end
+end)
+
+RegisterNetEvent('baseevents:enteredVehicle')
+AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSeat, modelName, netId)
+	UVozilu = true
+	Sjedalo = currentSeat
+	Vozilo = currentVehicle
+	if Sjedalo == 0 then
+		Citizen.CreateThread(function ()
+			while UVozilu do
+				Citizen.Wait(0)
+				if not disabled then
+					local veh = Vozilo
+					if Sjedalo == 0 then
+						local ped = PlayerPedId()
+						if not GetIsTaskActive(ped, 164) and GetIsTaskActive(ped, 165) then
+							local veh = Vozilo
+							local angle = GetVehicleDoorAngleRatio(veh, 1)
+							if angle ~= 0.0 then
+								SetVehicleDoorControl(veh, 1, 1, 0.0)
+							end
+							SetPedIntoVehicle(PlayerPedId(), veh, 0)
+						end
+					end
+				end
+			end
+		end)
+	end
+	if GetVehicleClass(Vozilo) == 18 then
+		ModifyVehicleTopSpeed(GetVehiclePedIsIn(Vozilo, false), 70.0)
+	end
+end)
+
+RegisterNetEvent('baseevents:leftVehicle')
+AddEventHandler('baseevents:leftVehicle', function(currentVehicle, currentSeat, modelName, netId)
+	UVozilu = false
+	Sjedalo = nil
+	Vozilo = nil
+end)
+
+function GetPedVehicleSeat(ped)
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    for i=-2,GetVehicleMaxNumberOfPassengers(vehicle) do
+        if(GetPedInVehicleSeat(vehicle, i) == ped) then return i end
+    end
+    return -2
+end
+
+RegisterCommand("prebaci", function()
+    Citizen.CreateThread(function()
+        disabled = true
+        Wait(3000)
+        disabled = false
+		Sjedalo = GetPedVehicleSeat(PlayerPedId())
+		if Sjedalo == -1 then
+			local globalplate  = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false))
+			if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+				ESX.TriggerServerCallback('mjenjac:ProvjeriVozilo',function(mj)
+					TriggerEvent("EoTiIzSalona", mj)
+				end, globalplate)
+			end
+		end
+    end)
+end)
+
+TriggerEvent('chat:addSuggestion', '/prebaci', 'Koristite da se prebacite na vozacevo mjesto!')
+
+local islandVec = vector3(4840.571, -5174.425, 2.0)
+Citizen.CreateThread(function()
+    while true do
+		local pCoords = GetEntityCoords(GetPlayerPed(-1))		
+		local distance1 = #(pCoords - islandVec)
+		if distance1 < 2000.0 then
+			SetIslandHopperEnabled("HeistIsland", true)  -- load the map and removes the city
+			SetToggleMinimapHeistIsland(true) -- load the minimap/pause map and removes the city minimap/pause map
+		else
+			SetIslandHopperEnabled("HeistIsland", false)
+			SetToggleMinimapHeistIsland(false)
+		end
+		Citizen.Wait(5000)
+    end
+end)
+
+-- OBJ : draw text in 3d
+-- PARAMETERS :
+--      - coords : world coordinates to where you want to draw the text
+--      - text : the text to display
+local function DrawText3D2(coords, text)
+    local camCoords = GetGameplayCamCoord()
+    local dist = #(coords - camCoords)
+    
+    -- Experimental math to scale the text down
+    local scale = 200 / (GetGameplayCamFov() * dist)
+
+    --if onScreen then
+
+        -- Format the text
+        SetTextColour(color.r, color.g, color.b, color.a)
+        SetTextScale(0.0, defaultScale * scale)
+        SetTextDropshadow(0, 0, 0, 0, 55)
+        SetTextDropShadow()
+        SetTextCentre(true)
+
+        -- Diplay the text
+        BeginTextCommandDisplayText("STRING")
+        AddTextComponentSubstringPlayerName(text)
+        SetDrawOrigin(coords, 0)
+        EndTextCommandDisplayText(0.0, 0.0)
+        ClearDrawOrigin()
+
+    --end
+end
+
+-- OBJ : handle the drawing of text above a ped head
+-- PARAMETERS :
+--      - coords : world coordinates to where you want to draw the text
+--      - text : the text to display
+local function Display(ped, text, koord)
+
+    local playerPed = PlayerPedId()
+    local playerCoords = GetEntityCoords(playerPed)
+    local dist = #(playerCoords - koord)
+
+    if dist <= distToDraw then
+
+        pedDisplaying[ped] = (pedDisplaying[ped] or 1) + 1
+
+        -- Timer
+        local display = true
+
+        Citizen.CreateThread(function()
+            Wait(displayTime)
+            display = false
+        end)
+
+        -- Display
+        local offset = 0.8 + pedDisplaying[ped] * 0.1
+        while display do
+            if HasEntityClearLosToEntity(playerPed, ped, 17 ) then
+                local x, y, z = table.unpack(GetEntityCoords(ped))
+                z = z + offset
+                DrawText3D2(vector3(x, y, z), text)
+            end
+            Wait(0)
+        end
+
+        pedDisplaying[ped] = pedDisplaying[ped] - 1
+
+    end
+end
+
+-- --------------------------------------------
+-- Event
+-- --------------------------------------------
+
+RegisterNetEvent('3dme:shareDisplay')
+AddEventHandler('3dme:shareDisplay', function(text, serverId, koord)
+    local ped = GetPlayerPed(GetPlayerFromServerId(serverId))
+    Display(ped, text, koord)
+end)
+
+function ShowInfo(text)
+	SetNotificationTextEntry("STRING")
+	AddTextComponentString(text)
+	DrawNotification(false, false)
+end
+
+RegisterCommand("gepek", function(source, args, raw)
+    local ped = GetPlayerPed(-1)
+    local veh = GetVehiclePedIsUsing(ped)
+	local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
+	local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
+	local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(closecar), 1)
+    local door = 5
+
+    if IsPedInAnyVehicle(ped, false) then
+        if GetVehicleDoorAngleRatio(veh, door) > 0 then
+            SetVehicleDoorShut(veh, door, false)
+        else	
+            SetVehicleDoorOpen(veh, door, false, false)
+        end
+    else
+        if closecar ~= nil and GetPedInVehicleSeat(closecar, -1) ~= GetPlayerPed(-1) and distanceToVeh <= 4.0 then
+			local locked = GetVehicleDoorsLockedForPlayer(closecar, PlayerId())
+            if GetVehicleDoorAngleRatio(closecar, door) > 0 then
+                SetVehicleDoorShut(closecar, door, false)
+            else
+				if not locked then
+					SetVehicleDoorOpen(closecar, door, false, false)
+					TriggerEvent("gepeke:OtvoriGa")
+				else
+					ShowInfo("Vozilo je zakljucano.")
+				end
+            end
+        else
+            ShowInfo("Previse ste udaljeni od vozila.")
+        end
+    end
+end)
+
+RegisterCommand("hauba", function(source, args, raw)
+    local ped = GetPlayerPed(-1)
+    local veh = GetVehiclePedIsUsing(ped)
+    local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
+	local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
+	local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(closecar), 1)
+    local door = 4
+
+    if IsPedInAnyVehicle(ped, false) then
+        if GetVehicleDoorAngleRatio(veh, door) > 0 then
+            SetVehicleDoorShut(veh, door, false)
+        else	
+            SetVehicleDoorOpen(veh, door, false, false)
+        end
+    else
+        if closecar ~= nil and GetPedInVehicleSeat(closecar, -1) ~= GetPlayerPed(-1) and distanceToVeh <= 4.0 then
+            if GetVehicleDoorAngleRatio(closecar, door) > 0 then
+                SetVehicleDoorShut(closecar, door, false)
+            else	
+                SetVehicleDoorOpen(closecar, door, false, false)
+            end
+        else
+            ShowInfo("Previse ste udaljeni od vozila.")
+        end
+    end
+end)
+
+RegisterCommand("vrata", function(source, args, raw)
+    local ped = GetPlayerPed(-1)
+    local veh = GetVehiclePedIsUsing(ped)
+	local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
+	local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
+	local distanceToVeh = GetDistanceBetweenCoords(GetEntityCoords(ped), GetEntityCoords(closecar), 1)
+    
+    if args[1] == "1" then -- Front Left Door
+        door = 0
+    elseif args[1] == "2" then -- Front Right Door
+        door = 1
+    elseif args[1] == "3" then -- Back Left Door
+        door = 2
+    elseif args[1] == "4" then -- Back Right Door
+        door = 3
+    else
+        door = nil
+        ShowInfo("Usage: ~n~~b~/vrata [vrata]")
+        ShowInfo("~y~Moguce vrata:")
+        ShowInfo("1(Prednja ljeva), 2(Prednja desna)")
+        ShowInfo("3(Straznja ljeva), 4(Straznja desna)")
+    end
+
+    if door ~= nil then
+        if IsPedInAnyVehicle(ped, false) then
+            if GetVehicleDoorAngleRatio(veh, door) > 0 then
+                SetVehicleDoorShut(veh, door, false)
+            else	
+                SetVehicleDoorOpen(veh, door, false, false)
+            end
+        else
+            if closecar ~= nil and GetPedInVehicleSeat(closecar, -1) ~= GetPlayerPed(-1) and distanceToVeh <= 4.0 then
+                if GetVehicleDoorAngleRatio(closecar, door) > 0 then
+                    SetVehicleDoorShut(closecar, door, false)
+                else	
+                    SetVehicleDoorOpen(closecar, door, false, false)
+                end
+            else
+                ShowInfo("Previse ste udaljeni od vozila.")
+            end
+        end
+    end
 end)
 
 --Voda

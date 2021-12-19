@@ -28,6 +28,22 @@ AddEventHandler('esx_joblisting:setJob', function(id)
 	xPlayer.setPosao(id)
 end)
 
+local function TableToString(tab)
+	local str = ""
+	for i = 1, #tab do
+		str = str .. " " .. tab[i]
+	end
+	return str
+end
+
+RegisterCommand('me', function(source, args)
+    local text = "*" .. TableToString(args) .. " *"
+	local player = source
+	local ped = GetPlayerPed(player)
+	local koord = GetEntityCoords(ped)
+    TriggerClientEvent('3dme:shareDisplay', -1, text, source, koord)
+end)
+
 RegisterNetEvent("prodajoruzje:TestSkinaa")
 AddEventHandler('prodajoruzje:TestSkinaa', function(id)
 	TriggerClientEvent("prodajoruzje:TestSkina", id)
