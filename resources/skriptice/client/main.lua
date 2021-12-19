@@ -137,13 +137,13 @@ Citizen.CreateThread(function()
 		SetDiscordAppId(693292673058078740)
 
         --Here you will have to put the image name for the "large" icon.
-		SetDiscordRichPresenceAsset('hugologo')
+		SetDiscordRichPresenceAsset('seallogo')
         
         --(11-11-2018) New Natives:
 		
         --Here you can add hover text for the "large" icon.
-        SetDiscordRichPresenceAssetText('https://discord.gg/hugo')
-		SetDiscordRichPresenceAction(0, "Pridruži se", "fivem://connect/cfx.re/join/49xa88")
+        SetDiscordRichPresenceAssetText('https://discord.gg/')
+		SetDiscordRichPresenceAction(0, "Pridruži se", "fivem://ip")
 		while ESX == nil do
 			Wait(0)
 		end
