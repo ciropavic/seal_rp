@@ -1,5 +1,8 @@
 ESX = nil
 local blip = nil
+local PoslKoord = nil
+local PoslNarID = nil
+local PoslFirma = nil
 
 Citizen.CreateThread(function()
   while ESX == nil do
@@ -123,6 +126,7 @@ function MenuVehicleSpawner()
 		table.insert(elements, {label = GetLabelText(GetDisplayNameFromVehicleModel(Config.Trucks[i])), value = Config.Trucks[i]})
 	end
 
+	table.insert(elements, {label = "Narudzbe", value=Config.Trucks[1]})
 
 	ESX.UI.Menu.CloseAll()
 
@@ -133,7 +137,7 @@ function MenuVehicleSpawner()
 			elements = elements
 		},
 		function(data, menu)
-		if data.current.value == "benson" then
+		if data.current.value == "benson" and data.current.label ~= "Narudzbe" then
 			--[[ESX.Game.SpawnVehicle(data.current.value, Config.Zones.VehicleSpawnPoint2.Pos, 270.0, function(vehicle)
 				platenum = math.random(10000, 99999)
 				SetVehicleNumberPlateText(vehicle, "WAL"..platenum)             
@@ -147,6 +151,24 @@ function MenuVehicleSpawner()
 				prikazi = true
 			})
 			SetNuiFocus(true, true)
+		else
+			ESX.TriggerServerCallback('esx_firme:DajNarudzbe', function(nar)
+				ESX.UI.Menu.Open(
+					'default', GetCurrentResourceName(), 'adfdfaa',
+					{
+						title    = "Popis narudzbi",
+						align    = 'bottom-right',
+						elements = nar,
+					},
+					function(datalr2, menulr2)
+						TriggerServerEvent("esx_firme:ZapocniNarudzbu2", datalr2.current.value, 69, datalr2.current.kolicina, datalr2.current.firma)
+						menulr2.close()
+					end,
+					function(datalr2, menulr2)
+						menulr2.close()
+					end
+				)
+			end, 69)
 		end
 
 			menu.close()
@@ -156,6 +178,21 @@ function MenuVehicleSpawner()
 		end
 	)
 end
+
+RegisterNetEvent('esx_dostavljac:DostaviRobu')
+AddEventHandler('esx_dostavljac:DostaviRobu', function(id, br, firma, dost, koord)
+	local found2, coords2, heading2 = GetClosestVehicleNodeWithHeading(koord.x, koord.y, koord.z, 4, 10.0, 0)
+	if found2 then
+		PoslKoord = coords2
+		PoslNarID = id
+		PoslFirma = firma
+		ESX.ShowNotification("Pritisnite na tražene artikle na traci!")
+		SendNUIMessage({
+			prikazi = true
+		})
+		SetNuiFocus(true, true)
+	end
+end)
 
 RegisterNUICallback('gotov', function()
 	SetNuiFocus(false)
@@ -230,9 +267,65 @@ RegisterNUICallback('gotov', function()
 	end
 	FreezeEntityPosition(vozilo, false) 
 	SetVehicleDoorShut(vozilo, 5, true)
-	MissionLivraisonSelect()
+	if PoslKoord == nil then
+		MissionLivraisonSelect()
+	else
+		local bogte = vector3(Config.Livraison.AnnulerMission.Pos.x, Config.Livraison.AnnulerMission.Pos.y, Config.Livraison.AnnulerMission.Pos.z)
+		DostavaPoslovnici(PoslKoord, bogte)
+	end
 	TaskWarpPedIntoVehicle(GetPlayerPed(-1), vozilo, -1)
 end)
+
+function DostavaPoslovnici(coords2, coords)
+	if Blips['delivery'] ~= nil then
+		RemoveBlip(Blips['delivery'])
+		Blips['delivery'] = nil
+	end
+	
+	Blips['delivery'] = AddBlipForCoord(coords2.x,  coords2.y, coords2.z)
+	SetBlipRoute(Blips['delivery'], true)
+	BeginTextCommandSetBlipName("STRING")
+	AddTextComponentString(_U('blip_delivery'))
+	EndTextCommandSetBlipName(Blips['delivery'])
+	local Dostavlja = true
+	local Vraca = false
+	Citizen.CreateThread(function()
+		while Dostavlja do
+			Citizen.Wait(1)
+			local coordse = GetEntityCoords(GetPlayerPed(-1))
+			if Vraca == false then
+				if #(coordse-coords2) < 100 then
+					DrawMarker(1, coords2.x, coords2.y, coords2.z-0.5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 3.0, 1.0, 204, 204, 0, 100, false, true, 2, false, false, false, false)
+				end
+				if #(coordse-coords2) < 3 then
+					ESX.ShowNotification("Dostavili ste robu, vratite kamion do firme")
+					RemoveBlip(Blips['delivery'])
+					Blips['delivery'] = nil
+					Vraca = true
+					TriggerServerEvent("esx_firme:ZavrsiDostavu2", PoslNarID, PoslFirma)
+				end
+			else
+				if Blips['delivery'] == nil then
+					Blips['delivery'] = AddBlipForCoord(coords.x,  coords.y, coords.z)
+					SetBlipRoute(Blips['delivery'], true)
+					BeginTextCommandSetBlipName("STRING")
+					AddTextComponentString(_U('blip_delivery'))
+					EndTextCommandSetBlipName(Blips['delivery'])
+				end
+				if #(coordse-coords) < 100 then
+					DrawMarker(1, coords.x, coords.y, coords.z-0.5, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 3.0, 1.0, 204, 204, 0, 100, false, true, 2, false, false, false, false)
+				end
+				if #(coordse-coords) < 3 then
+					ESX.ShowNotification("Vratili ste kamion u firmu.")
+					RemoveBlip(Blips['delivery'])
+					Blips['delivery'] = nil
+					ESX.Game.DeleteVehicle(GetVehiclePedIsIn(PlayerPedId()))
+					Dostavlja = false
+				end
+			end
+		end
+	end)
+end
 
 function setUniform(playerPed)
 	TriggerEvent('skinchanger:getSkin', function(skin)

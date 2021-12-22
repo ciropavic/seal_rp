@@ -42,7 +42,7 @@ ESX.StartPayCheck = function()
 											xPlayer.addAccountMoney('bank', salary)
 											TriggerClientEvent('esx:showAdvancedNotification', xPlayer.source, _U('bank'), _U('received_paycheck'), _U('received_salary', salary), 'CHAR_BANK_MAZE', 9)
 										end
-										MySQL.Async.fetchAll('SELECT * FROM billing WHERE identifier = @identifier', {
+										--[[MySQL.Async.fetchAll('SELECT * FROM billing WHERE identifier = @identifier', {
 											['@identifier'] = xPlayer.identifier
 										}, function(result)
 											if result[1] ~= nil then
@@ -131,7 +131,7 @@ ESX.StartPayCheck = function()
 													end
 												end
 											end
-										end)
+										end)]]
 										break
 									end
 								end

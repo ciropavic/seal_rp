@@ -764,6 +764,14 @@ function OpenShopMenu4(tip)
 								price      = 0,
 							})
 						end]]
+						if tip == 1 then
+							table.insert(elements, {
+								label      = "Naruci proizvode",
+								label_real = "narpr2",
+								item       = "naruci2",
+								price      = 0,
+							})
+						end
 						if tip == 4 then
 							table.insert(elements, {
 								label      = "Naruci proizvode",
@@ -947,6 +955,27 @@ function OpenShopMenu4(tip)
 					end
 				  )
 			end, tip)
+		elseif data.current.item == "naruci2" then
+			ESX.UI.Menu.Open(
+			'dialog', GetCurrentResourceName(), 'shops_daj_lovuahfdaa',
+			{
+				title = "Unesite kolicinu koju zelite naruciti"
+			},
+			function(data9, menu9)
+
+				local counte = tonumber(data9.value)
+
+				if counte == nil then
+					ESX.ShowNotification("Kriva vrijednost!")
+				else
+					TriggerServerEvent("esx_firme:NaruciRobu2", CurrentTrgID, counte, 100)
+					menu9.close()
+				end
+			end,
+			function(data9, menu9)
+				menu9.close()
+			end
+			)
 		elseif data.current.item == "radnici" then
 			local elements2 = {}
 			
@@ -1166,6 +1195,23 @@ AddEventHandler('firme:UpdateTekst', function(br, item, st)
 	})
 end)
 
+RegisterNetEvent('firme:UpdateTekst2')
+AddEventHandler('firme:UpdateTekst2', function(br, item, st)
+	local br2 = 0
+	for j = 1, #Firme, 1 do
+		if Firme[j].Ime == st then
+			br2 = Firme[j].Skladiste
+			break
+		end
+	end
+	local label = "["..br2.."] "..item.label
+	SendNUIMessage({
+		updateitem = true,
+		br = br,
+		label = label
+	})
+end)
+
 RegisterNUICallback(
     "kupi",
     function(data, cb)
@@ -1206,11 +1252,8 @@ function OpenShopMenu()
 		local br = 0
 		for j = 1, #Firme, 1 do
 			if Firme[j].Ime == st then
-				for k = 1, #Firme[j].Proizvodi, 1 do
-					if Firme[j].Proizvodi[k].Item == item.item then
-						br = Firme[j].Proizvodi[k].Stanje
-					end
-				end
+				br = Firme[j].Skladiste
+				break
 			end
 		end
 		local label = "["..br.."] "..item.label

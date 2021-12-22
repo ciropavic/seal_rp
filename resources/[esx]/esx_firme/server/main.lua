@@ -775,6 +775,19 @@ AddEventHandler('esx_firme:NaruciRobu', function(firmaid, br, dob, cij)
 	end)
 end)
 
+RegisterServerEvent('esx_firme:NaruciRobu2')
+AddEventHandler('esx_firme:NaruciRobu2', function(firmaid, br, cij)
+	local _source = source
+	local xPlayer = ESX.GetPlayerFromId(_source)
+	MySQL.Async.execute('INSERT INTO narudzbe(Firma, Dobavljac, Kolicina, Cijena) values(@firm, @dob, @kol, @cijena)', {
+		['@firm'] = firmaid,
+		['@dob'] = 69,
+		['@kol'] = br,
+		['@cijena'] = cij
+	})
+	xPlayer.showNotification("Narucili ste "..br.." proizvoda!")
+end)
+
 ESX.RegisterServerCallback('esx_firme:DajNarudzbe', function(source, cb, st)
 	local elem = {}
 	MySQL.Async.fetchAll('SELECT ID, Firma, Kolicina FROM narudzbe where Dobavljac = @firm and Rezervirano = 0', {['@firm'] = st}, function(result)
@@ -816,6 +829,26 @@ AddEventHandler('esx_firme:ZapocniNarudzbu', function(id, st, br, firma)
 	end)
 end)
 
+RegisterServerEvent('esx_firme:ZapocniNarudzbu2')
+AddEventHandler('esx_firme:ZapocniNarudzbu2', function(id, st, br, firma)
+	local _source = source
+	MySQL.Async.execute('UPDATE narudzbe SET `Rezervirano` = 1 WHERE ID = @st', {
+		['@st'] = id
+	})
+	local koord
+	for i = 1, #Firme, 1 do
+		if Firme[i].TrgID == firma then
+			koord = Firme[i].Kupovina
+			if Firme[i].Ulaz then
+				koord = Firme[i].Ulaz
+			end
+			break
+		end
+	end
+	TriggerClientEvent("esx_dostavljac:DostaviRobu", _source, id, br, firma, st, koord)
+	table.insert(Narudzbe, {NarID = id, Igrac = _source})
+end)
+
 RegisterServerEvent('esx_firme:ZavrsiDostavu')
 AddEventHandler('esx_firme:ZavrsiDostavu', function(id, firma, dost)
 	MySQL.Async.fetchAll('SELECT Kolicina, Cijena FROM narudzbe where ID = @id', {['@id'] = id}, function(result)
@@ -828,6 +861,31 @@ AddEventHandler('esx_firme:ZavrsiDostavu', function(id, firma, dost)
 				['@st'] = firma
 			})
 			DajFirmi2(dost, kol*cij)
+			OduzmiFirmi2(firma, kol*cij)
+			MySQL.Async.execute('delete from narudzbe where ID = @id', {
+				['@id'] = id
+			})
+			for i=1, #Narudzbe, 1 do
+				if Narudzbe[i].NarID == id then
+					table.remove(Narudzbe, i)
+				end
+			end
+		end)
+	end)
+end)
+
+RegisterServerEvent('esx_firme:ZavrsiDostavu2')
+AddEventHandler('esx_firme:ZavrsiDostavu2', function(id, firma)
+	MySQL.Async.fetchAll('SELECT Kolicina, Cijena FROM narudzbe where ID = @id', {['@id'] = id}, function(result)
+		MySQL.Async.fetchAll('SELECT Skladiste FROM firme where ID = @firm', {['@firm'] = firma}, function(result2)
+			local kol = result[1].Kolicina
+			local cij = result[1].Cijena
+			local skl = result2[1].Skladiste
+			MySQL.Async.execute('UPDATE firme SET `Skladiste` = @skl WHERE ID = @st', {
+				['@skl'] = skl+kol,
+				['@st'] = firma
+			})
+			--DajFirmi2(dost, kol*cij)
 			OduzmiFirmi2(firma, kol*cij)
 			MySQL.Async.execute('delete from narudzbe where ID = @id', {
 				['@id'] = id
@@ -1221,22 +1279,40 @@ AddEventHandler('ducan:piku', function(itemName, amount, zone, id, torba, did)
 				TriggerClientEvent('esx:showNotification', _source, _U('player_cannot_hold'))
 			else
 				local moze = true
-				for j = 1, #Firme, 1 do
-					if Firme[j].Ime == id then
-						for k = 1, #Firme[j].Proizvodi, 1 do
-							if Firme[j].Proizvodi[k].Item == itemName then
-								if Firme[j].Proizvodi[k].Stanje >= amount then
-									Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje-1
-									MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE Ime = @st', {
-										['@pr'] = json.encode(Firme[j].Proizvodi),
-										['@st'] = id
-									})
-									TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
-								else
-									moze = false
+				if zone == "TuningShop" then
+					for j = 1, #Firme, 1 do
+						if Firme[j].Ime == id then
+							for k = 1, #Firme[j].Proizvodi, 1 do
+								if Firme[j].Proizvodi[k].Item == itemName then
+									if Firme[j].Proizvodi[k].Stanje >= amount then
+										Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje-1
+										MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE Ime = @st', {
+											['@pr'] = json.encode(Firme[j].Proizvodi),
+											['@st'] = id
+										})
+										TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
+									else
+										moze = false
+									end
+									break
 								end
-								break
 							end
+						end
+					end
+				else
+					for j = 1, #Firme, 1 do
+						if Firme[j].Ime == id then
+							if Firme[j].Skladiste >= amount then
+								Firme[j].Skladiste = Firme[j].Skladiste-amount
+								TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
+								MySQL.Async.execute('UPDATE firme SET `Skladiste` = @pr WHERE Ime = @st', {
+									['@pr'] = Firme[j].Skladiste,
+									['@st'] = id
+								})
+							else
+								moze = false
+							end
+							break
 						end
 					end
 				end
@@ -1247,7 +1323,11 @@ AddEventHandler('ducan:piku', function(itemName, amount, zone, id, torba, did)
 					TriggerClientEvent('esx:showNotification', _source, _U('bought', amount, itemLabel, ESX.Math.GroupDigits(price)))
 					local por = "["..os.date("%X").."] ("..GetCurrentResourceName()..") Igrac "..GetPlayerName(_source).."("..xPlayer.identifier..") je dobio item "..itemName.." x "..amount
 					TriggerEvent("SpremiLog", por)
-					TriggerClientEvent("firme:UpdateTekst", _source, did, sourceItem, id)
+					if zone == "TuningShop" then
+						TriggerClientEvent("firme:UpdateTekst", _source, did, sourceItem, id)
+					else
+						TriggerClientEvent("firme:UpdateTekst2", _source, did, sourceItem, id)
+					end
 				else
 					TriggerClientEvent('esx:showNotification', _source, "Tog proizvoda nemamo na stanju!")
 				end
@@ -1257,22 +1337,40 @@ AddEventHandler('ducan:piku', function(itemName, amount, zone, id, torba, did)
 				TriggerClientEvent('esx:showNotification', _source, _U('player_cannot_hold'))
 			else
 				local moze = true
-				for j = 1, #Firme, 1 do
-					if Firme[j].Ime == id then
-						for k = 1, #Firme[j].Proizvodi, 1 do
-							if Firme[j].Proizvodi[k].Item == itemName then
-								if Firme[j].Proizvodi[k].Stanje >= amount then
-									Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje-1
-									MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE Ime = @st', {
-										['@pr'] = json.encode(Firme[j].Proizvodi),
-										['@st'] = id
-									})
-									TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
-								else
-									moze = false
+				if zone == "TuningShop" then
+					for j = 1, #Firme, 1 do
+						if Firme[j].Ime == id then
+							for k = 1, #Firme[j].Proizvodi, 1 do
+								if Firme[j].Proizvodi[k].Item == itemName then
+									if Firme[j].Proizvodi[k].Stanje >= amount then
+										Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje-1
+										MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE Ime = @st', {
+											['@pr'] = json.encode(Firme[j].Proizvodi),
+											['@st'] = id
+										})
+										TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
+									else
+										moze = false
+									end
+									break
 								end
-								break
 							end
+						end
+					end
+				else
+					for j = 1, #Firme, 1 do
+						if Firme[j].Ime == id then
+							if Firme[j].Skladiste >= amount then
+								Firme[j].Skladiste = Firme[j].Skladiste-amount
+								TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
+								MySQL.Async.execute('UPDATE firme SET `Skladiste` = @pr WHERE Ime = @st', {
+									['@pr'] = Firme[j].Skladiste,
+									['@st'] = id
+								})
+							else
+								moze = false
+							end
+							break
 						end
 					end
 				end
@@ -1283,7 +1381,11 @@ AddEventHandler('ducan:piku', function(itemName, amount, zone, id, torba, did)
 					TriggerClientEvent('esx:showNotification', _source, _U('bought', amount, itemLabel, ESX.Math.GroupDigits(price)))
 					local por = "["..os.date("%X").."] ("..GetCurrentResourceName()..") Igrac "..GetPlayerName(_source).."("..xPlayer.identifier..") je dobio item "..itemName.." x "..amount
 					TriggerEvent("SpremiLog", por)
-					TriggerClientEvent("firme:UpdateTekst", _source, did, sourceItem, id)
+					if zone == "TuningShop" then
+						TriggerClientEvent("firme:UpdateTekst", _source, did, sourceItem, id)
+					else
+						TriggerClientEvent("firme:UpdateTekst2", _source, did, sourceItem, id)
+					end
 				else
 					TriggerClientEvent('esx:showNotification', _source, "Tog proizvoda nemamo na stanju!")
 				end
@@ -1309,10 +1411,12 @@ function Kraft()
 					MySQL.Async.execute('delete from firme_kraft where ID = @id',{
 						['@id'] = Kraftanje[i].ID
 					})
+					local nasoga = false
 					for j = 1, #Firme, 1 do
 						if Firme[j].TrgID == Kraftanje[i].Firma then
 							for k = 1, #Firme[j].Proizvodi, 1 do
 								if Firme[j].Proizvodi[k].Item == Kraftanje[i].Item then
+									nasoga = true
 									Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje+1
 									MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE ID = @st', {
 										['@pr'] = json.encode(Firme[j].Proizvodi),
@@ -1321,6 +1425,14 @@ function Kraft()
 									TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
 									break
 								end
+							end
+							if not nasoga then
+								table.insert(Firme[j].Proizvodi, {Stanje = 1, Item = Kraftanje[i].Item})
+								MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE ID = @st', {
+									['@pr'] = json.encode(Firme[j].Proizvodi),
+									['@st'] = Kraftanje[i].Firma
+								})
+								TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
 							end
 						end
 					end
@@ -1331,10 +1443,12 @@ function Kraft()
 				MySQL.Async.execute('delete from firme_kraft where ID = @id',{
 					['@id'] = Kraftanje[i].ID
 				})
+				local nasoga = false
 				for j = 1, #Firme, 1 do
 					if Firme[j].TrgID == Kraftanje[i].Firma then
 						for k = 1, #Firme[j].Proizvodi, 1 do
 							if Firme[j].Proizvodi[k].Item == Kraftanje[i].Item then
+								nasoga = true
 								Firme[j].Proizvodi[k].Stanje = Firme[j].Proizvodi[k].Stanje+1
 								MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE ID = @st', {
 									['@pr'] = json.encode(Firme[j].Proizvodi),
@@ -1343,6 +1457,14 @@ function Kraft()
 								TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
 								break
 							end
+						end
+						if not nasoga then
+							table.insert(Firme[j].Proizvodi, {Stanje = 1, Item = Kraftanje[i].Item})
+							MySQL.Async.execute('UPDATE firme SET `Proizvodi` = @pr WHERE ID = @st', {
+								['@pr'] = json.encode(Firme[j].Proizvodi),
+								['@st'] = Kraftanje[i].Firma
+							})
+							TriggerClientEvent("firme:PosaljiFirme", -1,  Firme)
 						end
 					end
 				end
