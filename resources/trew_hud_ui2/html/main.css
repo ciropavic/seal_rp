@@ -70,7 +70,7 @@ div.separator { display: block; clear: both; width: 100%; }
 
 .info { position: absolute; }
 
-.info.server { right: 26px; width: 90px; height: 90px; }
+.info.server { right: 40px; width: 60px; height: 90px; top: 10px; }
 .info.server #server img { max-width: 100%; opacity: 0.75; }
 
 .info.player { 
