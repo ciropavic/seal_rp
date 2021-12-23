@@ -275,6 +275,7 @@ RegisterCommand("prebaci", function()
         disabled = false
 		Sjedalo = GetPedVehicleSeat(PlayerPedId())
 		if Sjedalo == -1 then
+			TriggerEvent("gameEventTriggered", "CEventNetworkPlayerEnteredVehicle", {128, GetVehiclePedIsIn(PlayerPedId(), false)})
 			local globalplate  = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false))
 			if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 				ESX.TriggerServerCallback('mjenjac:ProvjeriVozilo',function(mj)
@@ -2079,6 +2080,7 @@ end, false)
 RegisterCommand("resetstage", function(source, args, rawCommandString)
 	a = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
 	b = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+	print(a)
 end, false)
 
 RegisterCommand("guma", function(source, args, rawCommandString)

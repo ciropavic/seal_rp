@@ -74,7 +74,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 		align    = 'top-left',
 		elements = elems
 	}, function(data, menu)
-		local isRimMod, found, isMjenjac, isSvijetla, isDodaci, isSwap = false, false, false, false, false, false
+		local isRimMod, found, isMjenjac, isSvijetla, isDodaci, isSwap, isStage = false, false, false, false, false, false, false
 		local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
 		local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
 		local tablica = vehicleProps.plate
@@ -90,6 +90,10 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 		if data.current.modType == "swap" then
 			isSwap = true
 		end
+
+		if data.current.modType == "stage" then
+			isStage = true
+		end
 		
 		if data.current.modType == "dodaci" then
 			isDodaci = true
@@ -101,7 +105,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 
 		for k,v in pairs(Config.Menus) do
 
-			if k == data.current.modType or isRimMod or isMjenjac or isSvijetla or isDodaci or isSwap then
+			if k == data.current.modType or isRimMod or isMjenjac or isSvijetla or isDodaci or isSwap or isStage then
 
 				if data.current.label == _U('by_default') or string.match(data.current.label, _U('installed')) then
 					ESX.ShowNotification(_U('already_own', data.current.label))
@@ -159,6 +163,28 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 							SetVehicleMaxSpeed(vehicle, 230.0)
 							ForceVehicleEngineAudio(vehicle, "BANSHEE2")
 							SetVehRadioStation(vehicle, "OFF")
+						end
+					elseif isStage then
+						price = 5000
+						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
+						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
+						local a = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
+						local b = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+						if data.current.modNum == 1 then
+							ESX.ShowNotification("Kupio si stage 1!")
+							local drag = 2
+							local speed = 0.1
+							local br = a-drag
+							local br2 = b+(b*speed)
+							print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
+							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
+							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
+							SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+							SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
+							ModifyVehicleTopSpeed(GetVehiclePedIsIn(PlayerPedId(), false), 16.11)
+							print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
 						end
 					elseif isDodaci then
 						price = 50
@@ -348,6 +374,14 @@ function GetAction(data)
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 						_label = 'v10 motor - <span style="color:green;">$' .. price .. ' </span>'
+						table.insert(elements, {label = _label, modType = k, modNum = 1})
+					end
+				elseif v.modType == 'stage' then
+					local globalplate  = GetVehicleNumberPlateText(vehicle)
+					local _label = ''
+					price = 5000*1.30
+					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+						_label = 'Stage 1 - <span style="color:green;">$' .. price .. ' </span>'
 						table.insert(elements, {label = _label, modType = k, modNum = 1})
 					end
 				elseif v.modType == 'mjenjac' then
@@ -604,6 +638,104 @@ Citizen.CreateThread(function()
 		if naso == 0 then
 			waitara = 500
 		end
+	end
+end)
+
+local DragCoef = 0
+local FlatVel = 0
+
+RegisterNetEvent('stage:Provjera')
+AddEventHandler('stage:Provjera', function(currentSeat)
+	local globalplate  = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false))
+	if currentSeat == -1 then
+		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+				DragCoef = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
+				FlatVel = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+				local drag = 8
+				local speed = 0.4
+				if st == 1 then
+					drag = 8-2
+					speed = 0.3
+				elseif st == 2 then
+					drag = 8-4
+					speed = 0.2
+				elseif st == 3 then
+					drag = 8-6
+					speed = 0.1
+				elseif st == 4 then
+					drag = 0
+					speed = 0.0
+				end
+				local br = DragCoef+drag
+				local br2 = FlatVel-(FlatVel*speed)
+				print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
+				SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+				SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
+				ModifyVehicleTopSpeed(GetVehiclePedIsIn(PlayerPedId(), false), 16.11)
+				print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+			end, globalplate)
+		end
+	end
+end)
+
+RegisterNetEvent('baseevents:enteredVehicle')
+AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSeat, modelName, netId)
+	local globalplate  = GetVehicleNumberPlateText(currentVehicle)
+	if currentSeat == -1 then
+		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+				DragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
+				FlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+				local drag = 8
+				local speed = 0.4
+				if st == 1 then
+					drag = 8-2
+					speed = 0.3
+				elseif st == 2 then
+					drag = 8-4
+					speed = 0.2
+				elseif st == 3 then
+					drag = 8-6
+					speed = 0.1
+				elseif st == 4 then
+					drag = 0
+					speed = 0.0
+				end
+				local br = DragCoef+drag
+				local br2 = FlatVel-(FlatVel*speed)
+				print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
+				SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+				SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
+				ModifyVehicleTopSpeed(currentVehicle, 16.11)
+				print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+			end, globalplate)
+		end
+	end
+end)
+
+RegisterNetEvent('baseevents:leftVehicle')
+AddEventHandler('baseevents:leftVehicle', function(currentVehicle, currentSeat, modelName, netId)
+	if currentSeat == -1 then
+		print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
+		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
+		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
+		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff', DragCoef) --stage 0 -10.0
+		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', FlatVel)
+		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
+		ModifyVehicleTopSpeed(currentVehicle, 16.11)
+		print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+		DragCoef = 0
+		FlatVel = 0
 	end
 end)
 

@@ -48,6 +48,21 @@ AddEventHandler('meh:PromjeniMjenjac', function(br, plate)
 	})
 end)
 
+ESX.RegisterServerCallback('stage:ProvjeriVozilo', function(source, cb, vehicleplate)
+    MySQL.Async.fetchScalar(
+        'SELECT stage FROM owned_vehicles WHERE plate = @pl',
+        {
+            ['@pl'] = vehicleplate
+        },
+        function(result)
+            if result ~= nil then
+                cb(result)
+			else
+				cb(0)
+            end
+    end)
+end)
+
 RegisterServerEvent('esx_lscustom:refreshOwnedVehicle')
 AddEventHandler('esx_lscustom:refreshOwnedVehicle', function(vehicleProps)
 	local _source = source

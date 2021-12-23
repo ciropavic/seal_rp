@@ -27,7 +27,7 @@ AddEventHandler('gameEventTriggered', function (name, data)
 			Citizen.CreateThread(function()
 				while isInVehicle do
 					local ped = PlayerPedId()
-					if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
+					if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) or currentSeat ~= GetPedVehicleSeat(PlayerPedId()) then
 						-- bye, vehicle
 						zvao = false
 						local model = GetEntityModel(currentVehicle)
@@ -38,6 +38,7 @@ AddEventHandler('gameEventTriggered', function (name, data)
 						isInVehicle = false
 						currentVehicle = 0
 						currentSeat = 0
+						print("izaso")
 					end
 					Citizen.Wait(500)
 				end

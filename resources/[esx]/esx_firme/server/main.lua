@@ -790,11 +790,15 @@ end)
 
 ESX.RegisterServerCallback('esx_firme:DajNarudzbe', function(source, cb, st)
 	local elem = {}
+	local kol = "g"
 	MySQL.Async.fetchAll('SELECT ID, Firma, Kolicina FROM narudzbe where Dobavljac = @firm and Rezervirano = 0', {['@firm'] = st}, function(result)
 		for i=1, #result, 1 do
 			for a=1, #Firme, 1 do
 				if Firme[a] ~= nil and Firme[a].TrgID == result[i].Firma then
-					table.insert(elem, { label = Firme[a].Label.." | "..result[i].Kolicina.."g", value = result[i].ID, kolicina = result[i].Kolicina, firma = result[i].Firma })
+					if Firme[a].Tip == 1 then
+						kol = " proizvoda"
+					end
+					table.insert(elem, { label = Firme[a].Label.." | "..result[i].Kolicina..kol, value = result[i].ID, kolicina = result[i].Kolicina, firma = result[i].Firma })
 					break
 				end
 			end

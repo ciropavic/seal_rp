@@ -1,0 +1,25 @@
+Locales['hr'] = {
+    ['you_paid'] = 'Platili ste ~g~$%s~s~',
+    ['garage'] = 'Garaza',
+    ['notif_car_impounded'] = 'Garaza: <br /> Vase vozilo je ukradeno!',
+    ['status_in_garage'] = '%s: <font color="green">U garazi</font>',
+    ['status_impounded'] = '%s: <font color="red">Zapljenjeno</font>',
+    ['list_vehicles'] = 'Lista vozila',
+    ['stock_vehicle'] = 'Parkirajte vozilo',
+    ['return_vehicle'] = 'Vrati zapljenjeno vozilo ($%s)',
+    ['reparation'] = 'Tvoj auto je ostecen!',
+    ['reparation_yes'] = 'Popravi ovdje ($%s)',
+    ['reparation_no'] = 'Ne, hvala!',
+    ['reparation_no_notif'] = 'Da parkirate vozilo ono mora biti u savrsenom stanju',
+    ['ranger'] = 'Garaza: <br /> Tvoje vozilo je parkirano!',
+    ['stockv_not_owned'] = 'Garaza: <br /> Ovo vozilo nije tvoje!',
+    ['stockv_not_in_veh'] = 'Garaza: <br /> Morate biti u vozilu kako biste ga parkirali!',
+    ['spawn'] = 'Pritisnite ~INPUT_PICKUP~ da izvezete vozilo',
+    ['delete'] = 'Pritisnite  ~INPUT_PICKUP~ da spremite vozilo',
+    ['pound_action_menu'] = 'Pritisnite ~INPUT_PICKUP~ da vidite zapljenjena vozila',
+    ['not_enough_money'] = 'Nemate dovoljno novca',
+    ['impound_list'] = '%s: Vrati',
+    ['impound_yard'] = 'Impound Yard',
+    ['impound_not_enough_money'] = 'Garaza: <br /> Nemate dovoljno novca'
+
+}
