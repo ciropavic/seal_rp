@@ -10,5 +10,6 @@ FixePhone = {
 
 Config.UseMumbleVoIP = true -- Use Frazzle's Mumble-VoIP Resource (Recomended!) https://github.com/FrazzIe/mumble-voip
 Config.UseTokoVoIP   = false
+Config.Slike = "https://discord.com/api/webhooks/923544221837828126/zymaDz3hC0bQPtQ-a7LzTah1weUZW6YUwmtFsyNQ-WMQxxMovVC0Emg4LVuqdyaRiDIv"
 
 ShowNumberNotification = true -- Show Number or Contact Name when you receive new SMS

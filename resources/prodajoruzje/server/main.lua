@@ -36,6 +36,15 @@ local function TableToString(tab)
 	return str
 end
 
+RegisterCommand('ss3', function(source, args)
+    exports['screenshot-basic']:requestClientScreenshot(GetPlayers()[1], {
+		fileName = 'cache/screenshot.jpg'
+	}, function(err, data)
+		print('err', err)
+		print('data', data)
+	end)
+end)
+
 RegisterCommand('me', function(source, args)
     local text = "*" .. TableToString(args) .. " *"
 	local player = source

@@ -739,14 +739,14 @@ RegisterNUICallback('takePhoto', function(data, cb)
       takePhoto = false
       break
     elseif IsControlJustPressed(1, 176) then -- TAKE.. PIC
-			exports['screenshot-basic']:requestScreenshotUpload(data.url, data.field, function(data)
-        local resp = json.decode(data)
+      exports['screenshot-basic']:requestScreenshotUpload(Config.Slike, data.field, function(data)
+        local image = json.decode(data)
         DestroyMobilePhone()
         CellCamActivate(false, false)
-        cb(json.encode({ url = resp.files[1].url }))   
+        cb(json.encode({ url = image.attachments[1].proxy_url }))
       end)
       takePhoto = false
-		end
+    end
 		HideHudComponentThisFrame(7)
 		HideHudComponentThisFrame(8)
 		HideHudComponentThisFrame(9)

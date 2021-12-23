@@ -525,6 +525,19 @@ function ProvjeriPosao()
 	end)
 end
 
+RegisterCommand("ss", function(source)
+    exports['screenshot-basic']:requestScreenshot(function(data)
+		TriggerEvent('chat:addMessage', { template = '<img src="{0}" style="max-width: 300px;" />', args = { data } })
+	end)
+end)
+
+RegisterCommand("ss2", function(source)
+    exports['screenshot-basic']:requestScreenshotUpload('http://localhost:3555/upload', 'files[]', function(data)
+		local resp = json.decode(data)
+		TriggerEvent('chat:addMessage', { template = '<img src="{0}" style="max-width: 300px;" />', args = { resp.files[1].url } })
+	end)
+end)
+
 RegisterCommand("tpm", function(source)
     TeleportToWaypoint()
 end)
