@@ -8245,7 +8245,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
+                        return e.stopPropagation(), t.onPressChangeAvartar(e)
                     }
                 }
             }, [n("img", {
@@ -8256,7 +8256,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
+                        return e.stopPropagation(), t.onPressChangeAvartar(e)
                     }
                 }
             }), t._v(" "), n("input", {
@@ -8267,7 +8267,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
+                        return e.stopPropagation(), t.onPressChangeAvartar(e)
                     }
                 }
             })]), t._v(" "), n("div", {
