@@ -48,6 +48,15 @@ AddEventHandler('meh:PromjeniMjenjac', function(br, plate)
 	})
 end)
 
+RegisterServerEvent('stage:PromjeniStage')
+AddEventHandler('stage:PromjeniStage', function(br, plate)
+	MySQL.Async.execute('UPDATE `owned_vehicles` SET `stage` = @st WHERE `plate` = @plate',
+	{
+		['@plate']   = plate,
+		['@st'] = br
+	})
+end)
+
 ESX.RegisterServerCallback('stage:ProvjeriVozilo', function(source, cb, vehicleplate)
     MySQL.Async.fetchScalar(
         'SELECT stage FROM owned_vehicles WHERE plate = @pl',

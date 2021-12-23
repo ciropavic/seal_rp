@@ -168,24 +168,35 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						price = 5000
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
-						local a = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
-						local b = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+						local a = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+						local b = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+						local drag
+						local speed
 						if data.current.modNum == 1 then
-							ESX.ShowNotification("Kupio si stage 1!")
-							local drag = 2
-							local speed = 0.1
-							local br = a-drag
-							local br2 = b+(b*speed)
-							print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
-							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
-							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
-							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
-							SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
-							SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
-							--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
-							ModifyVehicleTopSpeed(GetVehiclePedIsIn(PlayerPedId(), false), 16.11)
-							print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+							drag = 2
+							speed = 0.1
+						elseif data.current.modNum == 2 then
+							drag = 4
+							speed = 0.2
+						elseif data.current.modNum == 3 then
+							drag = 6
+							speed = 0.3
+						elseif data.current.modNum == 4 then
+							drag = 0
+							speed = 0.0
 						end
+						ESX.ShowNotification("Kupio si stage "..data.current.modNum.."!")
+						local drag = 2
+						local speed = 0.1
+						local br = a-drag
+						local br2 = b+(b*speed)
+						print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+						SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br)
+						SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+						ModifyVehicleTopSpeed(vehicle, 16.11)
+						print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+						local globalplate = GetVehicleNumberPlateText(vehicle)
+						TriggerServerEvent("stage:PromjeniStage", data.current.modNum, globalplate)
 					elseif isDodaci then
 						price = 50
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
@@ -301,9 +312,7 @@ function GetAction(data)
 				ESX.ShowNotification("Vozilo mora imati ugradjena xenon svijetla!")
 				return
 			end
-
 			if v.modType ~= nil then
-				
 				if v.modType == 22 then
 					table.insert(elements, {label = " " .. _U('by_default'), modType = k, modNum = false})
 				elseif v.modType == 'neonColor' or v.modType == 'tyreSmokeColor' then -- disable neon
@@ -314,7 +323,7 @@ function GetAction(data)
 				elseif v.modType == 17 then
 					table.insert(elements, {label = " " .. _U('no_turbo'), modType = k, modNum = false})
  				else
-					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" then
+					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" and v.modType ~= "stage" then
 						table.insert(elements, {label = " " .. _U('by_default'), modType = k, modNum = -1})
 					end
 				end
@@ -379,10 +388,20 @@ function GetAction(data)
 				elseif v.modType == 'stage' then
 					local globalplate  = GetVehicleNumberPlateText(vehicle)
 					local _label = ''
+					local provjera = false
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
-						_label = 'Stage 1 - <span style="color:green;">$' .. price .. ' </span>'
-						table.insert(elements, {label = _label, modType = k, modNum = 1})
+						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+							provjera = true
+							st = tonumber(st)
+							if st < 4 then
+								_label = 'Stage '..(st+1)..' - <span style="color:green;">$' .. price .. ' </span>'
+								table.insert(elements, {label = _label, modType = k, modNum = (st+1)})
+							end
+						end, globalplate)
+					end
+					while not provjera do
+						Wait(100)
 					end
 				elseif v.modType == 'mjenjac' then
 					local globalplate  = GetVehicleNumberPlateText(vehicle)
@@ -546,7 +565,7 @@ function GetAction(data)
 			break
 		end
 	end
-
+	--Wait(500)
 	table.sort(elements, function(a, b)
 		return a.label < b.label
 	end)

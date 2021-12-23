@@ -532,11 +532,8 @@ RegisterCommand("ss", function(source)
 	end)
 end)
 
-RegisterCommand("ss2", function(source)
-    exports['screenshot-basic']:requestScreenshotUpload('http://localhost:3555/upload', 'files[]', function(data)
-		local resp = json.decode(data)
-		TriggerEvent('chat:addMessage', { template = '<img src="{0}" style="max-width: 300px;" />', args = { resp.files[1].url } })
-	end)
+RegisterCommand("hash", function(source, args, raw)
+    print(GetHashKey(args[1]))
 end)
 
 RegisterCommand("tpm", function(source)

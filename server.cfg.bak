@@ -87,6 +87,8 @@ start essentialmode
 start es_extended
 start cron
 
+start screenshot-basic
+
 start skinchanger
 start esx_skin
 start esx_menu_default
@@ -97,19 +99,29 @@ start esx_mafije
 start esx_addons_xenknight
 start xenknight
 
+start meta_libs
+
+start esx-races
+start esx_inventoryhud
+
 #start esx_vehicleshop
-#start esx_lscustom
+start esx_lscustom
 
 start pNotify
-#start esx_drp_garage
+start esx_drp_garage
 start LegacyFuel2
 
 #Custom special jobs
-#start esx_policejob
-#start esx_ambulancejob
-#start esx_mechanicjob
-#start esx_taxijob
+start esx_policejob
+start esx_ambulancejob
+start esx_mechanicjob
+start esx_taxijob
+#start esx_reporter
 start esx_jb_weashops
+start esx_deliveryjob
+
+#Mape
+start taxi
 
 # Add any new content addons here
 
@@ -119,9 +131,7 @@ start esx_scoreboard
 start es_admin2
 start fivem-ipl
 #start Peds
-#start esx_clotheshop
 #start esx-qalle-jail
-#start esx_barbershop
 #start esx_carwash
 #start esx_celldoors
 #start esx_dmvschool
@@ -131,18 +141,12 @@ start esx_rpchat
 #start esx-carRental
 #start esx_spectate
 start es_wsync
-#start esx-races
-#start vengine
 #start esx_advanced_holdup
 start prodajoruzje
-#start esx_inventoryhud
 start esx_anticheat
 start Seal
-start zone
 start connectqueue
 start trew_hud_ui2
-start policeboost
-start Suvozac
 start HousingShells
 start loaf_housing2
 
@@ -158,11 +162,10 @@ start progressBars
 #start autobomba
 
 ##
-start otok
 start mumble-voip
+start rp-radio
 start esx_zone
 start esx_zemljista
-start esx_droze
 start tagovi
 start upit
 
