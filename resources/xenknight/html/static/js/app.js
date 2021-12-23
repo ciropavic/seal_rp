@@ -1307,13 +1307,13 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
         p = 30 * l,
         f = 365 * l,
         d = {
-            fr_FR: ["à l'instant", ["il y a %s seconde", "il y a %s secondes"],
-                ["il y a %s minute", "il y a %s minutes"],
-                ["il y a %s heure", "il y a %s heures"],
-                ["il y a %s jour", "il y a %s jours"],
-                ["il y a %s semaine", "il y a %s semaines"],
-                ["il y a %s mois", "il y a %s mois"],
-                ["il y a %s an", "il y a %s ans"]
+            fr_FR: ["sada", ["%s sekundi", "%s sekundi"],
+                ["%s minuta", "%s minuta"],
+                ["%s sat", "%s sat"],
+                ["%s dan", "%s dan"],
+                ["%s tjedan", "%s tjedan"],
+                ["%s mjesec", "%s mjesec"],
+                ["%s godina", "%s godina"]
             ]
         }
 }, function (t, e, n) {
@@ -2626,8 +2626,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 a.a.notify({
                     message: e.message,
                     title: e.firstname + " " + e.lastname + " :",
-                    backgroundColor: "#FFFF00",
-                    sound: s.yellowNotificationSound ? "Yellow_Sound_Effect.ogg" : void 0
+                    backgroundColor: "#FFFF00"
                 }), n("ADD_PAGES", {
                     pages: e
                 })
@@ -3093,10 +3092,10 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 var e = this;
                 !0 !== this.ignoreControls && (this.ignoreControls = !0, l.a.CreateModal({
                     choix: [].concat(o()(t.subMenu), [{
-                        title: "Retour"
+                        title: "Povratak"
                     }])
                 }).then(function (t) {
-                    e.ignoreControls = !1, "Retour" !== t.title && (e.$phoneAPI.callEvent(t.eventName, t.type), e.$router.push({
+                    e.ignoreControls = !1, "Povratak" !== t.title && (e.$phoneAPI.callEvent(t.eventName, t.type), e.$router.push({
                         name: "home"
                     }))
                 }))
@@ -4663,16 +4662,16 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 if (-1 !== this.id) {
                     this.ignoreControls = !0;
                     var e = [{
-                        title: "Annuler"
+                        title: "Odustani"
                     }, {
-                        title: "Annuler"
+                        title: "Odustani"
                     }, {
                         title: "Supprimer",
                         color: "red"
                     }, {
-                        title: "Annuler"
+                        title: "Odustani"
                     }, {
-                        title: "Annuler"
+                        title: "Odustani"
                     }];
                     c.a.CreateModal({
                         choix: e
@@ -4758,7 +4757,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         color: "orange"
                     }, {
                         id: 3,
-                        title: "Annuler",
+                        title: "Odustani",
                         icons: "fa-undo"
                     }]
                 }).then(function (n) {
@@ -4833,7 +4832,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         case 0:
                             return t.prev = 0, n = e.billingg[e.selectMessage], s = [{
                                 id: "card",
-                                title: "Fatura Ödeme",
+                                title: "Placanje racuna",
                                 icons: "fa-credit-card"
                             }, {
                                 id: -1,
@@ -5981,11 +5980,11 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         case 0:
                             return t.ignoreControls = !0, n = t.tweets[t.selectMessage], s = [{
                                 id: 1,
-                                title: "Beğen / Beğeni Kaldır",
+                                title: "Sviđa mi se/Ukloni Like",
                                 icons: "fa-heart"
                             }, {
                                 id: 2,
-                                title: "Cevapla",
+                                title: "Odgovor",
                                 icons: "fa-reply"
                             }, {
                                 id: -1,
@@ -6027,7 +6026,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         for (;;) switch (n.prev = n.next) {
                         case 0:
                             return s = t.author, n.prev = 1, e.ignoreControls = !0, n.next = 5, d.a.CreateTextModal({
-                                title: "Cevapla",
+                                title: "Odgovor",
                                 text: "@" + s + " "
                             });
                         case 5:
@@ -6167,11 +6166,11 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         case 0:
                             return t.ignoreControls = !0, n = t.tweets[t.selectMessage], s = [{
                                 id: 1,
-                                title: "Beğen / Beğeni Kaldır",
+                                title: "Svida mi se/Ukloni Like",
                                 icons: "fa-heart"
                             }, {
                                 id: 2,
-                                title: "Cevapla",
+                                title: "Odgovor",
                                 icons: "fa-reply"
                             }, {
                                 id: -1,
@@ -6213,7 +6212,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                         for (;;) switch (n.prev = n.next) {
                         case 0:
                             return s = t.author, n.prev = 1, e.ignoreControls = !0, n.next = 5, d.a.CreateTextModal({
-                                title: "Cevapla",
+                                title: "Odgovor",
                                 text: "@" + s + " "
                             });
                         case 5:
@@ -6864,7 +6863,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 }
             }), t._v(" "), n("div", {
                 staticClass: "baslik"
-            }, [t._v("YELLOWPAGES ")]), t._v(" "), n("div", {
+            }, [t._v("OGLASI ")]), t._v(" "), n("div", {
                 staticClass: "phone_content"
             }, [void 0 !== t.imgZoom ? n("div", {
                 staticClass: "img-fullscreen",
@@ -8246,7 +8245,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.onPressChangeAvartar(e)
+                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
                     }
                 }
             }, [n("img", {
@@ -8257,7 +8256,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.onPressChangeAvartar(e)
+                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
                     }
                 }
             }), t._v(" "), n("input", {
@@ -8268,7 +8267,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 },
                 on: {
                     click: function (e) {
-                        return e.stopPropagation(), t.onPressChangeAvartar(e)
+                        return e.stopPropagation(), t.setLocalAccountAvartar(e)
                     }
                 }
             })]), t._v(" "), n("div", {
@@ -8753,7 +8752,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 }
             }), t._v(" "), n("div", {
                 staticClass: "baslik22"
-            }, [t._v("FATURALAR ")]), t._v(" "), n("div", {
+            }, [t._v("RACUNI")]), t._v(" "), n("div", {
                 staticClass: "phone_content"
             }, [n("div", {
                 ref: "elementsDiv",
@@ -8972,11 +8971,11 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 staticClass: "flex"
             }, [n("div", {
                 staticClass: "balance box-shadow"
-            }, [n("p", [t._v("Hoşgeldiniz"), n("br"), t._v(" "), n("span", {
+            }, [n("p", [t._v("Dobrodosli"), n("br"), t._v(" "), n("span", {
                 staticClass: "name"
             }, [n("span", {
                 staticClass: "username1"
-            }, [t._v(t._s(t.firstname))])]), n("br"), t._v("\n\t    \t\t\t\t\tParanız"), n("br"), t._v(" "), n("span", {
+            }, [t._v(t._s(t.firstname))])]), n("br"), t._v("\n\t    \t\t\t\t\tnovac"), n("br"), t._v(" "), n("span", {
                 staticClass: "money"
             }, [n("span", {
                 staticClass: "euro"
@@ -9005,7 +9004,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 staticClass: "highlight"
             }), t._v(" "), n("span", {
                 staticClass: "bar"
-            }), t._v(" "), n("label", [t._v("Göndericeğiniz Kişinin ID")])]), t._v(" "), n("div", {
+            }), t._v(" "), n("label", [t._v("ID vaseg posiljatelja")])]), t._v(" "), n("div", {
                 staticClass: "group inputText",
                 attrs: {
                     "data-type": "text",
@@ -9028,7 +9027,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 staticClass: "highlight"
             }), t._v(" "), n("span", {
                 staticClass: "bar"
-            }), t._v(" "), n("label", [t._v("Göndermek İstediğiniz Miktarı Girin")])]), t._v(" "), n("div", {
+            }), t._v(" "), n("label", [t._v("Unesite iznos koji zelite poslati")])]), t._v(" "), n("div", {
                 staticClass: "group",
                 attrs: {
                     "data-type": "button"
@@ -9042,7 +9041,7 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 staticClass: "btn btn-blue",
                 attrs: {
                     type: "button",
-                    value: "Gönder"
+                    value: "Posalji"
                 },
                 on: {
                     click: function (e) {
@@ -9076,14 +9075,14 @@ webpackJsonp([0], [, , , , , , function (t, e, n) {
                 staticClass: "fas fa-exchange-alt"
             }), t._v(" "), n("span", {
                 staticClass: "fas fa-exchange-alt icon"
-            }), t._v(" "), n("p", [t._v("Transfer"), n("br"), t._v(" "), n("span", [t._v("Paranızı Başka Birine Aktarın")])])])
+            }), t._v(" "), n("p", [t._v("Transfer"), n("br"), t._v(" "), n("span", [t._v("Prenesite svoj novac drugome")])])])
         }, function () {
             var t = this,
                 e = t.$createElement,
                 n = t._self._c || e;
             return n("div", {
                 staticClass: "group inputText"
-            }, [n("label", [t._v("@xenknight#7085")])])
+            }, [n("label", [t._v("@hugo")])])
         }]
     }
 }, function (t, e) {
