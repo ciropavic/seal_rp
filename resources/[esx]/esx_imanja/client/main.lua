@@ -42,9 +42,9 @@ end)
 
 function ProvjeriPosao()
 	PlayerData = ESX.GetPlayerData()
-	ESX.TriggerServerCallback('imanja:DohvatiImanja', function(zemlj)
-		Imanja = zemlj.voc
-		Koord = zemlj.kor
+	ESX.TriggerServerCallback('imanja:DohvatiImanja', function(imanja)
+		Imanja = imanja.voc
+		Koord = imanja.kor
 	end)
 	Wait(5000)
 	for i=1, #Imanja, 1 do
@@ -810,6 +810,48 @@ function OpenImanjeMenu(ime)
     )
 end
 
+RegisterCommand("testpoly", function(source, args, raw)
+	local trazi = true
+	local br = 0
+	local tablica = {}
+	local markeri = {}
+	while trazi do
+		Citizen.Wait(1)
+		if IsControlJustPressed(0, 24) then
+			local korde = GetEntityCoords(PlayerPedId())
+			local vek = vector2(korde.x, korde.y)
+			print(vek)
+			table.insert(tablica, vek)
+			table.insert(markeri, korde)
+			br = br+1
+			if br == 4 then
+				trazi = false
+				print("gotov")
+			end
+		end
+		for i=1, #markeri, 1 do
+			DrawMarker(0, markeri[i], 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 2.0, 1.0, 0, 0, 0, 100, false, true, 2, false, false, false, false)
+		end
+		if IsControlPressed(0, 186) then
+			trazi = false
+			ESX.ShowNotification("Odustali ste od postavljanja!")
+		end
+	end
+	local pinkcage = PolyZone:Create(tablica, {
+		name="test",
+		debugGrid = true,
+		--minZ = 53.744148254395,
+		--maxZ = 54.037460327148
+	})
+	pinkcage:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
+		if isPointInside then
+			print("uso")
+		else
+			print("izaso")
+		end
+	end)
+end)
+
 RegisterCommand("urediimanje", function(source, args, raw)
 	local elements = {}
 	
@@ -822,7 +864,7 @@ RegisterCommand("urediimanje", function(source, args, raw)
 	table.insert(elements, {label = "Kreiraj imanje", value = "nova"})
 
     ESX.UI.Menu.Open(
-		'default', GetCurrentResourceName(), 'uzemlj',
+		'default', GetCurrentResourceName(), 'uimanj',
 		{
 			title    = "Izaberite imanje",
 			align    = 'top-left',
@@ -856,7 +898,7 @@ RegisterCommand("urediimanje", function(source, args, raw)
 				table.insert(elements, {label = "Obrisi kucu", value = "obrisik"})
 				table.insert(elements, {label = "Obrisi imanje", value = "obrisi"})
 				ESX.UI.Menu.Open(
-					'default', GetCurrentResourceName(), 'uzemlj2',
+					'default', GetCurrentResourceName(), 'uimanj2',
 					{
 						title    = "Izaberite opciju",
 						align    = 'top-left',

@@ -1,16 +1,16 @@
 ESX = nil
 
 local Koord = {}
-local Zemljista = {}
+local Imanja = {}
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 MySQL.ready(function()
-	UcitajZemljista()
+	UcitajImanja()
 end)
 
-function UcitajZemljista()
-	Zemljista = {}
+function UcitajImanja()
+	Imanja = {}
 	Koord = {}
 	MySQL.Async.fetchAll(
       'SELECT * FROM imanja',
@@ -441,7 +441,7 @@ AddEventHandler('imanja:Kupi', function(ime)
 		if Imanja[i] ~= nil and Imanja[i].Ime == ime then
 			if xPlayer.getMoney() >= tonumber(Imanja[i].Cijena) then
 				xPlayer.removeMoney(Imanja[i].Cijena)
-				Imanja[i].Vlasnik = xPlayer.identifier
+				Imanja[i].Vlasnik = xPlayer.getID()
 				kupio = true
 				MySQL.Async.execute('UPDATE imanja SET Vlasnik = @vl WHERE Ime = @im', {
 					['@vl'] = xPlayer.getID(),

@@ -17,6 +17,7 @@ server_scripts {
 client_scripts {
   '@es_extended/locale.lua',
   'locales/hr.lua',
+  '@PolyZone/client.lua',
   'config.lua',
   'client/main.lua'
 }
