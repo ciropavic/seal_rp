@@ -28,9 +28,13 @@ function UcitajImanja()
 			--x,y,z = table.unpack(ete2)
 			local kordici = vector3(ete2.x,ete2.y,ete2.z)
 			table.insert(Imanja, {Ime = result[i].Ime, Cijena = result[i].Cijena, Vlasnik = tonumber(result[i].Vlasnik), KKoord = korda, Heading = h, Kuca = result[i].Kuca, MKoord = kordici, KucaID = result[i].KucaID})
-			local data = json.decode(result[i].Koord1)
-			local data2 = json.decode(result[i].Koord2)
-			table.insert(Koord, {Imanje = result[i].Ime, Coord = data, Coord2 = data2})
+			local data = json.decode(result[i].Koord)
+			local tabl = {}
+			for i=1, #data, 1 do
+				table.insert(tabl, vector2(data[i].x, data[i].y))
+			end
+			--local data2 = json.decode(result[i].Koord2)
+			table.insert(Koord, {Imanje = result[i].Ime, Coord = tabl})
         end
 		TriggerClientEvent("imanja:UpdateKoord", -1, Koord)
 		TriggerClientEvent("imanja:UpdateImanja", -1, Imanja)
@@ -239,11 +243,8 @@ end)
 
 RegisterNetEvent('imanja:SpremiCoord')
 AddEventHandler('imanja:SpremiCoord', function(ime, coord, br)
-	local x,y,z = table.unpack(coord)
-	z = z-1
-	coord = table.pack(x,y,z)
 	if br == 1 then
-		MySQL.Async.execute('UPDATE imanja SET Koord1 = @cor WHERE Ime = @im', {
+		MySQL.Async.execute('UPDATE imanja SET Koord = @cor WHERE Ime = @im', {
 			['@cor'] = json.encode(coord),
 			['@im'] = ime
 		})
@@ -255,9 +256,9 @@ AddEventHandler('imanja:SpremiCoord', function(ime, coord, br)
 			end
 		end
 		if Postoji == 0 then
-			table.insert(Koord, {Imanje = ime, Coord = coord, Coord2 = nil})
+			table.insert(Koord, {Imanje = ime, Coord = coord})
 		end
-		TriggerClientEvent('esx:showNotification', source, 'Koordinate x1,y1 su uspjesno spremljene za imanje '..ime..'!')
+		TriggerClientEvent('esx:showNotification', source, 'Koordinate su uspjesno spremljene za imanje '..ime..'!')
 		TriggerClientEvent("imanja:UpdateKoord", -1, Koord)
 	else
 		MySQL.Async.execute('UPDATE imanja SET Koord2 = @cor WHERE Ime = @im', {

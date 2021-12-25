@@ -371,8 +371,8 @@ local function _createGrid(poly, options)
 
     if options.debugGrid then
       local coverage = string.format("%.2f", poly.gridCoverage * 100)
-      print("[PolyZone] Debug: Grid Coverage at " .. coverage .. "% with " .. poly.gridDivisions
-      .. " divisions. Optimal coverage for memory usage and startup time is 80-90%")
+      --print("[PolyZone] Debug: Grid Coverage at " .. coverage .. "% with " .. poly.gridDivisions
+      --.. " divisions. Optimal coverage for memory usage and startup time is 80-90%")
 
       Citizen.CreateThread(function()
         poly.lines = _calculateLinesForDrawingGrid(poly)
@@ -499,7 +499,7 @@ end
 function PolyZone:destroy()
   self.destroyed = true
   if self.debugPoly or self.debugGrid then
-    print("[PolyZone] Debug: Destroying zone {name=" .. self.name .. "}")
+    --print("[PolyZone] Debug: Destroying zone {name=" .. self.name .. "}")
   end
 end
 

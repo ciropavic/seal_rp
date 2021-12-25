@@ -220,6 +220,7 @@ function OpenImanjeMenu(ime)
 		Wait(100)
 	end
 	brojic = 1
+	local pinkcage = nil
     ESX.UI.Menu.Open(
       'default', GetCurrentResourceName(), 'imanje',
       {
@@ -731,25 +732,22 @@ function OpenImanjeMenu(ime)
 				if not imal then
 					ESX.TriggerServerCallback('imanja:ImalImanje', function(imal2)
 						if not imal2 then
-							local umenu = true
+							FreezeEntityPosition(PlayerPedId(), true)
 							Citizen.CreateThread(function()
-								local kord1 = nil
-								local kord2 = nil
+								local kord = nil
 								for i=1, #Koord, 1 do
 									if Koord[i] ~= nil and Koord[i].Imanje == ime then
-										kord1 = Koord[i].Coord
-										if Koord[i].Coord2 ~= nil then
-											kord2 = Koord[i].Coord2
-										end
+										kord = Koord[i].Coord
 										break
 									end
 								end
-								local a,b,c = table.unpack(kord1)
-								local d,e,f = table.unpack(kord2)
-								while umenu do
-									DrawBox(a,b,c,d,e,f+0.4, 0, 255, 0, 100)
-									Citizen.Wait(1)
-								end
+								local koordic = GetEntityCoords(PlayerPedId())
+								pinkcage = PolyZone:Create(kord, {
+									name="test",
+									debugGrid = true,
+									minZ = koordic.z-5.0,
+									maxZ = koordic.z+10.0
+								})
 							end)
 							local elements2 = {
 								{label = "Da", value = 'da'},
@@ -764,7 +762,8 @@ function OpenImanjeMenu(ime)
 							  },
 							  function(data2, menu2)
 								if data2.current.value == 'da' then
-									umenu = false
+									pinkcage:destroy()
+									FreezeEntityPosition(PlayerPedId(), false)
 									TriggerServerEvent("imanja:Kupi", ime)
 									menu2.close()
 									menu.close()
@@ -772,7 +771,8 @@ function OpenImanjeMenu(ime)
 									CurrentActionMsg  = "Pritisnite E da vidite opcije imanja"
 									CurrentActionData = {ime = ime}
 								elseif data2.current.value == 'ne' then
-									umenu = false
+									pinkcage:destroy()
+									FreezeEntityPosition(PlayerPedId(), false)
 									menu2.close()
 									menu.close()
 									CurrentAction     = 'menu_imanje'
@@ -781,7 +781,8 @@ function OpenImanjeMenu(ime)
 								end
 							  end,
 							  function(data2, menu2)
-								umenu = false
+								pinkcage:destroy()
+								FreezeEntityPosition(PlayerPedId(), false)
 								menu2.close()
 
 								CurrentAction     = 'menu_imanje'
@@ -800,7 +801,6 @@ function OpenImanjeMenu(ime)
         end
       end,
       function(data, menu)
-
         menu.close()
 
         CurrentAction     = 'menu_imanje'
@@ -815,41 +815,63 @@ RegisterCommand("testpoly", function(source, args, raw)
 	local br = 0
 	local tablica = {}
 	local markeri = {}
+	ESX.ShowNotification("Pritisnite E da spremite marker.")
+	ESX.ShowNotification("Pritisnite enter da zavrsite pravljenje.")
+	ESX.ShowNotification("Pritisnite X da odustanete.")
 	while trazi do
 		Citizen.Wait(1)
-		if IsControlJustPressed(0, 24) then
+		if IsControlJustPressed(0, 38) then
 			local korde = GetEntityCoords(PlayerPedId())
 			local vek = vector2(korde.x, korde.y)
 			print(vek)
 			table.insert(tablica, vek)
 			table.insert(markeri, korde)
-			br = br+1
-			if br == 4 then
-				trazi = false
-				print("gotov")
-			end
 		end
 		for i=1, #markeri, 1 do
 			DrawMarker(0, markeri[i], 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 2.0, 1.0, 0, 0, 0, 100, false, true, 2, false, false, false, false)
 		end
 		if IsControlPressed(0, 186) then
 			trazi = false
+			tablica = {}
 			ESX.ShowNotification("Odustali ste od postavljanja!")
 		end
-	end
-	local pinkcage = PolyZone:Create(tablica, {
-		name="test",
-		debugGrid = true,
-		--minZ = 53.744148254395,
-		--maxZ = 54.037460327148
-	})
-	pinkcage:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
-		if isPointInside then
-			print("uso")
-		else
-			print("izaso")
+		if IsControlPressed(0, 191) then
+			trazi = false
+			ESX.ShowNotification("Zavrsili ste pravljenje!")
 		end
-	end)
+	end
+	if #tablica > 0 then
+		ESX.ShowNotification("Pritisnite enter da zavrsite pregled.")
+		local koordic = GetEntityCoords(PlayerPedId())
+		local pinkcage = PolyZone:Create(tablica, {
+			name="test",
+			debugGrid = true,
+			minZ = koordic.z-5.0,
+			maxZ = koordic.z+10.0
+			--minZ = 53.744148254395,
+			--maxZ = 54.037460327148
+		})
+		local lcord = GetEntityCoords(PlayerPedId())
+		pinkcage:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
+			if isPointInside then
+				print("uso")
+				lcord = GetEntityCoords(PlayerPedId())
+			else
+				print("izaso")
+				SetEntityCoords(PlayerPedId(), lcord)
+			end
+		end)
+		Wait(1000)
+		local gledaj = true
+		while gledaj do
+			Citizen.Wait(1)
+			if IsControlPressed(0, 18) then
+				gledaj = false
+				pinkcage:destroy()
+				ESX.ShowNotification("Zavrsili ste pregled!")
+			end
+		end
+	end
 end)
 
 RegisterCommand("urediimanje", function(source, args, raw)
@@ -892,7 +914,7 @@ RegisterCommand("urediimanje", function(source, args, raw)
 				local ime = data.current.value
 				elements = {}
 				table.insert(elements, {label = "Premjesti marker", value = "mkoord"})
-				table.insert(elements, {label = "Postavi min koord", value = "koord1"})
+				table.insert(elements, {label = "Postavi koord", value = "koord1"})
 				table.insert(elements, {label = "Postavi max koord", value = "koord2"})
 				table.insert(elements, {label = "Makni vlasnika", value = "vlasnik"})
 				table.insert(elements, {label = "Obrisi kucu", value = "obrisik"})
@@ -909,8 +931,69 @@ RegisterCommand("urediimanje", function(source, args, raw)
 							local koord = GetEntityCoords(PlayerPedId())
 							TriggerServerEvent("imanja:PremjestiMarker", ime, koord)
 						elseif data2.current.value == "koord1" then
-							local coord = GetEntityCoords(PlayerPedId())
-							TriggerServerEvent("imanja:SpremiCoord", ime, coord, 1)
+							Wait(1000)
+							local trazi = true
+							local br = 0
+							local tablica = {}
+							local markeri = {}
+							ESX.ShowNotification("Pritisnite E da spremite marker.")
+							ESX.ShowNotification("Pritisnite enter da zavrsite pravljenje.")
+							ESX.ShowNotification("Pritisnite X da odustanete.")
+							while trazi do
+								Citizen.Wait(1)
+								if IsControlJustPressed(0, 38) then
+									local korde = GetEntityCoords(PlayerPedId())
+									local vek = vector2(korde.x, korde.y)
+									print(vek)
+									table.insert(tablica, vek)
+									table.insert(markeri, korde)
+								end
+								for i=1, #markeri, 1 do
+									DrawMarker(0, markeri[i], 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 2.0, 1.0, 0, 0, 0, 100, false, true, 2, false, false, false, false)
+								end
+								if IsControlPressed(0, 186) then
+									trazi = false
+									tablica = {}
+									ESX.ShowNotification("Odustali ste od postavljanja!")
+								end
+								if IsControlPressed(0, 191) then
+									trazi = false
+									ESX.ShowNotification("Zavrsili ste pravljenje!")
+								end
+							end
+							if #tablica > 0 then
+								ESX.ShowNotification("Pritisnite enter da zavrsite pregled.")
+								local koordic = GetEntityCoords(PlayerPedId())
+								local pinkcage = PolyZone:Create(tablica, {
+									name="test",
+									debugGrid = true,
+									minZ = koordic.z-5.0,
+									maxZ = koordic.z+10.0
+									--minZ = 53.744148254395,
+									--maxZ = 54.037460327148
+								})
+								local lcord = GetEntityCoords(PlayerPedId())
+								pinkcage:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point)
+									if isPointInside then
+										print("uso")
+										lcord = GetEntityCoords(PlayerPedId())
+									else
+										print("izaso")
+										SetEntityCoords(PlayerPedId(), lcord)
+									end
+								end)
+								Wait(1000)
+								local gledaj = true
+								while gledaj do
+									Citizen.Wait(1)
+									if IsControlPressed(0, 18) then
+										gledaj = false
+										pinkcage:destroy()
+										ESX.ShowNotification("Zavrsili ste pregled i spremili koordinate!")
+										TriggerServerEvent("imanja:SpremiCoord", ime, tablica, 1)
+									end
+								end
+							end
 						elseif data2.current.value == "koord2" then
 							local coord = GetEntityCoords(PlayerPedId())
 							TriggerServerEvent("imanja:SpremiCoord", ime, coord, 2)
