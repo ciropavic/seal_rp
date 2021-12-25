@@ -46,18 +46,18 @@ AddEventHandler('loaf_housing:DodajKucu', function(id, prop, door, price, prod, 
 	TriggerClientEvent("loaf_housing:SaljiKucice", -1, Config.Houses)
 	
     local xPlayer = ESX.GetPlayerFromId(src)
-    MySQL.Async.fetchScalar("SELECT house FROM users WHERE identifier = @identifier", {['@identifier'] = xPlayer.identifier}, function(result)
-        local house = json.decode(result)
-        if house.houseId == 0 then
+    --MySQL.Async.fetchScalar("SELECT house FROM users WHERE identifier = @identifier", {['@identifier'] = xPlayer.identifier}, function(result)
+        --local house = json.decode(result)
+        --if house.houseId == 0 then
             MySQL.Async.fetchScalar("SELECT houseid FROM bought_houses WHERE houseid=@houseid", {['@houseid'] = id}, function(result)
-                local newHouse = ('{"owns":false,"furniture":[],"houseId":%s}'):format(id)
+                --local newHouse = ('{"owns":false,"furniture":[],"houseId":%s}'):format(id)
                 if not result then
-                    MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
-					MySQL.Sync.execute("INSERT INTO bought_houses (houseid) VALUES (@houseid)", {['houseid'] = id})
+                    --MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
+					MySQL.Sync.execute("INSERT INTO bought_houses (houseid, vlasnik) VALUES (@houseid, @vlasnik)", {['houseid'] = id, ['@vlasnik'] = xPlayer.getID()})
                 end
             end)
-        end
-    end)
+        --end
+    --end)
     Wait(1500)
     TriggerClientEvent('loaf_housing:reloadHouses', -1)
 end)
@@ -287,29 +287,29 @@ RegisterServerEvent('loaf_housing:buyHouse')
 AddEventHandler('loaf_housing:buyHouse', function(id, ka)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    MySQL.Async.fetchScalar("SELECT house FROM users WHERE identifier = @identifier", {['@identifier'] = xPlayer.identifier}, function(result)
+    --[[MySQL.Async.fetchScalar("SELECT house FROM users WHERE identifier = @identifier", {['@identifier'] = xPlayer.identifier}, function(result)
         local house = json.decode(result)
-        if house.houseId == 0 then
+        if house.houseId == 0 then]]
             MySQL.Async.fetchScalar("SELECT houseid FROM bought_houses WHERE houseid=@houseid", {['@houseid'] = id}, function(result)
-                local newHouse = ('{"owns":false,"furniture":[],"houseId":%s}'):format(id)
+                --local newHouse = ('{"owns":false,"furniture":[],"houseId":%s}'):format(id)
                 if not result then
                     if xPlayer.getAccount('bank').money >= Config.Houses[ka]['price'] then
                         xPlayer.removeAccountMoney('bank', Config.Houses[ka]['price'])
-                        MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
-                        MySQL.Sync.execute("INSERT INTO bought_houses (houseid) VALUES (@houseid)", {['houseid'] = id})
+                        --MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
+                        MySQL.Sync.execute("INSERT INTO bought_houses (houseid, vlasnik) VALUES (@houseid, @vlasnik)", {['houseid'] = id, ['vlasnik'] = xPlayer.getID()})
                     else
                         if xPlayer.getMoney() >= Config.Houses[ka]['price'] then
                             xPlayer.removeMoney(Config.Houses[ka]['price'])
-                            MySQL.Sync.execute("INSERT INTO bought_houses (houseid) VALUES (@houseid)", {['houseid'] = id})
-                            MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
+                            MySQL.Sync.execute("INSERT INTO bought_houses (houseid, vlasnik) VALUES (@houseid, @vlasnik)", {['houseid'] = id, ['vlasnik'] = xPlayer.getID()})
+                            --MySQL.Async.execute("UPDATE users SET house=@house WHERE identifier=@identifier", {['@identifier'] = xPlayer.identifier, ['@house'] = newHouse}) 
                         else
                             TriggerClientEvent('esx:showNotification', xPlayer.source, Strings['No_Money'])
                         end
                     end
                 end
             end)
-        end
-    end)
+        --[[end
+    end)]]
     Wait(1500)
     TriggerClientEvent('loaf_housing:reloadHouses', -1)
 end)
@@ -350,10 +350,9 @@ RegisterServerEvent('loaf_housing:getOwned')
 AddEventHandler('loaf_housing:getOwned', function()
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    MySQL.Async.fetchScalar("SELECT house FROM users WHERE identifier = @identifier", {['@identifier'] = xPlayer.identifier}, function(result)
-        local house = json.decode(result)
+    MySQL.Async.fetchScalar("SELECT houseid FROM bought_houses WHERE vlasnik = @identifier", {['@identifier'] = xPlayer.getID()}, function(result)
         MySQL.Async.fetchAll("SELECT houseid FROM bought_houses", {}, function(result2)
-            TriggerClientEvent('loaf_housing:setHouse', xPlayer.source, house, result2)
+            TriggerClientEvent('loaf_housing:setHouse', xPlayer.source, result, result2)
         end)
     end)
 end)
