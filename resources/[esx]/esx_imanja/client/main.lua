@@ -233,18 +233,24 @@ function OpenImanjeMenu(ime)
 			menu.close()
 			local cord = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 10.0, 0.0)
 			local x,y,z = table.unpack(cord)
-			local kord1 = nil
-			local kord2 = nil
+			local kord = nil
 			for i=1, #Koord, 1 do
 				if Koord[i] ~= nil and Koord[i].Imanje == ime then
-					kord1 = Koord[i].Coord
-					if Koord[i].Coord2 ~= nil then
-						kord2 = Koord[i].Coord2
-					end
+					kord = Koord[i].Coord
 				end
 			end
-			local a,b,c = table.unpack(kord1)
-			local d,e,f = table.unpack(kord2)
+			local zadnjimax = kord[1]
+			local zadnjimin = kord[1]
+			for i=1, #kord, 1 do
+				if zadnjimax.x < kord[i].x and zadnjimax.y < kord[i].y then
+					zadnjimax = kord[i]
+				end
+				if zadnjimin.x > kord[i].x and zadnjimin.y > kord[i].y then
+					zadnjimin = kord[i]
+				end
+			end
+			local a,b,c = zadnjimin.x, zadnjimin.y, z
+			local d,e,f = zadnjimax.x, zadnjimax.y, z
 			if a < d then
 				x = math.random(math.floor(a), math.floor(d))
 				if b < e then
@@ -273,8 +279,14 @@ function OpenImanjeMenu(ime)
 			ButtonsScaleform = Instructional.Create(controls)
 			local kordac = GetEntityCoords(Kuca)
 			Citizen.CreateThread(function()
+				local koordic = GetEntityCoords(PlayerPedId())
+				pinkcage = PolyZone:Create(kord, {
+					name="test",
+					debugGrid = true,
+					minZ = koordic.z-5.0,
+					maxZ = koordic.z+10.0
+				})
 				while Kuca ~= nil do
-					DrawBox(a,b,c,d,e,f+0.4, 0, 255, 0, 100)
 					DrawScaleformMovieFullscreen(ButtonsScaleform,255,255,255,255,0)
 						if IsControlJustPressed(0, 175) then
 							if (brojic+1) <= 15 then
@@ -323,88 +335,24 @@ function OpenImanjeMenu(ime)
 							end
 						end
 						if IsControlPressed(0, 32) then
-							local korde1 = nil
-							local korde2 = nil
 							local corde = GetOffsetFromEntityInWorldCoords(Kuca, 0.0, 0.1, 0.0)
-							local cordea = GetOffsetFromEntityInWorldCoords(Kuca, 0.0, 5.0, 0.0)
-							local x,y,z = table.unpack(kord1)
-							local x2,y2,z2 = table.unpack(kord2)
-							if x < x2 then
-								korde1 = kord1
-								korde2 = kord2
-							else
-								korde2 = kord1
-								korde1 = kord2
-							end
-							x,y,z = table.unpack(korde1)
-							x2,y2,z2 = table.unpack(korde2)
-							if cordea.x >= x and cordea.y >= y and cordea.x <= x2 and cordea.y <= y2 then
-								SetEntityCoords(Kuca, corde)
-								PlaceObjectOnGroundProperly(Kuca)
-							end
+							SetEntityCoords(Kuca, corde)
+							PlaceObjectOnGroundProperly(Kuca)
 						end
 						if IsControlPressed(0, 33) then
-							local korde1 = nil
-							local korde2 = nil
 							local corde = GetOffsetFromEntityInWorldCoords(Kuca, 0.0, -0.1, 0.0)
-							local cordea = GetOffsetFromEntityInWorldCoords(Kuca, 0.0, -5.0, 0.0)
-							local x,y,z = table.unpack(kord1)
-							local x2,y2,z2 = table.unpack(kord2)
-							if x < x2 then
-								korde1 = kord1
-								korde2 = kord2
-							else
-								korde2 = kord1
-								korde1 = kord2
-							end
-							x,y,z = table.unpack(korde1)
-							x2,y2,z2 = table.unpack(korde2)
-							if cordea.x >= x and cordea.y >= y and cordea.x <= x2 and cordea.y <= y2 then
-								SetEntityCoords(Kuca, corde)
-								PlaceObjectOnGroundProperly(Kuca)
-							end
+							SetEntityCoords(Kuca, corde)
+							PlaceObjectOnGroundProperly(Kuca)
 						end
 						if IsControlPressed(0, 34) then
-							local korde1 = nil
-							local korde2 = nil
 							local corde = GetOffsetFromEntityInWorldCoords(Kuca, 0.1, 0.0, 0.0)
-							local cordea = GetOffsetFromEntityInWorldCoords(Kuca, 5.0, 0.0, 0.0)
-							local x,y,z = table.unpack(kord1)
-							local x2,y2,z2 = table.unpack(kord2)
-							if x < x2 then
-								korde1 = kord1
-								korde2 = kord2
-							else
-								korde2 = kord1
-								korde1 = kord2
-							end
-							x,y,z = table.unpack(korde1)
-							x2,y2,z2 = table.unpack(korde2)
-							if cordea.x >= x and cordea.y >= y and cordea.x <= x2 and cordea.y <= y2 then
-								SetEntityCoords(Kuca, corde)
-								PlaceObjectOnGroundProperly(Kuca)
-							end
+							SetEntityCoords(Kuca, corde)
+							PlaceObjectOnGroundProperly(Kuca)
 						end
 						if IsControlPressed(0, 35) then
-							local korde1 = nil
-							local korde2 = nil
 							local corde = GetOffsetFromEntityInWorldCoords(Kuca, -0.1, 0.0, 0.0)
-							local cordea = GetOffsetFromEntityInWorldCoords(Kuca, -5.0, 0.0, 0.0)
-							local x,y,z = table.unpack(kord1)
-							local x2,y2,z2 = table.unpack(kord2)
-							if x < x2 then
-								korde1 = kord1
-								korde2 = kord2
-							else
-								korde2 = kord1
-								korde1 = kord2
-							end
-							x,y,z = table.unpack(korde1)
-							x2,y2,z2 = table.unpack(korde2)
-							if cordea.x >= x and cordea.y >= y and cordea.x <= x2 and cordea.y <= y2 then
-								SetEntityCoords(Kuca, corde)
-								PlaceObjectOnGroundProperly(Kuca)
-							end
+							SetEntityCoords(Kuca, corde)
+							PlaceObjectOnGroundProperly(Kuca)
 						end
 						if IsControlPressed(0, 52) then
 							local head = GetEntityHeading(Kuca)
@@ -419,6 +367,7 @@ function OpenImanjeMenu(ime)
 						if IsControlJustPressed(0, 191) then
 							ESX.TriggerServerCallback('imanja:ImalPara', function(imal)
 								if imal then
+									pinkcage:destroy()
 									FreezeEntityPosition(PlayerPedId(), false)
 									local korda = GetEntityCoords(Kuca)
 									local heading = GetEntityHeading(Kuca)
@@ -431,6 +380,7 @@ function OpenImanjeMenu(ime)
 								else
 									ESX.ShowNotification("Nemate dovoljno novca!")
 									DeleteObject(Kuca)
+									pinkcage:destroy()
 									Kuca = nil
 									CurrentAction     = 'menu_imanje'
 									CurrentActionMsg  = "Pritisnite E da vidite opcije imanja"
@@ -442,6 +392,7 @@ function OpenImanjeMenu(ime)
 						if IsControlJustPressed(0, 73) then
 							FreezeEntityPosition(PlayerPedId(), false)
 							DeleteObject(Kuca)
+							pinkcage:destroy()
 							Kuca = nil
 							CurrentAction     = 'menu_imanje'
 							CurrentActionMsg  = "Pritisnite E da vidite opcije imanja"
