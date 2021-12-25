@@ -224,10 +224,10 @@ RegisterCommand("zavrsikosenje", function(source, args, rawCommandString)
 end, false)
 
 function IzrastiTravo()
-	if OwnedHouse > 0 then
-		if Config.Trava[OwnedHouse] ~= nil then
-			for i=1, #Config.Trava[OwnedHouse], 1 do
-				local xa, ya, za = table.unpack(Config.Trava[OwnedHouse][i])
+	if OwnedHouse.houseId > 0 then
+		if Config.Trava[OwnedHouse.houseId] ~= nil then
+			for i=1, #Config.Trava[OwnedHouse.houseId], 1 do
+				local xa, ya, za = table.unpack(Config.Trava[OwnedHouse.houseId][i])
 				ESX.Game.SpawnLocalObject('prop_veg_grass_02_a', {
 					x = xa,
 					y = ya,
@@ -237,7 +237,7 @@ function IzrastiTravo()
 					Objekti[i] = obj
 				end)
 			end
-			Broj = #Config.Trava[OwnedHouse]
+			Broj = #Config.Trava[OwnedHouse.houseId]
 			Izrasla = true
 		end
 	end
@@ -304,7 +304,7 @@ Citizen.CreateThread(function()
         table.insert(blips, blip)
     end
 
-	if OwnedHouse > 0 then
+	if OwnedHouse.houseId > 0 then
 		IzrastiTravo()
 	end
 
@@ -315,11 +315,11 @@ Citizen.CreateThread(function()
             if Vdist2(GetEntityCoords(PlayerPedId()), v['door']) <= 2.5 then
                 local text = 'error'
                 while Vdist2(GetEntityCoords(PlayerPedId()), v['door']) <= 2.5 do
-                    if OwnedHouse == k then
+                    if OwnedHouse.houseId == k then
                         text = (Strings['Press_E']):format(Strings['Manage_House'])
                     else
                         if not AvailableHouses[k] then
-                            if OwnedHouse ~= 0 then
+                            if OwnedHouse.houseId ~= 0 then
                                 text = Strings['Must_Sell']
                             else
                                 text = (Strings['Press_E']):format((Strings['Buy_House']):format(k, v['price']))
@@ -330,7 +330,7 @@ Citizen.CreateThread(function()
                     end
                     HelpText(text, v['door'])
                     if IsControlJustReleased(0, 38) then
-                        if OwnedHouse == k then
+                        if OwnedHouse.houseId == k then
                             ESX.UI.Menu.CloseAll()
                             elements = {
                                 {label = Strings['Enter_House'], value = 'enter'},
@@ -339,7 +339,7 @@ Citizen.CreateThread(function()
                             if Config.EnableGarage then
                                 table.insert(elements, {label = Strings['Garage'], value = 'garage'})
                             end
-							if Config.Trava[OwnedHouse] ~= nil then
+							if Config.Trava[OwnedHouse.houseId] ~= nil then
 								if Kosim == false then
 									table.insert(elements, {label = "Pokosite travu", value = 'trava'})
 								else
@@ -392,13 +392,13 @@ Citizen.CreateThread(function()
 												function(data2, menu2)
 													if data2.current.value == 'yes' then
 														if Izrasla then
-															for i=1, #Config.Trava[OwnedHouse], 1 do
+															for i=1, #Config.Trava[OwnedHouse.houseId], 1 do
 																ESX.Game.DeleteObject(Objekti[i])
 															end
 															Objekti = {}
 															Izrasla = false
 														end
-														OwnedHouse = 0
+														OwnedHouse.houseId = 0
 														Kosim = false
 														TriggerServerEvent('loaf_housing:sellHouse')
 														ESX.UI.Menu.CloseAll()
@@ -419,7 +419,7 @@ Citizen.CreateThread(function()
 									elseif data.current.value == 'trava' then
                                         if Izrasla and Kosim == false then
 											ESX.UI.Menu.CloseAll()
-											local x,y,z = table.unpack(Config.Trava[OwnedHouse][8])
+											local x,y,z = table.unpack(Config.Trava[OwnedHouse.houseId][8])
 											SetEntityCoords(PlayerPedId(), x,y,z, false, false, false, true)
 											Kosim = true
 											if prop_ent ~= nil then
@@ -460,7 +460,7 @@ Citizen.CreateThread(function()
                                 menu.close()
                             end)
                         else
-                            if not AvailableHouses[k] and OwnedHouse == 0 then
+                            if not AvailableHouses[k] and OwnedHouse.houseId == 0 then
                                 ESX.UI.Menu.CloseAll()
                                 ESX.UI.Menu.Open(
                                     'default', GetCurrentResourceName(), 'buy',
@@ -505,7 +505,7 @@ Citizen.CreateThread(function()
                     Wait(0)
                 end
             else
-                if OwnedHouse == k then
+                if OwnedHouse.houseId == k then
                     local coords = v['door']
                     local found, coords, heading = GetClosestVehicleNodeWithHeading(coords.x, coords.y, coords.z, 4, 10.0, 0)
                     if found then
@@ -776,7 +776,7 @@ AddEventHandler('loaf_housing:spawnHouse', function(coords, furniture)
 	local ida = 0
 	for ka, v in pairs(Config.Houses) do
 		local k = v['ID']
-		if k == OwnedHouse then
+		if k == OwnedHouse.houseId then
 			ida = ka
 			break
 		end
@@ -846,9 +846,9 @@ AddEventHandler('loaf_housing:spawnHouse', function(coords, furniture)
                 },
                 function(data, menu)
                     if data.current.value == 'i' then
-                        itemStorage(OwnedHouse)
+                        itemStorage(OwnedHouse.houseId)
                     elseif data.current.value == 'w' then
-                        weaponStorage(OwnedHouse)
+                        weaponStorage(OwnedHouse.houseId)
 					elseif data.current.value == 'odjeca' then
                         ESX.TriggerServerCallback('esx_property:getPlayerDressing', function(dressing)
 							local elements = {}
@@ -941,7 +941,7 @@ AddEventHandler('loaf_housing:spawnHouse', function(coords, furniture)
                             else
                                 ESX.ShowNotification(Strings['Guests'])
                             end
-                        end, OwnedHouse)
+                        end, OwnedHouse.houseId)
                     elseif data.current.value == 'refurnish' then
                         ESX.TriggerServerCallback('loaf_housing:hasGuests', function(has)
                             if not has then
@@ -1373,14 +1373,14 @@ AddEventHandler('loaf_housing:setHouse', function(house, purchasedHouses)
     end
 
     for k, v in pairs(purchasedHouses) do
-        if v.houseid ~= OwnedHouse then
+        if v.houseid ~= OwnedHouse.houseId then
             AvailableHouses[v.houseid] = v.houseid
         end
     end
 
     for ka, v in pairs(Config.Houses) do
 		local k = v['ID']
-        if OwnedHouse == k then
+        if OwnedHouse.houseId == k then
             CreateBlip(v['door'], 40, 3, 0.75, Strings['Your_House'])
         else
             if not AvailableHouses[k] then
