@@ -703,6 +703,297 @@ function OpenImanjeMenu(ime)
     )
 end
 
+--[[
+X: 0.62 Y: -0.5 Z: 0.2
+PX: 0.0 PY: 110.45 PZ: 132.0
+Bone: IK_R_Hand Bone final: 6286
+]]
+local ograda = nil
+local ograda2 = nil
+local ograda3 = nil
+RegisterCommand("testogradu2", function(source, args, raw)
+	local playerPed = PlayerPedId()
+	local coords    = GetEntityCoords(playerPed)
+	local forward   = GetEntityForwardVector(playerPed)
+	local x, y, z   = table.unpack(coords + forward * 0.8)
+	Ograda(vector3(x,y,z), GetEntityHeading(playerPed))
+end)
+
+function Ograda(cord, head)
+	local hedara	= nil
+	local endara = false
+	print(cord.x)
+	ESX.Game.SpawnObject('prop_fncwood_08b', {
+		x = cord.x,
+		y = cord.y,
+		z = cord.z
+	}, function(obj)
+		ograda2 = obj
+		SetEntityHeading(obj, head)
+		PlaceObjectOnGroundProperly(obj)
+		local getara = GetEntityCoords(obj)
+		SetEntityCoords(obj, getara.x, getara.y, getara.z-0.1)
+		local kord = nil
+		local kordara = nil
+		local kordara2 = nil
+		local moze = true
+		while moze do
+			Wait(1)
+			DisableControlAction(0, 24, true)
+			DisableControlAction(2, 37, true)
+			--DisablePlayerFiring(player,true) -- Disables firing all together if they somehow bypass inzone Mouse Disable
+			DisableControlAction(0, 106, true)
+			DisableControlAction(0, 167, true)
+			DisableControlAction(0, 45, true)
+			DisableControlAction(0, 140, true)
+			DisableControlAction(0, 263, true)
+			if IsControlJustPressed(0, 174) then
+				local head = GetEntityHeading(obj)
+				SetEntityHeading(obj, head-1.0)
+			end
+			if IsControlJustPressed(0, 175) then
+				local head = GetEntityHeading(obj)
+				SetEntityHeading(obj, head+1.0)
+			end
+			if IsControlJustPressed(0, 176) then
+				kord = GetEntityCoords(obj)
+				hedara = GetEntityHeading(obj)
+				kordara = GetOffsetFromEntityInWorldCoords(obj, 2.1, 0.0, 0.0)
+				kordara2 = kordara
+				ESX.Game.DeleteObject(obj)
+				ograda2 = nil
+				if ograda == nil then
+					ESX.Game.SpawnObject('prop_fncwood_14a', {
+						x = kord.x,
+						y = kord.y,
+						z = kord.z
+					}, function(obj)
+						ograda = obj
+						PlaceObjectOnGroundProperly(obj)
+						local getara = GetEntityCoords(obj)
+						SetEntityCoords(obj, getara.x, getara.y, getara.z-0.1)
+					end)
+				end
+				if ograda2 == nil then
+					ESX.Game.SpawnObject('prop_fncwood_14a', {
+						x = kordara.x,
+						y = kordara.y,
+						z = kordara.z
+					}, function(obj)
+						ograda2 = obj
+						PlaceObjectOnGroundProperly(obj)
+						local getara = GetEntityCoords(obj)
+						SetEntityCoords(obj, getara.x, getara.y, getara.z-0.1)
+					end)
+				end
+				moze = false
+			end
+			if IsControlJustPressed(0, 73) then
+				ESX.Game.DeleteObject(obj)
+				ograda2 = nil
+				endara = true
+				moze = false
+			end
+		end
+		if not endara then
+			moze = true
+			while moze do
+				Wait(1)
+				DisableControlAction(0, 24, true)
+				DisableControlAction(2, 37, true)
+				--DisablePlayerFiring(player,true) -- Disables firing all together if they somehow bypass inzone Mouse Disable
+				DisableControlAction(0, 106, true)
+				DisableControlAction(0, 167, true)
+				DisableControlAction(0, 45, true)
+				DisableControlAction(0, 140, true)
+				DisableControlAction(0, 263, true)
+				if kord ~= nil and ograda ~= nil then
+					DrawMarker(0, kord, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 2.0, 1.0, 0, 0, 0, 100, false, true, 2, false, false, false, false)
+					if #(GetEntityCoords(PlayerPedId())-kord) <= 1.0 then
+						RequestAnimDict("melee@small_wpn@streamed_core")
+						while not HasAnimDictLoaded("melee@small_wpn@streamed_core") do
+							Citizen.Wait(100)
+						end
+						local moze2 = true
+						local proso = true
+						local br = 0
+						while moze2 do
+							Wait(1)
+							DisableControlAction(0, 24, true)
+							DisableControlAction(2, 37, true)
+							--DisablePlayerFiring(player,true) -- Disables firing all together if they somehow bypass inzone Mouse Disable
+							DisableControlAction(0, 106, true)
+							DisableControlAction(0, 167, true)
+							DisableControlAction(0, 45, true)
+							DisableControlAction(0, 140, true)
+							DisableControlAction(0, 263, true)
+							if IsDisabledControlJustPressed(0, 24) and proso then
+								proso = false
+								TaskPlayAnim(PlayerPedId(),"melee@small_wpn@streamed_core","car_down_attack", 8.0, -8, -1, 2, 0, 0, 0, 0)
+								Wait(400)
+								local corda = GetEntityCoords(ograda)
+								SetEntityCoords(ograda, corda.x, corda.y, corda.z-0.02)
+								Wait(300)
+								proso = true
+								br = br+1
+								if br == 10 then
+									moze2 = false
+									kord = nil
+								end
+							end
+						end
+						ClearPedTasksImmediately(PlayerPedId())
+						RemoveAnimDict("melee@small_wpn@streamed_core")
+					end
+				end
+				if kordara ~= nil and ograda2 ~= nil then
+					DrawMarker(0, kordara, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 2.0, 1.0, 0, 0, 0, 100, false, true, 2, false, false, false, false)
+					if #(GetEntityCoords(PlayerPedId())-kordara) <= 1.0 then
+						RequestAnimDict("melee@small_wpn@streamed_core")
+						while not HasAnimDictLoaded("melee@small_wpn@streamed_core") do
+							Citizen.Wait(100)
+						end
+						local moze2 = true
+						local proso = true
+						local br = 0
+						while moze2 do
+							Wait(1)
+							DisableControlAction(0, 24, true)
+							DisableControlAction(2, 37, true)
+							--DisablePlayerFiring(player,true) -- Disables firing all together if they somehow bypass inzone Mouse Disable
+							DisableControlAction(0, 106, true)
+							DisableControlAction(0, 167, true)
+							DisableControlAction(0, 45, true)
+							DisableControlAction(0, 140, true)
+							DisableControlAction(0, 263, true)
+							if IsDisabledControlJustPressed(0, 24) and proso then
+								proso = false
+								TaskPlayAnim(PlayerPedId(),"melee@small_wpn@streamed_core","car_down_attack", 8.0, -8, -1, 2, 0, 0, 0, 0)
+								Wait(400)
+								local corda = GetEntityCoords(ograda2)
+								SetEntityCoords(ograda2, corda.x, corda.y, corda.z-0.02)
+								Wait(300)
+								proso = true
+								br = br+1
+								if br == 10 then
+									moze2 = false
+									kordara = nil
+								end
+							end
+						end
+						ClearPedTasksImmediately(PlayerPedId())
+						RemoveAnimDict("melee@small_wpn@streamed_core")
+					end
+				end
+				if kord == nil and kordara == nil then
+					ESX.Game.DeleteObject(ograda)
+					ograda = nil
+					ESX.Game.DeleteObject(ograda2)
+					ograda2 = nil
+					ESX.Game.SpawnObject('prop_fncwood_08b', {
+						x = cord.x,
+						y = cord.y,
+						z = cord.z
+					}, function(obj)
+						PlaceObjectOnGroundProperly(obj)
+						local getara = GetEntityCoords(obj)
+						SetEntityCoords(obj, getara.x, getara.y, getara.z-0.5)
+						ograda = obj
+						SetEntityHeading(obj, hedara)
+					end)
+					moze = false
+				end
+			end
+			while ograda == nil do
+				Wait(1)
+			end
+			local kordo = GetOffsetFromEntityInWorldCoords(ograda, 2.1, 0.0, 0.0)
+			Ograda(kordo, GetEntityHeading(ograda))
+			ograda = nil
+		end
+	end)
+end
+
+RegisterCommand("testogradu3", function(source, args, raw)
+	local playerPed = PlayerPedId()
+	local coords    = GetEntityCoords(ograda2)
+	ESX.Game.SpawnObject('prop_fncwood_08b', {
+		x = coords.x,
+		y = coords.y,
+		z = coords.z
+	}, function(obj)
+		ograda3 = obj
+		SetEntityHeading(obj, GetEntityHeading(ograda2))
+		PlaceObjectOnGroundProperly(obj)
+		local getara = GetEntityCoords(obj)
+		SetEntityCoords(obj, getara.x, getara.y, getara.z-0.1)
+		local kordara = GetOffsetFromEntityInWorldCoords(obj, 2.1, 0.0, 0.0)
+		SetEntityCoords(obj, kordara)
+		local moze = true
+		while moze do
+			Wait(1)
+			if IsControlJustPressed(0, 174) then
+				local head = GetEntityHeading(obj)
+				SetEntityHeading(obj, head-1.0)
+			end
+			if IsControlJustPressed(0, 175) then
+				local head = GetEntityHeading(obj)
+				SetEntityHeading(obj, head+1.0)
+			end
+		end
+	end)
+end)
+
+RegisterCommand("testogradu", function(source, args, raw)
+	local playerPed = PlayerPedId()
+	local coords    = GetEntityCoords(playerPed)
+	local forward   = GetEntityForwardVector(playerPed)
+	local x, y, z   = table.unpack(coords + forward * 0.8)
+	ESX.Game.SpawnObject('prop_fncwood_14a', {
+		x = x,
+		y = y,
+		z = z
+	}, function(obj)
+		ograda = obj
+		SetEntityHeading(obj, GetEntityHeading(playerPed))
+		PlaceObjectOnGroundProperly(obj)
+		local getara = GetEntityCoords(obj)
+		SetEntityCoords(obj, getara.x, getara.y, getara.z-0.1)
+		RequestAnimDict("melee@small_wpn@streamed_core")
+		while not HasAnimDictLoaded("melee@small_wpn@streamed_core") do
+			Citizen.Wait(100)
+		end
+		local moze = true
+		local proso = true
+		local br = 0
+		while moze do
+			Wait(1)
+			DisableControlAction(0, 24, true)
+			if IsDisabledControlJustPressed(0, 24) and proso then
+				proso = false
+				TaskPlayAnim(PlayerPedId(),"melee@small_wpn@streamed_core","car_down_attack", 8.0, -8, -1, 2, 0, 0, 0, 0)
+				Wait(400)
+				local corda = GetEntityCoords(obj)
+				SetEntityCoords(obj, corda.x, corda.y, corda.z-0.02)
+				Wait(300)
+				proso = true
+				br = br+1
+				if br == 10 then
+					moze = false
+				end
+			end
+		end
+		ClearPedTasksImmediately(PlayerPedId())
+		RemoveAnimDict("melee@small_wpn@streamed_core")
+	end)
+end)
+
+RegisterCommand("obrisiogradu", function(source, args, raw)
+	ESX.Game.DeleteObject(ograda)
+	ESX.Game.DeleteObject(ograda2)
+	ESX.Game.DeleteObject(ograda3)
+end)
+
 RegisterCommand("testpoly", function(source, args, raw)
 	local trazi = true
 	local br = 0

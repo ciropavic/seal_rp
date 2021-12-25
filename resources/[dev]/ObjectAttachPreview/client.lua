@@ -242,19 +242,11 @@ RegisterKeyMapping('minuspx', '- PX', 'keyboard', 'numpad1')
 
 RegisterCommand("plustol", function(source,args,rawCommand)
     tol=tol+0.05;
-    exports['t-notify']:Alert({
-        style = 'error',
-        message = "Tol is now: " .. tostring(tol)
-    })
 end, false)
 RegisterKeyMapping('plustol', '+ TOL', 'keyboard', 'add')
 
 RegisterCommand("minustol", function(source,args,rawCommand)
     tol=tol-0.05;
-    exports['t-notify']:Alert({
-        style = 'error',
-        message = "Tol is now: " .. tostring(tol)
-    })
 end, false)
 RegisterKeyMapping('minustol', '- TOL', 'keyboard', 'subtract')
 
