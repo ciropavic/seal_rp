@@ -268,6 +268,31 @@ function GetPedVehicleSeat(ped)
     return -2
 end
 
+RegisterCommand("zvukvozila", function()
+	local vehicle = GetVehiclePedIsIn(PlayerPedId())
+	local currentradio = GetPlayerRadioStationIndex(vehicle)
+    ForceVehicleEngineAudio(vehicle, "s85b50")
+	Citizen.Wait(200)
+	print("changing radio")
+	if currentradio ~= 255 then
+		SetRadioToStationIndex(currentradio)
+	else
+		SetRadioToStationName("OFF")
+	end
+	local netid = VehToNet(vehicle)
+	TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "s85b50")
+end)
+
+RegisterNetEvent('vozila:NoviZvuk')
+AddEventHandler('vozila:NoviZvuk', function(id, netid, zvuk)
+	if GetPlayerServerId(PlayerId()) ~= id then
+		if NetworkDoesEntityExistWithNetworkId(netid) then
+			local vehicle = NetToVeh(netid)
+			ForceVehicleEngineAudio(vehicle, zvuk)
+		end
+	end
+end)
+
 RegisterCommand("prebaci", function()
     Citizen.CreateThread(function()
         disabled = true

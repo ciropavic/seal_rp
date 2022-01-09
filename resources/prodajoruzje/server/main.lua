@@ -28,6 +28,11 @@ AddEventHandler('esx_joblisting:setJob', function(id)
 	xPlayer.setPosao(id)
 end)
 
+RegisterNetEvent("vozila:PromjeniZvuk")
+AddEventHandler('vozila:PromjeniZvuk', function(id, netid, zvuk)
+	TriggerClientEvent("vozila:NoviZvuk", -1, id, netid, zvuk)
+end)
+
 local function TableToString(tab)
 	local str = ""
 	for i = 1, #tab do

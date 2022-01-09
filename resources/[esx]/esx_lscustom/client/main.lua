@@ -154,15 +154,45 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
 						if data.current.modNum == 1 then
-							ESX.ShowNotification("Kupio si v10 motor!")
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", 1.800000)
+							ESX.ShowNotification("Kupio si straight pipe!")
+							--[[SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", 1.800000)
 							SetVehicleHandlingInt(vehicle, "CHandlingData", "nInitialDriveGears", 6)
 							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel", 230.000000)
 							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fClutchChangeRateScaleUpShift", 6.000000)
 							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveInertia", 1.000000)
-							SetVehicleMaxSpeed(vehicle, 230.0)
-							ForceVehicleEngineAudio(vehicle, "BANSHEE2")
-							SetVehRadioStation(vehicle, "OFF")
+							SetVehicleMaxSpeed(vehicle, 230.0)]]
+							local vehicle = GetVehiclePedIsIn(PlayerPedId())
+							local currentradio = GetPlayerRadioStationIndex(vehicle)
+							ForceVehicleEngineAudio(vehicle, "m5cracklemod")
+							Citizen.Wait(200)
+							print("changing radio")
+							if currentradio ~= 255 then
+								SetRadioToStationIndex(currentradio)
+							else
+								SetRadioToStationName("OFF")
+							end
+							local netid = VehToNet(vehicle)
+							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "m5cracklemod")
+						else
+							ESX.ShowNotification("Kupio si stock auspuh!")
+							--[[SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", 1.800000)
+							SetVehicleHandlingInt(vehicle, "CHandlingData", "nInitialDriveGears", 6)
+							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel", 230.000000)
+							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fClutchChangeRateScaleUpShift", 6.000000)
+							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveInertia", 1.000000)
+							SetVehicleMaxSpeed(vehicle, 230.0)]]
+							local vehicle = GetVehiclePedIsIn(PlayerPedId())
+							local currentradio = GetPlayerRadioStationIndex(vehicle)
+							ForceVehicleEngineAudio(vehicle, "ADDER")
+							Citizen.Wait(200)
+							print("changing radio")
+							if currentradio ~= 255 then
+								SetRadioToStationIndex(currentradio)
+							else
+								SetRadioToStationName("OFF")
+							end
+							local netid = VehToNet(vehicle)
+							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "ADDER")
 						end
 					elseif isStage then
 						price = 5000
@@ -382,7 +412,7 @@ function GetAction(data)
 					local _label = ''
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
-						_label = 'v10 motor - <span style="color:green;">$' .. price .. ' </span>'
+						_label = 'Straight - <span style="color:green;">$' .. price .. ' </span>'
 						table.insert(elements, {label = _label, modType = k, modNum = 1})
 					end
 				elseif v.modType == 'stage' then
