@@ -3,6 +3,7 @@ local Grebalice = {}
 local COruzje = {}
 local LotoBrojevi = {}
 local Igraci = {}
+local Zvukovi = {}
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
@@ -21,6 +22,20 @@ AddEventHandler('prodajoruzje:PosaljiAdmOdgovor', function(id, odg)
 	end
 end)
 
+AddEventHandler("playerEnteredScope", function(data)
+    local playerEntering, player = data["player"], data["for"]
+    print(("%s is entering %s's scope"):format(playerEntering, player))
+	local veh = GetVehiclePedIsIn(GetPlayerPed(player))
+	local net = NetworkGetNetworkIdFromEntity(veh)
+	for i = 1, #Zvukovi do
+		if Zvukovi[i].netid == net then
+			print("naso")
+			TriggerClientEvent("vozila:NoviZvuk", -1, tonumber(player), net, Zvukovi[i].zvuk)
+			break
+		end
+	end
+end)
+
 RegisterNetEvent("esx_joblisting:setJob")
 AddEventHandler('esx_joblisting:setJob', function(id)
 	local _source = source
@@ -30,6 +45,17 @@ end)
 
 RegisterNetEvent("vozila:PromjeniZvuk")
 AddEventHandler('vozila:PromjeniZvuk', function(id, netid, zvuk)
+	local naso = false
+	for i = 1, #Zvukovi do
+		if Zvukovi[i].netid == netid then
+			Zvukovi[i].zvuk = zvuk
+			naso = true
+			break
+		end
+	end
+	if not naso then
+		table.insert(Zvukovi, {netid = netid, zvuk = zvuk})
+	end
 	TriggerClientEvent("vozila:NoviZvuk", -1, id, netid, zvuk)
 end)
 

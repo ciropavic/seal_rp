@@ -268,25 +268,128 @@ function GetPedVehicleSeat(ped)
     return -2
 end
 
-RegisterCommand("zvukvozila", function()
+RegisterCommand("zvukvozila", function(source, args, raw)
 	local vehicle = GetVehiclePedIsIn(PlayerPedId())
 	local currentradio = GetPlayerRadioStationIndex(vehicle)
-    ForceVehicleEngineAudio(vehicle, "s85b50")
-	Citizen.Wait(200)
-	print("changing radio")
-	if currentradio ~= 255 then
-		SetRadioToStationIndex(currentradio)
-	else
-		SetRadioToStationName("OFF")
+	if tonumber(args[1]) == 1 then
+		ForceVehicleEngineAudio(vehicle, "s85b50")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "s85b50")
+	elseif tonumber(args[1]) == 2 then
+		ForceVehicleEngineAudio(vehicle, "n55b30t0")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "n55b30t0")
+	elseif tonumber(args[1]) == 3 then
+		ForceVehicleEngineAudio(vehicle, "s55b30")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "s55b30")
+	elseif tonumber(args[1]) == 4 then
+		ForceVehicleEngineAudio(vehicle, "audicrdb")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audicrdb")
+	elseif tonumber(args[1]) == 5 then
+		ForceVehicleEngineAudio(vehicle, "audi7a")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audi7a")
+	elseif tonumber(args[1]) == 6 then
+		ForceVehicleEngineAudio(vehicle, "audiea855")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiea855")
+	elseif tonumber(args[1]) == 7 then
+		ForceVehicleEngineAudio(vehicle, "audiwx")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiwx")
+	elseif tonumber(args[1]) == 8 then
+		ForceVehicleEngineAudio(vehicle, "ferrarif154")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "ferrarif154")
+	elseif tonumber(args[1]) == 9 then
+		ForceVehicleEngineAudio(vehicle, "hondaf20c")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "hondaf20c")
+	elseif tonumber(args[1]) == 10 then
+		ForceVehicleEngineAudio(vehicle, "gallardov10")
+		Citizen.Wait(200)
+		print("changing radio")
+		if currentradio ~= 255 then
+			SetRadioToStationIndex(currentradio)
+		else
+			SetRadioToStationName("OFF")
+		end
+		local netid = VehToNet(vehicle)
+		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "gallardov10")
 	end
-	local netid = VehToNet(vehicle)
-	TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "s85b50")
 end)
 
 RegisterNetEvent('vozila:NoviZvuk')
 AddEventHandler('vozila:NoviZvuk', function(id, netid, zvuk)
 	if GetPlayerServerId(PlayerId()) ~= id then
+		Wait(500)
 		if NetworkDoesEntityExistWithNetworkId(netid) then
+			print("postojim")
 			local vehicle = NetToVeh(netid)
 			ForceVehicleEngineAudio(vehicle, zvuk)
 		end
