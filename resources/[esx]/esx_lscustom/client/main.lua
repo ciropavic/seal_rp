@@ -200,6 +200,51 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 							ModifyVehicleTopSpeed(vehicle, 16.11)
 							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
 							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+						elseif data.current.modNum == 2 then
+							ESX.ShowNotification("Kupio si Gallardo v10 motor!")
+							local vehicle = GetVehiclePedIsIn(PlayerPedId())
+							local currentradio = GetPlayerRadioStationIndex(vehicle)
+							ForceVehicleEngineAudio(vehicle, "gallardov10")
+							Citizen.Wait(200)
+							print("changing radio")
+							if currentradio ~= 255 then
+								SetRadioToStationIndex(currentradio)
+							else
+								SetRadioToStationName("OFF")
+							end
+							local netid = VehToNet(vehicle)
+							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "gallardov10")
+							local globalplate = GetVehicleNumberPlateText(vehicle)
+							TriggerServerEvent("motor:PromjeniMotor", "gallardov10", globalplate)
+							local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+							local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+							local drag
+							local speed
+							if DragCoef >= 20.0 then
+								drag = DragCoef*0.7
+								speed = 1.4
+							end
+							if DragCoef < 20.0 and DragCoef > 10.0 then
+								drag = DragCoef*0.3
+								speed = 0.4
+							end
+							if DragCoef <= 10.0 and DragCoef > 6.0 then
+								drag = DragCoef*0.1
+								speed = 0.1
+							end
+							if DragCoef <= 6.0 then
+								drag = DragCoef*0.02
+								speed = 0.02
+							end
+							local br = DragCoef-drag
+							local br2 = FlatVel+(FlatVel*speed)
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+							ModifyVehicleTopSpeed(vehicle, 16.11)
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
 						end
 					elseif isStage then
 						price = 5000
@@ -422,6 +467,8 @@ function GetAction(data)
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 						_label = 'Audi i5 - <span style="color:green;">$' .. price .. ' </span>'
 						table.insert(elements, {label = _label, modType = k, modNum = 1})
+						_label = 'Gallardo v10 - <span style="color:green;">$' .. price .. ' </span>'
+						table.insert(elements, {label = _label, modType = k, modNum = 2})
 					end
 				elseif v.modType == 'stage' then
 					local globalplate  = GetVehicleNumberPlateText(vehicle)
