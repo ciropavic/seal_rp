@@ -501,7 +501,7 @@ Config.Menus = {
 		modType 		= 'dodaci'
 	},
 	swap = {
-		label			= "Straight pipe",
+		label			= "Zamjena motora",
 		parent			= 'upgrades',
 		modType 		= 'swap'
 	},
@@ -521,7 +521,7 @@ Config.Menus = {
 		modTurbo		= _U('turbo'),
 		mjenjac 		= "Zamjena mjenjaca",
 		stage 			= "Stage tuning",
-		swap 			= "Straight pipe"
+		swap 			= "Zamjena motora"
 	},
 	modEngine = {
 		label = _U('engine'),

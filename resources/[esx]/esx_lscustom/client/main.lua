@@ -16,6 +16,8 @@ local PlayerData		= {}
 local lsMenuIsShowed	= false
 local isInLSMarker		= false
 local myCar				= {}
+local gDragCoef = 0
+local gFlatVel = 0
 
 Citizen.CreateThread(function()
 	while ESX == nil do
@@ -154,16 +156,10 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
 						if data.current.modNum == 1 then
-							ESX.ShowNotification("Kupio si straight pipe!")
-							--[[SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", 1.800000)
-							SetVehicleHandlingInt(vehicle, "CHandlingData", "nInitialDriveGears", 6)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel", 230.000000)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fClutchChangeRateScaleUpShift", 6.000000)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveInertia", 1.000000)
-							SetVehicleMaxSpeed(vehicle, 230.0)]]
+							ESX.ShowNotification("Kupio si Audi i5 motor!")
 							local vehicle = GetVehiclePedIsIn(PlayerPedId())
 							local currentradio = GetPlayerRadioStationIndex(vehicle)
-							ForceVehicleEngineAudio(vehicle, "m5cracklemod")
+							ForceVehicleEngineAudio(vehicle, "audiea855")
 							Citizen.Wait(200)
 							print("changing radio")
 							if currentradio ~= 255 then
@@ -172,30 +168,42 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 								SetRadioToStationName("OFF")
 							end
 							local netid = VehToNet(vehicle)
-							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "m5cracklemod")
-						else
-							ESX.ShowNotification("Kupio si stock auspuh!")
-							--[[SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", 1.800000)
-							SetVehicleHandlingInt(vehicle, "CHandlingData", "nInitialDriveGears", 6)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel", 230.000000)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fClutchChangeRateScaleUpShift", 6.000000)
-							SetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveInertia", 1.000000)
-							SetVehicleMaxSpeed(vehicle, 230.0)]]
-							local vehicle = GetVehiclePedIsIn(PlayerPedId())
-							local currentradio = GetPlayerRadioStationIndex(vehicle)
-							ForceVehicleEngineAudio(vehicle, "ADDER")
-							Citizen.Wait(200)
-							print("changing radio")
-							if currentradio ~= 255 then
-								SetRadioToStationIndex(currentradio)
-							else
-								SetRadioToStationName("OFF")
+							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiea855")
+							local globalplate = GetVehicleNumberPlateText(vehicle)
+							TriggerServerEvent("motor:PromjeniMotor", "audiea855", globalplate)
+							local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+							local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+							local drag
+							local speed
+							if DragCoef >= 20.0 then
+								drag = DragCoef*0.7
+								speed = 1.4
 							end
-							local netid = VehToNet(vehicle)
-							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "ADDER")
+							if DragCoef < 20.0 and DragCoef > 10.0 then
+								drag = DragCoef*0.3
+								speed = 0.4
+							end
+							if DragCoef <= 10.0 and DragCoef > 6.0 then
+								drag = DragCoef*0.1
+								speed = 0.1
+							end
+							if DragCoef <= 6.0 then
+								drag = DragCoef*0.02
+								speed = 0.02
+							end
+							local br = DragCoef-drag
+							local br2 = FlatVel+(FlatVel*speed)
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+							ModifyVehicleTopSpeed(vehicle, 16.11)
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
+							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
 						end
 					elseif isStage then
 						price = 5000
+						--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
 						local a = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
@@ -412,7 +420,7 @@ function GetAction(data)
 					local _label = ''
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
-						_label = 'Straight - <span style="color:green;">$' .. price .. ' </span>'
+						_label = 'Audi i5 - <span style="color:green;">$' .. price .. ' </span>'
 						table.insert(elements, {label = _label, modType = k, modNum = 1})
 					end
 				elseif v.modType == 'stage' then
@@ -423,7 +431,7 @@ function GetAction(data)
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
 							provjera = true
-							st = tonumber(st)
+							st = tonumber(st.stage)
 							if st < 4 then
 								_label = 'Stage '..(st+1)..' - <span style="color:green;">$' .. price .. ' </span>'
 								table.insert(elements, {label = _label, modType = k, modNum = (st+1)})
@@ -690,43 +698,71 @@ Citizen.CreateThread(function()
 	end
 end)
 
-local DragCoef = 0
-local FlatVel = 0
-
 RegisterNetEvent('stage:Provjera')
 AddEventHandler('stage:Provjera', function(currentSeat)
 	local globalplate  = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false))
 	if currentSeat == -1 then
 		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-				DragCoef = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
-				FlatVel = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', gDragCoef) --stage 0 -10.0
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', gFlatVel)
+				ForceVehicleEngineAudio(vehicle, st.motor)
+				Citizen.Wait(200)
+				if currentradio ~= 255 then
+					SetRadioToStationIndex(currentradio)
+				else
+					SetRadioToStationName("OFF")
+				end
+				local netid = VehToNet(vehicle)
+				TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, st.motor)
+				local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+				local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
 				local drag = 8
 				local speed = 0.4
-				if st == 1 then
+				if st.stage == 1 then
 					drag = 8-2
 					speed = 0.3
-				elseif st == 2 then
+				elseif st.stage == 2 then
 					drag = 8-4
 					speed = 0.2
-				elseif st == 3 then
+				elseif st.stage == 3 then
 					drag = 8-6
 					speed = 0.1
-				elseif st == 4 then
+				elseif st.stage == 4 then
 					drag = 0
 					speed = 0.0
 				end
 				local br = DragCoef+drag
 				local br2 = FlatVel-(FlatVel*speed)
-				print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
-				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
-				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
-				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
-				SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
-				SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
-				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
-				ModifyVehicleTopSpeed(GetVehiclePedIsIn(PlayerPedId(), false), 16.11)
-				print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+				ModifyVehicleTopSpeed(vehicle, 16.11)
+				if st.motor ~= nil then
+					DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
+					FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+					if DragCoef >= 20.0 then
+						drag = DragCoef*0.7
+						speed = 1.4
+					end
+					if DragCoef < 20.0 and DragCoef > 10.0 then
+						drag = DragCoef*0.3
+						speed = 0.4
+					end
+					if DragCoef <= 10.0 and DragCoef > 6.0 then
+						drag = DragCoef*0.1
+						speed = 0.1
+					end
+					if DragCoef <= 6.0 then
+						drag = DragCoef*0.02
+						speed = 0.02
+					end
+					br = DragCoef-drag
+					br2 = FlatVel+(FlatVel*speed)
+					SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br)
+					SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+					ModifyVehicleTopSpeed(vehicle, 16.11)
+				end
 			end, globalplate)
 		end
 	end
@@ -738,25 +774,25 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 	if currentSeat == -1 then
 		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-				DragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
-				FlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+				gDragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
+				gFlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
 				local drag = 8
 				local speed = 0.4
-				if st == 1 then
+				if st.stage == 1 then
 					drag = 8-2
 					speed = 0.3
-				elseif st == 2 then
+				elseif st.stage == 2 then
 					drag = 8-4
 					speed = 0.2
-				elseif st == 3 then
+				elseif st.stage == 3 then
 					drag = 8-6
 					speed = 0.1
-				elseif st == 4 then
+				elseif st.stage == 4 then
 					drag = 0
 					speed = 0.0
 				end
-				local br = DragCoef+drag
-				local br2 = FlatVel-(FlatVel*speed)
+				local br = gDragCoef+drag
+				local br2 = gFlatVel-(gFlatVel*speed)
 				print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
 				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
 				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
@@ -766,6 +802,44 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 				--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
 				ModifyVehicleTopSpeed(currentVehicle, 16.11)
 				print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+				if st.motor ~= nil then
+					ForceVehicleEngineAudio(currentVehicle, st.motor)
+					Citizen.Wait(200)
+					if currentradio ~= 255 then
+						SetRadioToStationIndex(currentradio)
+					else
+						SetRadioToStationName("OFF")
+					end
+					local netid = VehToNet(currentVehicle)
+					TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, st.motor)
+					local DragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
+					local FlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+					if DragCoef >= 20.0 then
+						drag = DragCoef*0.7
+						speed = 1.4
+					end
+					if DragCoef < 20.0 and DragCoef > 10.0 then
+						drag = DragCoef*0.3
+						speed = 0.4
+					end
+					if DragCoef <= 10.0 and DragCoef > 6.0 then
+						drag = DragCoef*0.1
+						speed = 0.1
+					end
+					if DragCoef <= 6.0 then
+						drag = DragCoef*0.02
+						speed = 0.02
+					end
+					br = DragCoef-drag
+					br2 = FlatVel+(FlatVel*speed)
+					print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+					print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+					SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff', br)
+					SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+					ModifyVehicleTopSpeed(currentVehicle, 16.11)
+					print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
+					print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+				end
 			end, globalplate)
 		end
 	end
@@ -778,13 +852,13 @@ AddEventHandler('baseevents:leftVehicle', function(currentVehicle, currentSeat, 
 		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',139.20) --stage 3 -20.0
 		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel',129.20) --stage 2 -10.0
 		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', 119.20) --stage 1 -10.0
-		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff', DragCoef) --stage 0 -10.0
-		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', FlatVel)
+		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff', gDragCoef) --stage 0 -10.0
+		SetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', gFlatVel)
 		--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
 		ModifyVehicleTopSpeed(currentVehicle, 16.11)
 		print(GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff'))
-		DragCoef = 0
-		FlatVel = 0
+		gDragCoef = 0
+		gFlatVel = 0
 	end
 end)
 

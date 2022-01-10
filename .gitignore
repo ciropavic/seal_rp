@@ -6,4 +6,5 @@ cache/*
 *.ytd
 *.webm
 *.log
+resources/vozila/*
 resources/t-loadingscreen/loading.mp4

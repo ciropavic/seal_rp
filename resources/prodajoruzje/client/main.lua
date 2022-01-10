@@ -337,6 +337,35 @@ RegisterCommand("zvukvozila", function(source, args, raw)
 		end
 		local netid = VehToNet(vehicle)
 		TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiea855")
+		local DragCoef = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff')
+		local FlatVel = GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel')
+		local drag
+		local speed
+		if DragCoef >= 20.0 then
+			drag = DragCoef*0.7
+		 	speed = 1.4
+		end
+		if DragCoef < 20.0 and DragCoef > 10.0 then
+			drag = DragCoef*0.3
+		 	speed = 0.4
+		end
+		if DragCoef <= 10.0 and DragCoef > 6.0 then
+			drag = DragCoef*0.1
+		 	speed = 0.1
+		end
+		if DragCoef <= 6.0 then
+			drag = DragCoef*0.02
+		 	speed = 0.02
+		end
+		local br = DragCoef-drag
+		local br2 = FlatVel+(FlatVel*speed)
+		print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+		print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel'))
+		SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
+		SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
+		ModifyVehicleTopSpeed(GetVehiclePedIsIn(PlayerPedId(), false), 16.11)
+		print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDragCoeff'))
+		print(GetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveMaxFlatVel'))
 	elseif tonumber(args[1]) == 7 then
 		ForceVehicleEngineAudio(vehicle, "audiwx")
 		Citizen.Wait(200)
