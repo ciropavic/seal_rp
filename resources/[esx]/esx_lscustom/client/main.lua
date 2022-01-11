@@ -155,39 +155,21 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						price = 5000
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
-						if data.current.modNum == 1 then
-							ESX.ShowNotification("Kupio si Audi i5 motor!")
-							local vehicle = GetVehiclePedIsIn(PlayerPedId())
-							local currentradio = GetPlayerRadioStationIndex(vehicle)
-							ForceVehicleEngineAudio(vehicle, "audiea855")
-							Citizen.Wait(200)
-							print("changing radio")
-							if currentradio ~= 255 then
-								SetRadioToStationIndex(currentradio)
-							else
-								SetRadioToStationName("OFF")
-							end
-							local netid = VehToNet(vehicle)
-							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiea855")
-							local globalplate = GetVehicleNumberPlateText(vehicle)
-							TriggerServerEvent("motor:PromjeniMotor", "audiea855", globalplate)
-						elseif data.current.modNum == 2 then
-							ESX.ShowNotification("Kupio si Gallardo v10 motor!")
-							local vehicle = GetVehiclePedIsIn(PlayerPedId())
-							local currentradio = GetPlayerRadioStationIndex(vehicle)
-							ForceVehicleEngineAudio(vehicle, "gallardov10")
-							Citizen.Wait(200)
-							print("changing radio")
-							if currentradio ~= 255 then
-								SetRadioToStationIndex(currentradio)
-							else
-								SetRadioToStationName("OFF")
-							end
-							local netid = VehToNet(vehicle)
-							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "gallardov10")
-							local globalplate = GetVehicleNumberPlateText(vehicle)
-							TriggerServerEvent("motor:PromjeniMotor", "gallardov10", globalplate)
+						ESX.ShowNotification("Kupio si "..data.current.mlabel.." motor!")
+						local vehicle = GetVehiclePedIsIn(PlayerPedId())
+						local currentradio = GetPlayerRadioStationIndex(vehicle)
+						ForceVehicleEngineAudio(vehicle, data.current.modNum)
+						Citizen.Wait(200)
+						print("changing radio")
+						if currentradio ~= 255 then
+							SetRadioToStationIndex(currentradio)
+						else
+							SetRadioToStationName("OFF")
 						end
+						local netid = VehToNet(vehicle)
+						TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, data.current.modNum)
+						local globalplate = GetVehicleNumberPlateText(vehicle)
+						TriggerServerEvent("motor:PromjeniMotor", data.current.modNum, globalplate)
 						Wait(500)
 						TriggerEvent('stage:Provjera', -1)
 					elseif isStage then
@@ -323,7 +305,7 @@ function GetAction(data)
 				elseif v.modType == 17 then
 					table.insert(elements, {label = " " .. _U('no_turbo'), modType = k, modNum = false})
  				else
-					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" and v.modType ~= "stage" then
+					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" and v.modType ~= "stage" and v.modType ~= "swap" then
 						table.insert(elements, {label = " " .. _U('by_default'), modType = k, modNum = -1})
 					end
 				end
@@ -380,12 +362,22 @@ function GetAction(data)
 				elseif v.modType == 'swap' then
 					local globalplate  = GetVehicleNumberPlateText(vehicle)
 					local _label = ''
+					local provjera = false
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
-						_label = 'Audi i5 - <span style="color:green;">$' .. price .. ' </span>'
-						table.insert(elements, {label = _label, modType = k, modNum = 1})
-						_label = 'Gallardo v10 - <span style="color:green;">$' .. price .. ' </span>'
-						table.insert(elements, {label = _label, modType = k, modNum = 2})
+						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+							print(st.motor)
+							for i = 1, #Config.Motori do
+								if st.motor ~= Config.Motori[i].naziv then
+									_label = Config.Motori[i].label..' - <span style="color:green;">$' .. price .. ' </span>'
+									table.insert(elements, {label = _label, modType = k, mlabel = Config.Motori[i].label, modNum = Config.Motori[i].naziv})
+								end
+							end
+							provjera = true
+						end, globalplate)
+					end
+					while not provjera do
+						Wait(100)
 					end
 				elseif v.modType == 'stage' then
 					local globalplate  = GetVehicleNumberPlateText(vehicle)
