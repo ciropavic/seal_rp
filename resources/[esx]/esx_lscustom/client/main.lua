@@ -171,35 +171,6 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "audiea855")
 							local globalplate = GetVehicleNumberPlateText(vehicle)
 							TriggerServerEvent("motor:PromjeniMotor", "audiea855", globalplate)
-							local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
-							local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
-							local drag
-							local speed
-							if DragCoef >= 20.0 then
-								drag = DragCoef*0.7
-								speed = 1.4
-							end
-							if DragCoef < 20.0 and DragCoef > 10.0 then
-								drag = DragCoef*0.3
-								speed = 0.4
-							end
-							if DragCoef <= 10.0 and DragCoef > 6.0 then
-								drag = DragCoef*0.1
-								speed = 0.1
-							end
-							if DragCoef <= 6.0 then
-								drag = DragCoef*0.02
-								speed = 0.02
-							end
-							local br = DragCoef-drag
-							local br2 = FlatVel+(FlatVel*speed)
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
-							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
-							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
-							ModifyVehicleTopSpeed(vehicle, 16.11)
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
 						elseif data.current.modNum == 2 then
 							ESX.ShowNotification("Kupio si Gallardo v10 motor!")
 							local vehicle = GetVehiclePedIsIn(PlayerPedId())
@@ -216,70 +187,18 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 							TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, "gallardov10")
 							local globalplate = GetVehicleNumberPlateText(vehicle)
 							TriggerServerEvent("motor:PromjeniMotor", "gallardov10", globalplate)
-							local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
-							local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
-							local drag
-							local speed
-							if DragCoef >= 20.0 then
-								drag = DragCoef*0.7
-								speed = 1.4
-							end
-							if DragCoef < 20.0 and DragCoef > 10.0 then
-								drag = DragCoef*0.3
-								speed = 0.4
-							end
-							if DragCoef <= 10.0 and DragCoef > 6.0 then
-								drag = DragCoef*0.1
-								speed = 0.1
-							end
-							if DragCoef <= 6.0 then
-								drag = DragCoef*0.02
-								speed = 0.02
-							end
-							local br = DragCoef-drag
-							local br2 = FlatVel+(FlatVel*speed)
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
-							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br) --stage 0 -10.0
-							SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
-							ModifyVehicleTopSpeed(vehicle, 16.11)
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
-							print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel'))
 						end
+						Wait(500)
+						TriggerEvent('stage:Provjera', -1)
 					elseif isStage then
 						price = 5000
-						--SetVehicleHandlingFloat(GetVehiclePedIsIn(PlayerPedId(), false), 'CHandlingData', 'fInitialDriveForce', 0.24) --stage 0 -10.0
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
-						local a = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
-						local b = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
-						local drag
-						local speed
-						if data.current.modNum == 1 then
-							drag = 2
-							speed = 0.1
-						elseif data.current.modNum == 2 then
-							drag = 4
-							speed = 0.2
-						elseif data.current.modNum == 3 then
-							drag = 6
-							speed = 0.3
-						elseif data.current.modNum == 4 then
-							drag = 0
-							speed = 0.0
-						end
 						ESX.ShowNotification("Kupio si stage "..data.current.modNum.."!")
-						local drag = 2
-						local speed = 0.1
-						local br = a-drag
-						local br2 = b+(b*speed)
-						print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
-						SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', br)
-						SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
-						ModifyVehicleTopSpeed(vehicle, 16.11)
-						print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
 						local globalplate = GetVehicleNumberPlateText(vehicle)
 						TriggerServerEvent("stage:PromjeniStage", data.current.modNum, globalplate)
+						Wait(500)
+						TriggerEvent('stage:Provjera', -1)
 					elseif isDodaci then
 						price = 50
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
@@ -291,7 +210,6 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
 					end
 				end
-
 				menu.close()
 				found = true
 				break
@@ -305,7 +223,6 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 	end, function(data, menu) -- on cancel
 		menu.close()
 		TriggerEvent('esx_lscustom:cancelInstallMod')
-
 		local playerPed = PlayerPedId()
 		local vehicle = GetVehiclePedIsIn(playerPed, false)
 		SetVehicleDoorsShut(vehicle, false)
@@ -754,19 +671,12 @@ AddEventHandler('stage:Provjera', function(currentSeat)
 				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
 				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff', gDragCoef) --stage 0 -10.0
 				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', gFlatVel)
-				ForceVehicleEngineAudio(vehicle, st.motor)
-				Citizen.Wait(200)
-				if currentradio ~= 255 then
-					SetRadioToStationIndex(currentradio)
-				else
-					SetRadioToStationName("OFF")
-				end
-				local netid = VehToNet(vehicle)
-				TriggerServerEvent("vozila:PromjeniZvuk", GetPlayerServerId(PlayerId()), netid, st.motor)
+				print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
 				local DragCoef = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff')
 				local FlatVel = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
 				local drag = 8
 				local speed = 0.4
+				print(st.stage)
 				if st.stage == 1 then
 					drag = 8-2
 					speed = 0.3
@@ -810,6 +720,7 @@ AddEventHandler('stage:Provjera', function(currentSeat)
 					SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel', br2)
 					ModifyVehicleTopSpeed(vehicle, 16.11)
 				end
+				print(GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDragCoeff'))
 			end, globalplate)
 		end
 	end
