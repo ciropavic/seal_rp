@@ -73,7 +73,6 @@ ESX.RegisterServerCallback('stage:ProvjeriVozilo', function(source, cb, vehiclep
             ['@pl'] = vehicleplate
         },
         function(result)
-			print(#result)
             if #result ~= 0 then
                 cb(result[1])
 			else

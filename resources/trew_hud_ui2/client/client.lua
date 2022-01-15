@@ -962,9 +962,79 @@ Citizen.CreateThread(function()
 	end
 end)
 
+local vehica = 0
+local prosliy
+local orgsusp
+local eng
 function toggleEngine()
     if UVozilu and Sjedalo == -1 then
+		vehica = Vozilo
+		eng = (not GetIsVehicleEngineRunning(vehica))
         SetVehicleEngineOn(Vozilo, (not GetIsVehicleEngineRunning(Vozilo)), false, true)
+		local speed = GetEntitySpeed(vehica)
+		local kmh = (speed * 3.6)
+		if kmh == 0.0 then
+			--SetVehicleEngineOn(vehica, eng, false, true)
+			if not eng then
+				prosliy = GetVehicleWheelYRotation(vehica, 0)
+				local susppr = GetVehicleSuspensionHeight(vehica)
+				orgsusp = susppr
+				local novibr = -0.1
+				while prosliy > novibr do
+					SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+					prosliy = prosliy-0.0008
+					Wait(1)
+				end
+				local nbr = 0.13
+				while nbr > susppr do
+					SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+					susppr = susppr+0.0008
+					Wait(1)
+				end
+				local veho = vehica
+				while not eng do
+					if IsControlJustPressed(0, 71) or vehica == 0 then
+						local nbr = GetVehicleSuspensionHeight(veho)
+						while nbr > orgsusp do
+							SetVehicleSuspensionHeight(veho, nbr-0.0008)
+							nbr = nbr-0.0008
+							Wait(1)
+						end
+						local novibr = 0.0
+						while prosliy < novibr do
+							SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
+							SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
+							SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
+							SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
+							prosliy = prosliy+0.0008
+							Wait(1)
+						end
+						eng = true
+					end
+					vehica = GetVehiclePedIsIn(PlayerPedId())
+					Wait(1)
+				end
+			else
+				local nbr = GetVehicleSuspensionHeight(vehica)
+				while nbr > orgsusp do
+					SetVehicleSuspensionHeight(vehica, nbr-0.0008)
+					nbr = nbr-0.0008
+					Wait(1)
+				end
+				local novibr = 0.0
+				while prosliy < novibr do
+					SetVehicleWheelYRotation(vehica, 0, prosliy+0.0008)
+					SetVehicleWheelYRotation(vehica, 1, -prosliy+0.0008)
+					SetVehicleWheelYRotation(vehica, 2, prosliy+0.0008)
+					SetVehicleWheelYRotation(vehica, 3, -prosliy+0.0008)
+					prosliy = prosliy+0.0008
+					Wait(1)
+				end
+			end
+		end
     end
 end
 

@@ -724,10 +724,9 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 	if currentSeat == -1 then
 		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-				print(st)
+				gDragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
+				gFlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
 				if st ~= 0 then
-					gDragCoef = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDragCoeff')
-					gFlatVel = GetVehicleHandlingFloat(currentVehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
 					local drag = 8
 					local speed = 0.4
 					if st.stage == 1 then

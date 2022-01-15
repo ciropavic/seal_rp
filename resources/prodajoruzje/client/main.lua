@@ -268,6 +268,27 @@ function GetPedVehicleSeat(ped)
     return -2
 end
 
+local vehica = 0
+RegisterCommand("kvacilo", function(source, args, raw)
+	vehica = 0
+	Wait(100)
+	vehica = GetVehiclePedIsIn(PlayerPedId())
+	Citizen.CreateThread(function()
+		while vehica ~= 0 do
+			if not IsControlJustPressed(0, 132) then
+				vehica = GetVehiclePedIsIn(PlayerPedId())
+				SetVehicleClutch(vehica, tonumber(args[1]))
+			else
+				local vrime = GetGameTimer()
+				while GetGameTimer()<vrime+500 do
+					Citizen.Wait(1)
+				end
+			end
+			Citizen.Wait(1)
+		end
+	end)
+end)
+
 RegisterCommand("zvukvozila", function(source, args, raw)
 	local vehicle = GetVehiclePedIsIn(PlayerPedId())
 	local currentradio = GetPlayerRadioStationIndex(vehicle)
