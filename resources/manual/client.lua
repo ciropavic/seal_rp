@@ -112,7 +112,13 @@ Citizen.CreateThread(function ()
 				DisableControlAction(2, 72, true)
 				while IsDisabledControlPressed(2, 71) and GetIsVehicleEngineRunning(vehicle) do
 					SetVehicleHandbrake(vehicle, true)
-					SetVehicleCurrentRpm(vehicle, 1.0)
+					SetVehicleCurrentRpm(vehicle, 0.89)
+					Wait(50)
+					SetControlNormal(0, 71, 1.0)
+					--SetVehicleCurrentRpm(vehicle, 0.7)
+					Wait(50)
+					SetControlNormal(0, 71, 0.0)
+					--SetVehicleCurrentRpm(vehicle, 1.0)
 					Wait(1)
 				end
 				SetVehicleHandbrake(vehicle, false)
@@ -207,10 +213,19 @@ Citizen.CreateThread(function ()
 					end
 					TriggerEvent("SaljiGear", gira)
 					Brejkaj()
-					if gira ~= "N" and gira ~= "R" and gira ~= 1 then
+					local speed = GetEntitySpeed(vehicle)
+					local kmh = (speed * 3.6)
+					if gira ~= "N" and gira ~= "R" and gira ~= 1 and kmh > 5 then
 						local vrime = GetGameTimer()
+						SetVehicleCurrentRpm(vehicle, 2.0)
 						while GetGameTimer()<vrime+500 do
-							SetVehicleCurrentRpm(vehicle, 2.0)
+							--SetControlNormal(0, 71, 0)
+							--SetVehicleCurrentRpm(vehicle, 1.0)
+							--Wait(100)
+							--SetControlNormal(0, 71, 1.0)
+							--SetVehicleCurrentRpm(vehicle, 2.0)
+							SetVehicleClutch(vehicle, 0.0)
+							SetControlNormal(0, 71, 1.0)
 							Wait(1)
 						end
 					end
