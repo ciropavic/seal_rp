@@ -76,7 +76,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 		align    = 'top-left',
 		elements = elems
 	}, function(data, menu)
-		local isRimMod, found, isMjenjac, isSvijetla, isDodaci, isSwap, isStage = false, false, false, false, false, false, false
+		local isRimMod, found, isMjenjac, isSvijetla, isDodaci, isSwap, isStage, isZracni = false, false, false, false, false, false, false, false
 		local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
 		local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
 		local tablica = vehicleProps.plate
@@ -93,6 +93,10 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 			isSwap = true
 		end
 
+		if data.current.modType == "zracni" then
+			isZracni = true
+		end
+
 		if data.current.modType == "stage" then
 			isStage = true
 		end
@@ -107,7 +111,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 
 		for k,v in pairs(Config.Menus) do
 
-			if k == data.current.modType or isRimMod or isMjenjac or isSvijetla or isDodaci or isSwap or isStage then
+			if k == data.current.modType or isRimMod or isMjenjac or isSvijetla or isDodaci or isSwap or isStage or isZracni then
 
 				if data.current.label == _U('by_default') or string.match(data.current.label, _U('installed')) then
 					ESX.ShowNotification(_U('already_own', data.current.label))
@@ -172,6 +176,18 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 						TriggerServerEvent("motor:PromjeniMotor", data.current.modNum, globalplate)
 						Wait(500)
 						TriggerEvent('stage:Provjera', -1)
+					elseif isZracni then
+						price = 5000
+						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
+						TriggerServerEvent("DiscordBot:Mehanicari", GetPlayerName(PlayerId()).." je kupio dio za $"..price)
+						if data.current.modNum == 0 then
+							ESX.ShowNotification("Kupio si obicni ovjes!")
+						else
+							ESX.ShowNotification("Kupio si zracni ovjes!")
+						end
+						local vehicle = GetVehiclePedIsIn(PlayerPedId())
+						local globalplate = GetVehicleNumberPlateText(vehicle)
+						TriggerServerEvent("ovjes:PromjeniOvjes", data.current.modNum, globalplate)
 					elseif isStage then
 						price = 5000
 						TriggerServerEvent("lscs:kupiPeraje", GetEntityModel(vehicle), price, tablica)
@@ -305,7 +321,7 @@ function GetAction(data)
 				elseif v.modType == 17 then
 					table.insert(elements, {label = " " .. _U('no_turbo'), modType = k, modNum = false})
  				else
-					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" and v.modType ~= "stage" and v.modType ~= "swap" then
+					if v.modType ~= "mjenjac" and v.modType ~= "dodaci" and v.modType ~= "stage" and v.modType ~= "swap" and v.modType ~= "zracni" then
 						table.insert(elements, {label = " " .. _U('by_default'), modType = k, modNum = -1})
 					end
 				end
@@ -366,11 +382,35 @@ function GetAction(data)
 					price = 5000*1.30
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-							print(st.motor)
-							for i = 1, #Config.Motori do
-								if st.motor ~= Config.Motori[i].naziv then
-									_label = Config.Motori[i].label..' - <span style="color:green;">$' .. price .. ' </span>'
-									table.insert(elements, {label = _label, modType = k, mlabel = Config.Motori[i].label, modNum = Config.Motori[i].naziv})
+							if st ~= 0 then
+								print(st.motor)
+								for i = 1, #Config.Motori do
+									if st.motor ~= Config.Motori[i].naziv then
+										_label = Config.Motori[i].label..' - <span style="color:green;">$' .. price .. ' </span>'
+										table.insert(elements, {label = _label, modType = k, mlabel = Config.Motori[i].label, modNum = Config.Motori[i].naziv})
+									end
+								end
+							end
+							provjera = true
+						end, globalplate)
+					end
+					while not provjera do
+						Wait(100)
+					end
+				elseif v.modType == 'zracni' then
+					local globalplate  = GetVehicleNumberPlateText(vehicle)
+					local _label = ''
+					local provjera = false
+					price = 5000*1.30
+					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+							if st ~= 0 then
+								if st.zracni == 0 then
+									_label = 'Zracni ovjes'..' - <span style="color:green;">$' .. price .. ' </span>'
+									table.insert(elements, {label = _label, modType = k, modNum = 1})
+								else
+									_label = 'Obicni ovjes'..' - <span style="color:green;">$' .. price .. ' </span>'
+									table.insert(elements, {label = _label, modType = k, modNum = 0})
 								end
 							end
 							provjera = true
@@ -387,10 +427,12 @@ function GetAction(data)
 					if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 						ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
 							provjera = true
-							st = tonumber(st.stage)
-							if st < 4 then
-								_label = 'Stage '..(st+1)..' - <span style="color:green;">$' .. price .. ' </span>'
-								table.insert(elements, {label = _label, modType = k, modNum = (st+1)})
+							if st ~= 0 then
+								st = tonumber(st.stage)
+								if st < 4 then
+									_label = 'Stage '..(st+1)..' - <span style="color:green;">$' .. price .. ' </span>'
+									table.insert(elements, {label = _label, modType = k, modNum = (st+1)})
+								end
 							end
 						end, globalplate)
 					end

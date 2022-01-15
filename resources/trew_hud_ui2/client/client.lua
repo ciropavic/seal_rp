@@ -971,14 +971,99 @@ function toggleEngine()
 		vehica = Vozilo
 		eng = (not GetIsVehicleEngineRunning(vehica))
         SetVehicleEngineOn(Vozilo, (not GetIsVehicleEngineRunning(Vozilo)), false, true)
-		local speed = GetEntitySpeed(vehica)
-		local kmh = (speed * 3.6)
-		if kmh == 0.0 then
-			--SetVehicleEngineOn(vehica, eng, false, true)
-			if not eng then
-				prosliy = GetVehicleWheelYRotation(vehica, 0)
-				local susppr = GetVehicleSuspensionHeight(vehica)
-				orgsusp = susppr
+		local globalplate  = GetVehicleNumberPlateText(Vozilo)
+		price = 5000*1.30
+		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+				print(st.zracni)
+				if st ~= 0 and st.zracni == 1 then
+					local speed = GetEntitySpeed(vehica)
+					local kmh = (speed * 3.6)
+					if kmh == 0.0 then
+						--SetVehicleEngineOn(vehica, eng, false, true)
+						if not eng then
+							prosliy = GetVehicleWheelYRotation(vehica, 0)
+							local susppr = GetVehicleSuspensionHeight(vehica)
+							orgsusp = susppr
+							local netid = VehToNet(vehica)
+							TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 1)
+							local novibr = -0.1
+							while prosliy > novibr do
+								SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+								prosliy = prosliy-0.0008
+								Wait(1)
+							end
+							local nbr = 0.13
+							while nbr > susppr do
+								SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+								susppr = susppr+0.0008
+								Wait(1)
+							end
+							local veho = vehica
+							while not eng do
+								if IsControlJustPressed(0, 71) or vehica == 0 then
+									local netid = VehToNet(veho)
+									TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+									local nbr = GetVehicleSuspensionHeight(veho)
+									while nbr > orgsusp do
+										SetVehicleSuspensionHeight(veho, nbr-0.0008)
+										nbr = nbr-0.0008
+										Wait(1)
+									end
+									local novibr = 0.0
+									while prosliy < novibr do
+										SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
+										SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
+										SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
+										SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
+										prosliy = prosliy+0.0008
+										Wait(1)
+									end
+									eng = true
+								end
+								vehica = GetVehiclePedIsIn(PlayerPedId())
+								Wait(1)
+							end
+						else
+							if orgsusp ~= nil then
+								local netid = VehToNet(vehica)
+								TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+								local nbr = GetVehicleSuspensionHeight(vehica)
+								while nbr > orgsusp do
+									SetVehicleSuspensionHeight(vehica, nbr-0.0008)
+									nbr = nbr-0.0008
+									Wait(1)
+								end
+								local novibr = 0.0
+								while prosliy < novibr do
+									SetVehicleWheelYRotation(vehica, 0, prosliy+0.0008)
+									SetVehicleWheelYRotation(vehica, 1, -prosliy+0.0008)
+									SetVehicleWheelYRotation(vehica, 2, prosliy+0.0008)
+									SetVehicleWheelYRotation(vehica, 3, -prosliy+0.0008)
+									prosliy = prosliy+0.0008
+									Wait(1)
+								end
+							end
+						end
+					end
+				end
+			end, globalplate)
+		end
+    end
+end
+
+RegisterNetEvent('ovjes:EoVamOvjes')
+AddEventHandler('ovjes:EoVamOvjes', function(id, nid, y, susp, br)
+	if GetPlayerServerId(PlayerId()) ~= id then
+		Wait(500)
+		if NetworkDoesEntityExistWithNetworkId(nid) then
+			if br == 1 then
+				local vehica = NetToVeh(nid)
+				local prosliy = y
+				local susppr = susp
 				local novibr = -0.1
 				while prosliy > novibr do
 					SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
@@ -994,30 +1079,10 @@ function toggleEngine()
 					susppr = susppr+0.0008
 					Wait(1)
 				end
-				local veho = vehica
-				while not eng do
-					if IsControlJustPressed(0, 71) or vehica == 0 then
-						local nbr = GetVehicleSuspensionHeight(veho)
-						while nbr > orgsusp do
-							SetVehicleSuspensionHeight(veho, nbr-0.0008)
-							nbr = nbr-0.0008
-							Wait(1)
-						end
-						local novibr = 0.0
-						while prosliy < novibr do
-							SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
-							SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
-							SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
-							SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
-							prosliy = prosliy+0.0008
-							Wait(1)
-						end
-						eng = true
-					end
-					vehica = GetVehiclePedIsIn(PlayerPedId())
-					Wait(1)
-				end
 			else
+				local vehica = NetToVeh(nid)
+				local orgsusp = susp
+				local prosliy = y
 				local nbr = GetVehicleSuspensionHeight(vehica)
 				while nbr > orgsusp do
 					SetVehicleSuspensionHeight(vehica, nbr-0.0008)
@@ -1035,8 +1100,8 @@ function toggleEngine()
 				end
 			end
 		end
-    end
-end
+	end
+end)
 
 RegisterCommand('motor', function()
     toggleEngine()

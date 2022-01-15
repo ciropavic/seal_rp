@@ -57,6 +57,15 @@ AddEventHandler('motor:PromjeniMotor', function(br, plate)
 	})
 end)
 
+RegisterServerEvent('ovjes:PromjeniOvjes')
+AddEventHandler('ovjes:PromjeniOvjes', function(br, plate)
+	MySQL.Async.execute('UPDATE `owned_vehicles` SET `zracni` = @st WHERE `plate` = @plate',
+	{
+		['@plate'] = plate,
+		['@st'] = br
+	})
+end)
+
 RegisterServerEvent('stage:PromjeniStage')
 AddEventHandler('stage:PromjeniStage', function(br, plate)
 	MySQL.Async.execute('UPDATE `owned_vehicles` SET `stage` = @st WHERE `plate` = @plate',
@@ -68,7 +77,7 @@ end)
 
 ESX.RegisterServerCallback('stage:ProvjeriVozilo', function(source, cb, vehicleplate)
     MySQL.Async.fetchAll(
-        'SELECT stage, motor FROM owned_vehicles WHERE plate = @pl',
+        'SELECT stage, motor, zracni FROM owned_vehicles WHERE plate = @pl',
         {
             ['@pl'] = vehicleplate
         },

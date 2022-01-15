@@ -30,6 +30,11 @@ AddEventHandler('trew_hud_ui:getServerInfo', function()
 	end
 end)
 
+RegisterServerEvent('ovjes:SyncSvima')
+AddEventHandler('ovjes:SyncSvima', function(id, nid, y, susp, br)
+	TriggerClientEvent('ovjes:EoVamOvjes', -1, id, nid, y, susp, br)
+end)
+
 RegisterServerEvent('trew_hud_ui:syncCarLights')
 AddEventHandler('trew_hud_ui:syncCarLights', function(status)
 	TriggerClientEvent('trew_hud_ui:syncCarLights', -1, source, status)

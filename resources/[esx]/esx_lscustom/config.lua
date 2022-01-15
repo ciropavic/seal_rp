@@ -521,6 +521,11 @@ Config.Menus = {
 		parent			= 'upgrades',
 		modType 		= 'stage'
 	},
+	zracni = {
+		label			= "Zracni ovjes",
+		parent			= 'upgrades',
+		modType 		= 'zracni'
+	},
 	upgrades = {
 		label			= _U('upgrades'),
 		parent			= 'main',
@@ -532,7 +537,8 @@ Config.Menus = {
 		modTurbo		= _U('turbo'),
 		mjenjac 		= "Zamjena mjenjaca",
 		stage 			= "Stage tuning",
-		swap 			= "Zamjena motora"
+		swap 			= "Zamjena motora",
+		zracni 			= "Zracni ovjes"
 	},
 	modEngine = {
 		label = _U('engine'),
