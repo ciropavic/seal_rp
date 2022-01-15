@@ -15,6 +15,12 @@ local zedj = 0
 local Statusi = nil
 local IsDead = false
 local IsAnimated = false
+local ZabraniCmd = false
+
+local vehica = 0
+local orgsusp
+local orgy
+local eng
 
 -- ESX
 Citizen.CreateThread(function()
@@ -962,12 +968,8 @@ Citizen.CreateThread(function()
 	end
 end)
 
-local vehica = 0
-local prosliy
-local orgsusp
-local eng
 function toggleEngine()
-    if UVozilu and Sjedalo == -1 then
+    if UVozilu and Sjedalo == -1 and not ZabraniCmd then
 		vehica = Vozilo
 		eng = (not GetIsVehicleEngineRunning(vehica))
         SetVehicleEngineOn(Vozilo, (not GetIsVehicleEngineRunning(Vozilo)), false, true)
@@ -980,13 +982,14 @@ function toggleEngine()
 					local speed = GetEntitySpeed(vehica)
 					local kmh = (speed * 3.6)
 					if kmh == 0.0 then
-						--SetVehicleEngineOn(vehica, eng, false, true)
+						ZabraniCmd = true
 						if not eng then
-							prosliy = GetVehicleWheelYRotation(vehica, 0)
+							local prosliy = GetVehicleWheelYRotation(vehica, 0)
+							orgy = prosliy
 							local susppr = GetVehicleSuspensionHeight(vehica)
 							orgsusp = susppr
 							local netid = VehToNet(vehica)
-							TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 1)
+							TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, orgy, orgsusp, 1)
 							local novibr = -0.1
 							while prosliy > novibr do
 								SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
@@ -1002,26 +1005,33 @@ function toggleEngine()
 								susppr = susppr+0.0008
 								Wait(1)
 							end
+							ZabraniCmd = false
 							local veho = vehica
 							while not eng do
-								if IsControlJustPressed(0, 71) or vehica == 0 then
-									local netid = VehToNet(veho)
-									TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
-									local nbr = GetVehicleSuspensionHeight(veho)
-									while nbr > orgsusp do
-										SetVehicleSuspensionHeight(veho, nbr-0.0008)
-										nbr = nbr-0.0008
-										Wait(1)
+								if vehica ~= 0 then
+									if IsControlJustPressed(0, 71) then
+										local netid = VehToNet(veho)
+										TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+										local nbr = GetVehicleSuspensionHeight(veho)
+										while nbr > orgsusp do
+											SetVehicleSuspensionHeight(veho, nbr-0.0008)
+											nbr = nbr-0.0008
+											Wait(1)
+										end
+										local novibr = 0.0
+										while prosliy < novibr do
+											SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
+											SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
+											SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
+											SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
+											prosliy = prosliy+0.0008
+											Wait(1)
+										end
+										prosliy = 0.0
+										orgy = -0.2
+										eng = true
 									end
-									local novibr = 0.0
-									while prosliy < novibr do
-										SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
-										SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
-										SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
-										SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
-										prosliy = prosliy+0.0008
-										Wait(1)
-									end
+								else
 									eng = true
 								end
 								vehica = GetVehiclePedIsIn(PlayerPedId())
@@ -1030,24 +1040,27 @@ function toggleEngine()
 						else
 							if orgsusp ~= nil then
 								local netid = VehToNet(vehica)
-								TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+								TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, orgy, orgsusp, 0)
 								local nbr = GetVehicleSuspensionHeight(vehica)
 								while nbr > orgsusp do
 									SetVehicleSuspensionHeight(vehica, nbr-0.0008)
 									nbr = nbr-0.0008
 									Wait(1)
 								end
-								local novibr = 0.0
-								while prosliy < novibr do
-									SetVehicleWheelYRotation(vehica, 0, prosliy+0.0008)
-									SetVehicleWheelYRotation(vehica, 1, -prosliy+0.0008)
-									SetVehicleWheelYRotation(vehica, 2, prosliy+0.0008)
-									SetVehicleWheelYRotation(vehica, 3, -prosliy+0.0008)
-									prosliy = prosliy+0.0008
+								local novibr = -0.1
+								while orgy > novibr do
+									SetVehicleWheelYRotation(vehica, 0, novibr+0.0008)
+									SetVehicleWheelYRotation(vehica, 1, -novibr+0.0008)
+									SetVehicleWheelYRotation(vehica, 2, novibr+0.0008)
+									SetVehicleWheelYRotation(vehica, 3, -novibr+0.0008)
+									novibr = novibr+0.0008
 									Wait(1)
 								end
+								orgy = -0.2
+								ZabraniCmd = false
 							end
 						end
+						ZabraniCmd = false
 					end
 				end
 			end, globalplate)
@@ -1089,15 +1102,45 @@ AddEventHandler('ovjes:EoVamOvjes', function(id, nid, y, susp, br)
 					nbr = nbr-0.0008
 					Wait(1)
 				end
-				local novibr = 0.0
-				while prosliy < novibr do
-					SetVehicleWheelYRotation(vehica, 0, prosliy+0.0008)
-					SetVehicleWheelYRotation(vehica, 1, -prosliy+0.0008)
-					SetVehicleWheelYRotation(vehica, 2, prosliy+0.0008)
-					SetVehicleWheelYRotation(vehica, 3, -prosliy+0.0008)
-					prosliy = prosliy+0.0008
+				local novibr = -0.1
+				while prosliy > novibr do
+					SetVehicleWheelYRotation(vehica, 0, novibr+0.0008)
+					SetVehicleWheelYRotation(vehica, 1, -novibr+0.0008)
+					SetVehicleWheelYRotation(vehica, 2, novibr+0.0008)
+					SetVehicleWheelYRotation(vehica, 3, -novibr+0.0008)
+					novibr = novibr+0.0008
 					Wait(1)
 				end
+			end
+		end
+	end
+end)
+
+RegisterNetEvent('ovjes:EoVamOvjes2')
+AddEventHandler('ovjes:EoVamOvjes2', function(ovj)
+	Wait(500)
+	for i=1, #ovj, 1 do
+		local nid = ovj[i].netid
+		local y = ovj[i].roty
+		local susp = ovj[i].susp
+		if NetworkDoesEntityExistWithNetworkId(nid) then
+			local vehica = NetToVeh(nid)
+			local prosliy = y
+			local susppr = susp
+			local novibr = -0.1
+			while prosliy > novibr do
+				SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+				SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+				SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+				SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+				prosliy = prosliy-0.0008
+				Wait(1)
+			end
+			local nbr = 0.13
+			while nbr > susppr do
+				SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+				susppr = susppr+0.0008
+				Wait(1)
 			end
 		end
 	end
@@ -1471,6 +1514,38 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 	ESX.TriggerServerCallback('vozilo:dajKilometre', function(km)
 		Kilometri = km
 	end, Tablica)
+	ESX.TriggerServerCallback('ovjes:DajStari', function(roty, susp)
+		prosliy = roty
+		orgsusp = susp
+		if roty ~= nil then
+			local veho = currentVehicle
+			eng = false
+			while not eng and UVozilu do
+				if IsControlJustPressed(0, 71) then
+					local netid = VehToNet(veho)
+					TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+					local nbr = GetVehicleSuspensionHeight(veho)
+					while nbr > orgsusp do
+						SetVehicleSuspensionHeight(veho, nbr-0.0008)
+						nbr = nbr-0.0008
+						Wait(1)
+					end
+					local novibr = -0.1
+					while prosliy > novibr do
+						SetVehicleWheelYRotation(veho, 0, novibr+0.0008)
+						SetVehicleWheelYRotation(veho, 1, -novibr+0.0008)
+						SetVehicleWheelYRotation(veho, 2, novibr+0.0008)
+						SetVehicleWheelYRotation(veho, 3, -novibr+0.0008)
+						novibr = novibr+0.0008
+						Wait(1)
+					end
+					orgy = -0.2
+					eng = true
+				end
+				Wait(1)
+			end
+		end
+	end, netId)
 	ZadnjaPoz = GetEntityCoords(Vozilo)
 	Citizen.CreateThread(function()
 		local zadnjikm = 0
@@ -1498,6 +1573,48 @@ end)
 
 RegisterNetEvent('baseevents:leftVehicle')
 AddEventHandler('baseevents:leftVehicle', function(currentVehicle, currentSeat, modelName, netId)
+	ESX.TriggerServerCallback('ovjes:DajStari', function(roty, susp)
+		if roty == nil then
+			local globalplate = GetVehicleNumberPlateText(currentVehicle)
+			if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
+				print("uso")
+				ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+					print(st.zracni)
+					local vehica = currentVehicle
+					if st ~= 0 and st.zracni == 1 then
+						print("ima zracni")
+						local speed = GetEntitySpeed(vehica)
+						local kmh = (speed * 3.6)
+						print(kmh)
+						if kmh < 0.1 then
+							print("0 kmh")
+							local prosliy = GetVehicleWheelYRotation(vehica, 0)
+							orgy = prosliy
+							local susppr = GetVehicleSuspensionHeight(vehica)
+							orgsusp = susppr
+							local netid = VehToNet(vehica)
+							TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, orgy, orgsusp, 1)
+							local novibr = -0.1
+							while prosliy > novibr do
+								SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+								SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+								prosliy = prosliy-0.0008
+								Wait(1)
+							end
+							local nbr = 0.13
+							while nbr > susppr do
+								SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+								susppr = susppr+0.0008
+								Wait(1)
+							end
+						end
+					end
+				end, globalplate)
+			end
+		end
+	end, netId)
 	UVozilu = false
 	Vozilo = nil
 	Klasa = nil

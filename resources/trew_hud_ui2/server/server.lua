@@ -1,5 +1,6 @@
 ESX = nil
 local KVozila = {}
+local Ovjesi = {}
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
@@ -32,7 +33,36 @@ end)
 
 RegisterServerEvent('ovjes:SyncSvima')
 AddEventHandler('ovjes:SyncSvima', function(id, nid, y, susp, br)
+	if br == 1 then
+		table.insert(Ovjesi, {netid = nid, roty = y, susp = susp})
+	else
+		for i=1, #Ovjesi, 1 do
+			if Ovjesi[i].netid == nid then
+				table.remove(Ovjesi, i)
+			end
+		end
+	end
 	TriggerClientEvent('ovjes:EoVamOvjes', -1, id, nid, y, susp, br)
+end)
+
+AddEventHandler("playerEnteredScope", function(data)
+	local playerEntering, player = data["player"], data["for"]
+    print(("%s is entering %s's scope"):format(playerEntering, player))
+	TriggerClientEvent('ovjes:EoVamOvjes2', playerEntering, Ovjesi)
+end)
+
+ESX.RegisterServerCallback('ovjes:DajStari', function(source, cb, netid)
+	print(netid)
+	local naso = false
+	for i=1, #Ovjesi, 1 do
+		if Ovjesi[i].netid == netid then
+			naso = true
+			cb(Ovjesi[i].roty, Ovjesi[i].susp)
+		end
+	end
+	if not naso then
+		cb(nil)
+	end
 end)
 
 RegisterServerEvent('trew_hud_ui:syncCarLights')
