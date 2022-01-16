@@ -1498,11 +1498,6 @@ Citizen.CreateThread(function()
 	end
 end)
 
-
-
-
-
-
 RegisterNetEvent('baseevents:enteredVehicle')
 AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSeat, modelName, netId)
 	UVozilu = true
@@ -1564,6 +1559,23 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 						zadnjikm = Kilometri
 						TriggerServerEvent('vozilo:dodajKm', Tablica, Kilometri)
 					end
+					--[[if Kilometri >= 100 then
+						vehica = GetVehiclePedIsIn(PlayerPedId())
+						Citizen.CreateThread(function()
+							while vehica ~= 0 do
+								if not IsControlJustPressed(0, 132) then
+									vehica = GetVehiclePedIsIn(PlayerPedId())
+									SetVehicleClutch(vehica, 0.0)
+								else
+									local vrime = GetGameTimer()
+									while GetGameTimer()<vrime+500 do
+										Citizen.Wait(1)
+									end
+								end
+								Citizen.Wait(1)
+							end
+						end)
+					end]]
 					ZadnjaPoz = curPos
 				end
 			end
@@ -1579,7 +1591,6 @@ AddEventHandler('baseevents:leftVehicle', function(currentVehicle, currentSeat, 
 			if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 				print("uso")
 				ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-					print(st.zracni)
 					local vehica = currentVehicle
 					if st ~= 0 and st.zracni == 1 then
 						print("ima zracni")

@@ -268,6 +268,21 @@ function GetPedVehicleSeat(ped)
     return -2
 end
 
+RegisterCommand("propara", function(source, args, raw)
+	local prop_ent = nil
+	if prop_ent ~= nil then
+		DeleteObject(prop_ent)
+	end
+	ESX.Streaming.RequestAnimDict("anim@heists@box_carry@", function()
+		TaskPlayAnim(PlayerPedId(),"anim@heists@box_carry@", "idle", 8.0, 8.0, -1, 50)
+	end)
+	local modele = "imp_prop_engine_hoist_02a"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), false, false, false)
+	AttachEntityToEntityPhysically(prop_ent, PlayerPedId(), 0, GetEntityBoneIndexByName(PlayerPedId(), "SKEL_Pelvis"), -0.03, 1.16, 0.0, -0.03, 0.05, 0.0, 0.0, -0.95, 178.8, 10000.0, true, true, true, false, 2)
+	SetModelAsNoLongerNeeded(modele)
+end)
+
 local vehica = 0
 RegisterCommand("kvacilo", function(source, args, raw)
 	vehica = 0
@@ -1722,7 +1737,8 @@ RegisterCommand("testanim", function(source, args, rawCommandString)
 			while not HasAnimDictLoaded(args[1]) do
 				Citizen.Wait(1000)
 			end
-			TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, -8, -1, 2, 0, 0, 0, 0)
+			--TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, -8, -1, 2, 0, 0, 0, 0)
+			TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, 8.0, -1, 50)
 			--TaskStartScenarioInPlace(PlayerPedId(), args[1], 0, true)
 		else
 			name = "System"..":"

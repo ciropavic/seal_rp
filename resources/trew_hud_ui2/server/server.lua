@@ -37,7 +37,7 @@ AddEventHandler('ovjes:SyncSvima', function(id, nid, y, susp, br)
 		table.insert(Ovjesi, {netid = nid, roty = y, susp = susp})
 	else
 		for i=1, #Ovjesi, 1 do
-			if Ovjesi[i].netid == nid then
+			if Ovjesi[i] ~= nil and Ovjesi[i].netid == nid then
 				table.remove(Ovjesi, i)
 			end
 		end
