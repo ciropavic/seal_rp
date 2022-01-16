@@ -268,10 +268,18 @@ function GetPedVehicleSeat(ped)
     return -2
 end
 
+local prop_ent = nil
+local prop_ent2 = nil
+local prop_ent3 = nil
 RegisterCommand("propara", function(source, args, raw)
-	local prop_ent = nil
 	if prop_ent ~= nil then
 		DeleteObject(prop_ent)
+	end
+	if prop_ent2 ~= nil then
+		DeleteObject(prop_ent2)
+	end
+	if prop_ent3 ~= nil then
+		DeleteObject(prop_ent3)
 	end
 	ESX.Streaming.RequestAnimDict("anim@heists@box_carry@", function()
 		TaskPlayAnim(PlayerPedId(),"anim@heists@box_carry@", "idle", 8.0, 8.0, -1, 50)
@@ -279,8 +287,115 @@ RegisterCommand("propara", function(source, args, raw)
 	local modele = "imp_prop_engine_hoist_02a"
 	ESX.Streaming.RequestModel(modele)
 	prop_ent = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), false, false, false)
-	AttachEntityToEntityPhysically(prop_ent, PlayerPedId(), 0, GetEntityBoneIndexByName(PlayerPedId(), "SKEL_Pelvis"), -0.03, 1.16, 0.0, -0.03, 0.05, 0.0, 0.0, -0.95, 178.8, 10000.0, true, true, true, false, 2)
+	AttachEntityToEntity(prop_ent, PlayerPedId(), GetEntityBoneIndexByName(PlayerPedId(), "SKEL_Pelvis"), -0.1, 1.3, -1.0, 0.0, -0.95, 178.8, 10000.0, false, false, false, 0, true)
 	SetModelAsNoLongerNeeded(modele)
+	local veh, Distance = ESX.Game.GetClosestVehicle()
+	while Distance > 4.0 do
+		veh, Distance = ESX.Game.GetClosestVehicle()
+		Wait(1)
+	end
+	FreezeEntityPosition(PlayerPedId(), true)
+	local head = GetEntityHeading(veh)
+	local coords = GetWorldPositionOfEntityBone(veh, GetEntityBoneIndexByName(veh, "engine"))
+	modele = "prop_car_engine_01"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent2 = CreateObject(GetHashKey(modele), coords.x, coords.y, coords.z-0.5, false, false, false)
+	SetEntityHeading(prop_ent2, head)
+	SetEntityNoCollisionEntity(prop_ent2, veh, false)
+	SetModelAsNoLongerNeeded(modele)
+	local novecoord = GetOffsetFromEntityInWorldCoords(prop_ent2, 0.0, 0.0, 0.8)
+	Wait(3000)
+	while not SlideObject(
+		prop_ent2, 
+		novecoord.x,
+		novecoord.y,
+		novecoord.z,
+		0.001, 
+		0.001, 
+		0.001, 
+		false
+	) do
+		Wait(1)
+	end
+	DeleteEntity(prop_ent2)
+	FreezeEntityPosition(PlayerPedId(), false)
+	--uzeo motor
+	modele = "prop_car_engine_01"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent2 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), false, false, false)
+	AttachEntityToEntity(prop_ent2, prop_ent, 0, -0.1, -1.1, 1.2, 0.0, -0.95, 0.0, 10000.0, false, false, false, 0, true)
+	SetModelAsNoLongerNeeded(modele)
+	--makne taj motor
+	Wait(5000)
+	DetachEntity(prop_ent2, true, true)
+	Wait(5000)
+	--Zakaci drugi
+	modele = "prop_car_engine_01"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent3 = CreateObject(GetHashKey(modele), GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 0.0, -5.0), false, false, false)
+	AttachEntityToEntity(prop_ent3, prop_ent, 0, -0.1, -1.1, 1.2, 0.0, -0.95, 0.0, 10000.0, false, false, false, 0, true)
+	SetModelAsNoLongerNeeded(modele)
+	--Ugradi drugi
+	veh, Distance = ESX.Game.GetClosestVehicle()
+	while Distance > 3.9 do
+		veh, Distance = ESX.Game.GetClosestVehicle()
+		Wait(1)
+	end
+	FreezeEntityPosition(PlayerPedId(), true)
+	head = GetEntityHeading(prop_ent3)
+	coords = GetEntityCoords(prop_ent3)
+	DeleteEntity(prop_ent3)
+	modele = "prop_car_engine_01"
+	ESX.Streaming.RequestModel(modele)
+	prop_ent3 = CreateObject(GetHashKey(modele), coords.x, coords.y, coords.z, false, false, false)
+	SetEntityHeading(prop_ent3, head)
+	SetEntityNoCollisionEntity(prop_ent3, veh, false)
+	SetModelAsNoLongerNeeded(modele)
+	local novecoord = GetWorldPositionOfEntityBone(veh, GetEntityBoneIndexByName(veh, "engine"))
+	Wait(3000)
+	while not SlideObject(
+		prop_ent3, 
+		novecoord.x,
+		novecoord.y,
+		novecoord.z-0.5,
+		0.001, 
+		0.001, 
+		0.001, 
+		false
+	) do
+		Wait(1)
+	end
+	FreezeEntityPosition(PlayerPedId(), false)
+	DetachEntity(prop_ent3, true, true)
+	DeleteEntity(prop_ent3)
+	prop_ent3 = nil
+	if prop_ent ~= nil then
+		DeleteObject(prop_ent)
+		prop_ent = nil
+	end
+	if prop_ent2 ~= nil then
+		DeleteObject(prop_ent2)
+		prop_ent2 = nil
+	end
+	if prop_ent3 ~= nil then
+		DeleteObject(prop_ent3)
+		prop_ent3 = nil
+	end
+end)
+
+RegisterCommand("pdv", function(source, args, raw)
+	if prop_ent ~= nil then
+		DeleteObject(prop_ent)
+		prop_ent = nil
+	end
+	if prop_ent2 ~= nil then
+		DeleteObject(prop_ent2)
+		prop_ent2 = nil
+	end
+	if prop_ent3 ~= nil then
+		DeleteObject(prop_ent3)
+		prop_ent3 = nil
+	end
 end)
 
 local vehica = 0

@@ -34,7 +34,16 @@ end)
 RegisterServerEvent('ovjes:SyncSvima')
 AddEventHandler('ovjes:SyncSvima', function(id, nid, y, susp, br)
 	if br == 1 then
-		table.insert(Ovjesi, {netid = nid, roty = y, susp = susp})
+		local naso = false
+		for i=1, #Ovjesi, 1 do
+			if Ovjesi[i] ~= nil and Ovjesi[i].netid == nid then
+				naso = true
+				break
+			end
+		end
+		if not naso then
+			table.insert(Ovjesi, {netid = nid, roty = y, susp = susp})
+		end
 	else
 		for i=1, #Ovjesi, 1 do
 			if Ovjesi[i] ~= nil and Ovjesi[i].netid == nid then
@@ -47,12 +56,10 @@ end)
 
 AddEventHandler("playerEnteredScope", function(data)
 	local playerEntering, player = data["player"], data["for"]
-    print(("%s is entering %s's scope"):format(playerEntering, player))
 	TriggerClientEvent('ovjes:EoVamOvjes2', playerEntering, Ovjesi)
 end)
 
 ESX.RegisterServerCallback('ovjes:DajStari', function(source, cb, netid)
-	print(netid)
 	local naso = false
 	for i=1, #Ovjesi, 1 do
 		if Ovjesi[i].netid == netid then

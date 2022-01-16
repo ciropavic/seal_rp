@@ -24,12 +24,10 @@ end)
 
 AddEventHandler("playerEnteredScope", function(data)
     local playerEntering, player = data["player"], data["for"]
-    print(("%s is entering %s's scope"):format(playerEntering, player))
 	local veh = GetVehiclePedIsIn(GetPlayerPed(player))
 	local net = NetworkGetNetworkIdFromEntity(veh)
 	for i = 1, #Zvukovi do
 		if Zvukovi[i].netid == net then
-			print("naso")
 			TriggerClientEvent("vozila:NoviZvuk", -1, tonumber(player), net, Zvukovi[i].zvuk)
 			break
 		end

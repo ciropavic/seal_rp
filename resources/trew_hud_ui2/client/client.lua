@@ -977,65 +977,67 @@ function toggleEngine()
 		price = 5000*1.30
 		if globalplate ~= nil or globalplate ~= "" or globalplate ~= " " then
 			ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
-				print(st.zracni)
 				if st ~= 0 and st.zracni == 1 then
 					local speed = GetEntitySpeed(vehica)
 					local kmh = (speed * 3.6)
 					if kmh == 0.0 then
 						ZabraniCmd = true
 						if not eng then
-							local prosliy = GetVehicleWheelYRotation(vehica, 0)
-							orgy = prosliy
-							local susppr = GetVehicleSuspensionHeight(vehica)
-							orgsusp = susppr
-							local netid = VehToNet(vehica)
-							TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, orgy, orgsusp, 1)
-							local novibr = -0.1
-							while prosliy > novibr do
-								SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
-								SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
-								SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
-								SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
-								prosliy = prosliy-0.0008
-								Wait(1)
-							end
-							local nbr = 0.13
-							while nbr > susppr do
-								SetVehicleSuspensionHeight(vehica, susppr+0.0008)
-								susppr = susppr+0.0008
-								Wait(1)
-							end
-							ZabraniCmd = false
-							local veho = vehica
-							while not eng do
-								if vehica ~= 0 then
-									if IsControlJustPressed(0, 71) then
-										local netid = VehToNet(veho)
-										TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
-										local nbr = GetVehicleSuspensionHeight(veho)
-										while nbr > orgsusp do
-											SetVehicleSuspensionHeight(veho, nbr-0.0008)
-											nbr = nbr-0.0008
-											Wait(1)
+							if orgsusp == nil then
+								local prosliy = GetVehicleWheelYRotation(vehica, 0)
+								orgy = prosliy
+								local susppr = GetVehicleSuspensionHeight(vehica)
+								orgsusp = susppr
+								local netid = VehToNet(vehica)
+								TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, orgy, orgsusp, 1)
+								local novibr = -0.1
+								while prosliy > novibr do
+									SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+									SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+									SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+									SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+									prosliy = prosliy-0.0008
+									Wait(1)
+								end
+								local nbr = 0.13
+								while nbr > susppr do
+									SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+									susppr = susppr+0.0008
+									Wait(1)
+								end
+								ZabraniCmd = false
+								local veho = vehica
+								while not eng do
+									if vehica ~= 0 then
+										if IsControlJustPressed(0, 71) then
+											local netid = VehToNet(veho)
+											TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
+											local nbr = GetVehicleSuspensionHeight(veho)
+											while nbr > orgsusp do
+												SetVehicleSuspensionHeight(veho, nbr-0.0008)
+												nbr = nbr-0.0008
+												Wait(1)
+											end
+											local novibr = 0.0
+											while prosliy < novibr do
+												SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
+												SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
+												SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
+												SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
+												prosliy = prosliy+0.0008
+												Wait(1)
+											end
+											prosliy = 0.0
+											orgy = -0.2
+											orgsusp = nil
+											eng = true
 										end
-										local novibr = 0.0
-										while prosliy < novibr do
-											SetVehicleWheelYRotation(veho, 0, prosliy+0.0008)
-											SetVehicleWheelYRotation(veho, 1, -prosliy+0.0008)
-											SetVehicleWheelYRotation(veho, 2, prosliy+0.0008)
-											SetVehicleWheelYRotation(veho, 3, -prosliy+0.0008)
-											prosliy = prosliy+0.0008
-											Wait(1)
-										end
-										prosliy = 0.0
-										orgy = -0.2
+									else
 										eng = true
 									end
-								else
-									eng = true
+									vehica = GetVehiclePedIsIn(PlayerPedId())
+									Wait(1)
 								end
-								vehica = GetVehiclePedIsIn(PlayerPedId())
-								Wait(1)
 							end
 						else
 							if orgsusp ~= nil then
@@ -1057,6 +1059,7 @@ function toggleEngine()
 									Wait(1)
 								end
 								orgy = -0.2
+								orgsusp = nil
 								ZabraniCmd = false
 							end
 						end
@@ -1516,7 +1519,8 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 			local veho = currentVehicle
 			eng = false
 			while not eng and UVozilu do
-				if IsControlJustPressed(0, 71) then
+				local enge = GetIsVehicleEngineRunning(currentVehicle)
+				if IsControlJustPressed(0, 71) or enge then
 					local netid = VehToNet(veho)
 					TriggerServerEvent("ovjes:SyncSvima", GetPlayerServerId(PlayerId()), netid, prosliy, orgsusp, 0)
 					local nbr = GetVehicleSuspensionHeight(veho)
@@ -1535,6 +1539,7 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 						Wait(1)
 					end
 					orgy = -0.2
+					orgsusp = nil
 					eng = true
 				end
 				Wait(1)
