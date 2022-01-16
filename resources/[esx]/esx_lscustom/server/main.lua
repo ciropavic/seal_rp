@@ -77,7 +77,7 @@ end)
 
 ESX.RegisterServerCallback('stage:ProvjeriVozilo', function(source, cb, vehicleplate)
     MySQL.Async.fetchAll(
-        'SELECT stage, motor, zracni FROM owned_vehicles WHERE plate = @pl',
+        'SELECT stage, motor, zracni, servis, kvar FROM owned_vehicles WHERE plate = @pl',
         {
             ['@pl'] = vehicleplate
         },

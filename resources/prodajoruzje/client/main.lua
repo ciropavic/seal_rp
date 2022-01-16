@@ -398,6 +398,12 @@ RegisterCommand("pdv", function(source, args, raw)
 	end
 end)
 
+RegisterCommand("temp", function(source, args, raw)
+	local vehica = GetVehiclePedIsIn(PlayerPedId())
+	SetDisableVehicleEngineFires(vehica, true)
+	SetVehicleEngineHealth(vehica, 301)
+end)
+
 local vehica = 0
 RegisterCommand("kvacilo", function(source, args, raw)
 	vehica = 0

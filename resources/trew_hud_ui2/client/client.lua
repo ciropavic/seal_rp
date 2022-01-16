@@ -16,6 +16,8 @@ local Statusi = nil
 local IsDead = false
 local IsAnimated = false
 local ZabraniCmd = false
+local Kvar = nil
+local VrstaKvara = 0
 
 local vehica = 0
 local orgsusp
@@ -1512,6 +1514,12 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 	ESX.TriggerServerCallback('vozilo:dajKilometre', function(km)
 		Kilometri = km
 	end, Tablica)
+	ESX.TriggerServerCallback('stage:ProvjeriVozilo',function(st)
+		if st ~= 0 and st.servis ~= nil then
+			Kvar = st.servis
+			VrstaKvara = st.kvar
+		end
+	end, Tablica)
 	ESX.TriggerServerCallback('ovjes:DajStari', function(roty, susp)
 		prosliy = roty
 		orgsusp = susp
@@ -1564,23 +1572,39 @@ AddEventHandler('baseevents:enteredVehicle', function(currentVehicle, currentSea
 						zadnjikm = Kilometri
 						TriggerServerEvent('vozilo:dodajKm', Tablica, Kilometri)
 					end
-					--[[if Kilometri >= 100 then
+					if Kvar ~= nil and Kilometri >= Kvar then
+						if VrstaKvara == 0 then
+							local rand = math.random(1,2)
+							VrstaKvara = rand
+							TriggerServerEvent("kvar:SpremiKvar", Tablica, rand)
+						end
 						vehica = GetVehiclePedIsIn(PlayerPedId())
-						Citizen.CreateThread(function()
-							while vehica ~= 0 do
-								if not IsControlJustPressed(0, 132) then
-									vehica = GetVehiclePedIsIn(PlayerPedId())
-									SetVehicleClutch(vehica, 0.0)
-								else
-									local vrime = GetGameTimer()
-									while GetGameTimer()<vrime+500 do
-										Citizen.Wait(1)
+						if VrstaKvara == 1 then
+							Citizen.CreateThread(function()
+								while vehica ~= 0 do
+									if not IsControlJustPressed(0, 132) then
+										vehica = GetVehiclePedIsIn(PlayerPedId())
+										SetVehicleClutch(vehica, 0.0)
+									else
+										local vrime = GetGameTimer()
+										while GetGameTimer()<vrime+500 do
+											Citizen.Wait(1)
+										end
 									end
+									Citizen.Wait(1)
 								end
-								Citizen.Wait(1)
-							end
-						end)
-					end]]
+							end)
+						elseif VrstaKvara == 2 then
+							Citizen.CreateThread(function()
+								while vehica ~= 0 do
+									vehica = GetVehiclePedIsIn(PlayerPedId())
+									SetDisableVehicleEngineFires(vehica, true)
+									SetVehicleEngineHealth(vehica, 301)
+									Citizen.Wait(2000)
+								end
+							end)
+						end
+					end
 					ZadnjaPoz = curPos
 				end
 			end

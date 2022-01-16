@@ -77,6 +77,13 @@ AddEventHandler('trew_hud_ui:syncCarLights', function(status)
 	TriggerClientEvent('trew_hud_ui:syncCarLights', -1, source, status)
 end)
 
+RegisterServerEvent('kvar:SpremiKvar')
+AddEventHandler('kvar:SpremiKvar', function(plate, kv)
+    MySQL.Async.execute('UPDATE owned_vehicles SET kvar = @kv WHERE plate = @plate', {['@plate'] = plate, ['@kv'] = kv}, function(affectedRows)
+		
+	end)
+end)
+
 RegisterServerEvent('vozilo:dodajKm')
 AddEventHandler('vozilo:dodajKm', function(plate, km)
     MySQL.Async.execute('UPDATE owned_vehicles SET kilometri = @kms WHERE plate = @plate', {['@plate'] = plate, ['@kms'] = km}, function(affectedRows)
