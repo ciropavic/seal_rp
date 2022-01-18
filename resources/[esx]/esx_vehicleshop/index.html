@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Autosalon</title>
+    <script src="assets/plugins/jquery/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="assets/plugins/bootstrap-3.3.7-dist/css/bootstrap.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		html {
+		  font-size: 14px;
+		}
+		@media (min-width: 768px) {
+		  html {
+			font-size: 16px;
+		  }
+		}
+
+		.container {
+			max-width: 330px;
+			max-height: 85%;
+			min-height: 85%;
+			overflow: scroll;
+			overflow-x: hidden;
+			overflow-y: auto;
+			position: relative;
+			left: 0;
+			margin: 0;
+			padding-top: 10px;
+			background-color: #c3c3c3;
+			top: 65px;
+			border-radius: 15px;
+		}
+		
+		.container2 {
+			width: 340px;
+			background-color: #c3c3c3;
+			padding: 15px;
+			border-radius: 15px;
+		}
+
+		.pricing-header {
+		  max-width: 700px;
+		}
+
+		.card-deck .card {
+			margin-right: 0px;
+			margin-top: 11px;
+			margin-bottom: 11px;
+			background-color: #00000017;
+		}
+		
+		.jumbotron {
+			margin-bottom: 0px;
+			padding-top: 15px;
+			padding-bottom: 15px;
+		}
+		
+		#tijelo {
+			background-color: transparent;
+			display:none;
+		}
+
+		.border-top { border-top: 1px solid #e5e5e5; }
+		.border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+		.box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+		
+		.btn-danger {
+			float: right;
+		}
+
+		::-webkit-scrollbar {
+			width: 12px;
+		}
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+		}
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			background: rgba(51,122,183,0.8); 
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(51,122,183,0.8);
+		}
+		.modal{
+			top: 120px !important;
+		}
+		.modal-dialog{
+			width: 400px !important;
+		}
+		#bdodaj{
+			margin-top: 10px;
+		}
+		img{
+			max-width: 30px;
+		}
+		.boje
+		{
+			margin-top: -12px !important;
+			margin-right: 3px;
+			width: 35px !important;
+		}
+		#glavni
+		{
+			position: absolute;
+			bottom: 20px;
+			left: 50%;
+			transform: translate(-50%,0);
+		}
+		#salon{
+			display:none;
+		}
+		.vertical-center {
+			display:none;
+			margin: 0;
+			position: absolute;
+			top: 50%;
+			-ms-transform: translateY(-50%);
+			transform: translateY(-50%);
+			text-align: center;
+		}
+		#unutarnji{	
+			background-color: #969696b3;
+			width: 220px;
+			border-radius: 0px 0px 15px 15px;
+			padding: 15px;
+		}
+		#naslov{
+			background-color: #a7a7a7;
+			border-radius: 15px 15px 0px 0px;
+			padding: 15px;
+			font-weight: bold;
+			font-size: 20px;
+		}
+		html, 
+		body {
+			height: 100%;
+		}
+	</style>
+</head>
+	<body id = "tijelo">
+		<div class="vertical-center" id="kurac">
+			<div id="naslov">
+				Tuning vozila
+			</div>
+			<div id="unutarnji">
+				<b>Armor</b><br> <font id="alvl">Level 5</font><br>
+				<b>Kocnice</b><br> <font id="klvl">Level 5</font><br>
+				<b>Mjenjac</b><br> <font id="mjlvl">Level 5</font><br><font id="mjv">Rucni</font><br>
+				<b>Motor</b><br> <font id="mlvl">Level 5</font><br>
+				<b>Suspenzija</b><br> <font id="slvl">Level 5</font><br>
+				<b>Turbo</b><br> <font id="tlvl">Da</font>
+			</div>
+		</div>
+		<div id = "salon" style="overflow: hidden;height: 100%;">
+			<div class="container">
+			<button type="button" class="btn btn-danger" onclick="Zatvori()">X</button>
+			<div class="jumbotron text-center"><h2>Autosalon</h2></div>
+			  <div class="card-deck mb-3 text-center" id="maindivic">
+				
+			  </div>
+			</div>
+			<div id="glavni">
+				<div class="container2" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;margin-bottom: -12px;">
+				  <div class="card-deck mb-3 text-center">
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 65px;float: left; margin-top:0px;" onclick="Pogled()"><i class="fa fa-eye" style=" font-size: 20px;"></i></button>
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 155px; margin-top:0px;" onclick="Zamjeni()"><i id="slicica" class="fa fa-toggle-off" style=" font-size: 20px; "></i></button>
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 70px;float: right; margin-top:0px;" onclick="Svijetla()"><i class="fa fa-lightbulb-o" style=" font-size: 20px; "></i></button>
+				  </div>
+				</div>
+				<div class="container2" style="border-radius: 0px;">
+				  <div class="card-deck mb-3 text-center">
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 65px;float: left; margin-top:0px;" onclick="Lijevo()"><i class="fa fa-toggle-left" style=" font-size: 20px; "></i></button>
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 155px; margin-top:0px;font-size: 16px;" onclick="Kupi()">Kupi vozilo</button>
+					<button type="button" id="bdodaj" class="btn btn-primary" style="width: 70px;float: right; margin-top:0px;" onclick="Desno()"><i class="fa fa-toggle-right" style=" font-size: 20px; "></i></button>
+				  </div>
+				</div>
+				<div class="container2" style="border-top-left-radius: 0px;border-top-right-radius: 0px;border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;">
+				  <div class="card-deck mb-3 text-center">
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('crvena')" style="float: left;margin-top:0px;height: 25px;background-color: red;border-color: red;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('bijela')" style="float: left;margin-top:0px;height: 25px;background-color: white;border-color: white;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('plava')" style="float: left;margin-top:0px;height: 25px;background-color: blue;border-color: blue;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('orange')" style="float: left;margin-top:0px;height: 25px;background-color: orange;border-color: orange;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('zuta')" style="margin-top: -21px !important;height: 25px;background-color: yellow;border-color: yellow;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('siva')" style="float: left;margin-top:0px;height: 25px;background-color: grey;border-color: grey;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('zelena')" style="float: left;margin-top:0px;height: 25px;background-color: green;border-color: green;"></button>
+					<button type="button" id="boje" class="btn btn-primary boje" onclick="Boja('crna')" style="float: left;margin-top:0px;height: 25px;background-color: #000;border-color: black;"></button>
+				  </div>
+				</div>
+				<div class="container2" style="border-top-left-radius: 0px;border-top-right-radius: 0px;margin-top: -24px;">
+				  <div class="card-deck mb-3 text-center">
+					<font id="imevozila" style="font-size: 16px;">BMW M5 e60</font><br><font id="cijenavozila" style="font-size: 16px;">600000$</font>
+				  </div>
+				</div>
+			</div>
+		</div>
+		<script src="assets/plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		<script>
+			var Prikazan = false;
+			var Zabrani = false;
+			window.addEventListener('message', function(event) {
+				var item = event.data;
+				if (item.dodajkat) {
+					var maindiv = document.getElementById('maindivic');
+					var div = document.createElement('button');
+					div.className = 'btn btn-lg btn-block btn-primary';
+					div.id = item.ime;
+					div.innerHTML = item.label;
+					div.onclick = function() { PostaviAuto(item.ime); };
+					maindiv.appendChild(div);
+				}
+				if (item.prikazi) {
+					var x = document.getElementById("tijelo");
+					var y = document.getElementById("salon");
+					if(Prikazan == false)
+					{
+						x.style.display = "block";
+						y.style.display = "block";
+						Prikazan = true;
+					}
+					else
+					{
+						x.style.display = "none";
+						y.style.display = "none";
+						Prikazan = false;
+						$("#maindivic").empty();
+					}
+				}
+				if (item.prikazi2) {
+					var x = document.getElementById("tijelo");
+					var y = document.getElementById("kurac");
+					if(Prikazan == false)
+					{
+						x.style.display = "block";
+						y.style.display = "block";
+						Prikazan = true;
+					}
+					else
+					{
+						x.style.display = "none";
+						y.style.display = "none";
+						Prikazan = false;
+					}
+				}
+				if (item.zabrani) {
+					var x = document.getElementById("tijelo");
+					if(Zabrani == false)
+					{
+						var x = document.getElementsByClassName("btn");
+						var i;
+						for (i = 0; i < x.length; i++) {
+						  x[i].disabled = true;
+						}
+						Zabrani = true;
+					}
+					else
+					{
+						var x = document.getElementsByClassName("btn");
+						var i;
+						for (i = 0; i < x.length; i++) {
+						  x[i].disabled = false;
+						}
+						Zabrani = false;
+					}
+				}
+				if (item.postaviime) {
+					var naziv = item.imevozila;
+					var cijena = item.cijenavozila;
+					document.getElementById("imevozila").innerHTML = naziv;
+					document.getElementById("cijenavozila").innerHTML = cijena;
+				}
+				if (item.postavisve) {
+					var armor = item.armor;
+					var kocnice = item.kocnice;
+					var mjenjac = item.mjenjac;
+					var vmjenjac = item.vmjenjac;
+					var motor = item.motor;
+					var suspenzija = item.suspenzija;
+					var turbo = item.turbo;
+					document.getElementById("alvl").innerHTML = armor;
+					document.getElementById("klvl").innerHTML = kocnice;
+					document.getElementById("mjlvl").innerHTML = mjenjac;
+					document.getElementById("mjv").innerHTML = vmjenjac;
+					document.getElementById("mlvl").innerHTML = motor;
+					document.getElementById("slvl").innerHTML = suspenzija;
+					document.getElementById("tlvl").innerHTML = turbo;
+				}
+			});
+			
+			var svij = false;
+			function Svijetla()
+			{
+				if(svij == false)
+				{
+					$.post("http://esx_vehicleshop/svijetla", JSON.stringify({
+						svijetla: true
+					}));
+					svij = true;
+				}
+				else
+				{
+					$.post("http://esx_vehicleshop/svijetla", JSON.stringify({
+						svijetla: false
+					}));
+					svij = false;
+				}
+			}
+			function Pogled()
+			{
+				$.post("http://esx_vehicleshop/pogled", JSON.stringify({
+					pogled: true
+				}));
+			}
+			var Jeste = false;
+			function Zamjeni()
+			{
+				if(Jeste == false)
+				{
+					document.getElementById("slicica").className = "fa fa-toggle-on";
+					$.post("http://esx_vehicleshop/vrata", JSON.stringify({
+						otvori: true
+					}));
+					
+					Jeste = true;
+				}
+				else
+				{
+					document.getElementById("slicica").className = "fa fa-toggle-off";
+					$.post("http://esx_vehicleshop/vrata", JSON.stringify({
+						otvori: false
+					}));
+					Jeste = false;
+				}
+			}
+			function Boja(ime)
+			{
+				$.post("http://esx_vehicleshop/staviboju", JSON.stringify({
+					ime: ime
+				}));
+			}
+			function PostaviAuto(ime)
+			{
+				Jeste = false;
+				document.getElementById("slicica").className = "fa fa-toggle-off";
+				svij = false;
+				$.post("http://esx_vehicleshop/spawnauto", JSON.stringify({
+					naziv: ime
+				}));
+			}
+			function Kupi()
+			{
+				$.post("http://esx_vehicleshop/kupi", JSON.stringify({}));
+			}
+			function Lijevo()
+			{
+				Jeste = false;
+				document.getElementById("slicica").className = "fa fa-toggle-off";
+				svij = false;
+				$.post("http://esx_vehicleshop/lijevo", JSON.stringify({}));
+			}
+			function Desno()
+			{
+				Jeste = false;
+				document.getElementById("slicica").className = "fa fa-toggle-off";
+				svij = false;
+				$.post("http://esx_vehicleshop/desno", JSON.stringify({}));
+			}
+			function Zatvori()
+			{
+				$.post("http://esx_vehicleshop/zatvori", JSON.stringify({}));
+				var x = document.getElementById("tijelo");
+				x.style.display = "none";
+				Prikazan = false;
+				$("#maindivic").empty();
+				Jeste = false;
+				document.getElementById("slicica").className = "fa fa-toggle-off";
+				svij = false;
+			}
+		</script>
+	</body>
+</html>
