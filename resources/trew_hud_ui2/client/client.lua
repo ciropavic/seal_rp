@@ -1130,22 +1130,24 @@ AddEventHandler('ovjes:EoVamOvjes2', function(ovj)
 		local susp = ovj[i].susp
 		if NetworkDoesEntityExistWithNetworkId(nid) then
 			local vehica = NetToVeh(nid)
-			local prosliy = y
-			local susppr = susp
-			local novibr = -0.1
-			while prosliy > novibr do
-				SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
-				SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
-				SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
-				SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
-				prosliy = prosliy-0.0008
-				Wait(1)
-			end
-			local nbr = 0.13
-			while nbr > susppr do
-				SetVehicleSuspensionHeight(vehica, susppr+0.0008)
-				susppr = susppr+0.0008
-				Wait(1)
+			if IsEntityAVehicle(vehica) then
+				local prosliy = y
+				local susppr = susp
+				local novibr = -0.1
+				while prosliy > novibr do
+					SetVehicleWheelYRotation(vehica, 0, prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 1, -prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 2, prosliy-0.0008)
+					SetVehicleWheelYRotation(vehica, 3, -prosliy-0.0008)
+					prosliy = prosliy-0.0008
+					Wait(1)
+				end
+				local nbr = 0.13
+				while nbr > susppr do
+					SetVehicleSuspensionHeight(vehica, susppr+0.0008)
+					susppr = susppr+0.0008
+					Wait(1)
+				end
 			end
 		end
 	end
