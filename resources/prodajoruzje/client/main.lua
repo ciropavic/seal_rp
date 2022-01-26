@@ -1858,8 +1858,8 @@ RegisterCommand("testanim", function(source, args, rawCommandString)
 			while not HasAnimDictLoaded(args[1]) do
 				Citizen.Wait(1000)
 			end
-			--TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, -8, -1, 2, 0, 0, 0, 0)
-			TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, 8.0, -1, 50)
+			TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, -8, 1300, 2, 0, 0, 0, 0)
+			--TaskPlayAnim(PlayerPedId(),args[1],args[2], 8.0, 8.0, -1, 50)
 			--TaskStartScenarioInPlace(PlayerPedId(), args[1], 0, true)
 		else
 			name = "System"..":"
