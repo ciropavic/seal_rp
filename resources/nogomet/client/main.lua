@@ -30,20 +30,16 @@ local forceTypes = {
 }
 
 Citizen.CreateThread(function()
-  while ESX == nil do
-    TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-    Citizen.Wait(0)
-  end
-  while ESX.GetPlayerData().job == nil do
-	Citizen.Wait(100)
-  end
-  --ProvjeriPosao()
+	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+		Citizen.Wait(0)
+	end
 end)
 
 local Lopta
 local NLopta = nil
 
-RegisterCommand("lopta", function(source, args, rawCommandString)
+--[[RegisterCommand("lopta", function(source, args, rawCommandString)
 	ESX.TriggerServerCallback('esx-races:DohvatiPermisiju', function(br)
 		if br == 1 then
 			Lopta = CreateObject(GetHashKey("stt_prop_stunt_soccer_ball"), 231.90512084961, -791.50927734375, 29.607139587402,true,false,false)
@@ -54,7 +50,7 @@ RegisterCommand("lopta", function(source, args, rawCommandString)
 			TriggerEvent('chat:addMessage', { args = { name, message }, color = r,g,b })	
 		end
 	end)
-end, false)
+end, false)]]
 
 RegisterCommand("npozovi", function(source, args, rawCommandString)
 	ESX.TriggerServerCallback('esx-races:DohvatiPermisiju', function(br)
@@ -106,14 +102,14 @@ end)
 RegisterNetEvent("nogomet:stop")
 AddEventHandler('nogomet:stop', function()
 	if Tim > 0 then
-		vani1:destroy()
+		--[[vani1:destroy()
 		vani2:destroy()
 		vani3:destroy()
 		vani4:destroy()
 		vani5:destroy()
 		vani6:destroy()
 		gol1:destroy()
-		gol2:destroy()
+		gol2:destroy()]]
 		ESX.Game.DeleteObject(NLopta)
 		SendNUIMessage({
 			zatvoriscore = true
@@ -184,16 +180,121 @@ RegisterCommand("npokreni", function(source, args, rawCommandString)
 			local vrijeme = tonumber(args[1])
 			if vrijeme ~= nil then
 				if vrijeme > 0 then
-					local loptee = "p_ld_soc_ball_01"
-					ESX.Streaming.RequestModel(loptee)
-					NLopta = CreateObject(GetHashKey(loptee), 771.25549316406, -233.44470214844, 65.114479064941,true,true,false)
-					while not DoesEntityExist(NLopta) do
-						Wait(100)
+					if #(GetEntityCoords(PlayerPedId())-vector3(771.25549316406, -233.44470214844, 65.114479064941)) < 100 then
+						local loptee = "p_ld_soc_ball_01"
+						ESX.Streaming.RequestModel(loptee)
+						NLopta = CreateObject(GetHashKey(loptee), 771.25549316406, -233.44470214844, 65.114479064941,true,true,false)
+						while not DoesEntityExist(NLopta) do
+							Wait(100)
+						end
+						local netid = ObjToNet(NLopta)
+						TriggerServerEvent("SpawnLoptu", netid)
+						SetModelAsNoLongerNeeded(GetHashKey(loptee))
+						vani1 = PolyZone:Create({
+							vector2(812.66046142578, -233.1636505127),
+							vector2(815.43634033203, -228.81861877441),
+							vector2(747.61761474609, -194.87043762207),
+							vector2(745.51031494141, -199.70210266113)
+						}, {
+							name="vani1",
+							--minZ = 65.975372314453,
+							--maxZ = 66.193855285645
+						})
+						--Name: vani2 | 2022-01-26T21:48:35Z
+						vani2 = PolyZone:Create({
+							vector2(749.1806640625, -201.51795959473),
+							vector2(744.89215087891, -199.52757263184),
+							vector2(738.13970947266, -213.43597412109),
+							vector2(742.50347900391, -215.25355529785)
+						}, {
+							name="vani2",
+							--minZ = 66.114501953125,
+							--maxZ = 66.114501953125
+						})
+						
+						--Name: vani3 | 2022-01-26T21:49:43Z
+						vani3 = PolyZone:Create({
+							vector2(732.34478759766, -235.93173217773),
+							vector2(727.60388183594, -233.55186462402),
+							vector2(734.65051269531, -220.43460083008),
+							vector2(739.20886230469, -221.98890686035)
+						}, {
+							name="vani3",
+							--minZ = 66.114418029785,
+							--maxZ = 66.207328796387
+						})
+						
+						--Name: vani4 | 2022-01-26T21:50:39Z
+						vani4 = PolyZone:Create({
+							vector2(727.59857177734, -233.55166625977),
+							vector2(725.10559082031, -239.1104888916),
+							vector2(792.82885742188, -274.17495727539),
+							vector2(796.154296875, -268.60934448242)
+						}, {
+							name="vani4",
+							--minZ = 65.96297454834,
+							--maxZ = 66.627540588379
+						})
+						
+						--Name: vani5 | 2022-01-26T21:51:34Z
+						vani5 = PolyZone:Create({
+							vector2(792.51214599609, -266.68005371094),
+							vector2(796.0078125, -268.29458618164),
+							vector2(804.20465087891, -253.71546936035),
+							vector2(800.11260986328, -251.97682189941)
+						}, {
+							name="vani5",
+							--minZ = 65.915916442871,
+							--maxZ = 66.096611022949
+						})
+						
+						--Name: vani6 | 2022-01-26T21:52:21Z
+						vani6 = PolyZone:Create({
+							vector2(810.33905029297, -232.22758483887),
+							vector2(814.70727539062, -234.35900878906),
+							vector2(807.39721679688, -247.03788757324),
+							vector2(803.51525878906, -245.35041809082)
+						}, {
+							name="vani6",
+							--minZ = 65.915901184082,
+							--maxZ = 66.114273071289
+						})
+						
+						--Name: gol1 | 2022-01-26T21:53:43Z
+						gol1 = PolyZone:Create({
+							vector2(807.74987792969, -247.04742431641),
+							vector2(805.00341796875, -254.11936950684),
+							vector2(800.12377929688, -251.95057678223),
+							vector2(803.52575683594, -245.37042236328)
+						}, {
+							name="gol1",
+							--minZ = 65.915885925293,
+							--maxZ = 66.094314575195
+						})
+						
+						--Name: gol2 | 2022-01-26T21:54:58Z
+						gol2 = PolyZone:Create({
+							vector2(734.88439941406, -220.15863037109),
+							vector2(738.16870117188, -213.6103515625),
+							vector2(742.49066162109, -215.27342224121),
+							vector2(739.17004394531, -221.94694519043)
+						}, {
+							name="gol2",
+							--minZ = 66.11449432373,
+							--maxZ = 66.114517211914
+						})
+						TriggerServerEvent("nogomet:pokreni", vrijeme*60, netid, vani1, vani2, vani3, vani4, vani5, vani6, gol1, gol2)
+						vani1:destroy()
+						vani2:destroy()
+						vani3:destroy()
+						vani4:destroy()
+						vani5:destroy()
+						vani6:destroy()
+						gol1:destroy()
+						gol2:destroy()
+					else
+						ESX.ShowNotification("Morate biti kod terena kako bih ste startali nogomet!")
 					end
-					local netid = ObjToNet(NLopta)
-					TriggerServerEvent("SpawnLoptu", netid)
-					SetModelAsNoLongerNeeded(GetHashKey(loptee))
-					TriggerServerEvent("nogomet:pokreni", vrijeme*60)
 				else
 					name = "System"..":"
 					message = " /npokreni [Vrijeme trajanja(minute)]"
@@ -280,100 +381,7 @@ AddEventHandler("nogomet:pozvao", function(tim)
 		TriggerServerEvent("nogomet:SyncTimove", Tim1Igr, Tim2Igr)
 		FreezeEntityPosition(GetPlayerPed(-1), true)
 		ESX.ShowNotification("Pozvani ste u tim "..tim.." na nogometu!")
-		vani1 = PolyZone:Create({
-			vector2(812.66046142578, -233.1636505127),
-			vector2(815.43634033203, -228.81861877441),
-			vector2(747.61761474609, -194.87043762207),
-			vector2(745.51031494141, -199.70210266113)
-		}, {
-			name="vani1",
-			--minZ = 65.975372314453,
-			--maxZ = 66.193855285645
-		})
-		--Name: vani2 | 2022-01-26T21:48:35Z
-		vani2 = PolyZone:Create({
-			vector2(749.1806640625, -201.51795959473),
-			vector2(744.89215087891, -199.52757263184),
-			vector2(738.13970947266, -213.43597412109),
-			vector2(742.50347900391, -215.25355529785)
-		}, {
-			name="vani2",
-			--minZ = 66.114501953125,
-			--maxZ = 66.114501953125
-		})
-		
-		--Name: vani3 | 2022-01-26T21:49:43Z
-		vani3 = PolyZone:Create({
-			vector2(732.34478759766, -235.93173217773),
-			vector2(727.60388183594, -233.55186462402),
-			vector2(734.65051269531, -220.43460083008),
-			vector2(739.20886230469, -221.98890686035)
-		}, {
-			name="vani3",
-			--minZ = 66.114418029785,
-			--maxZ = 66.207328796387
-		})
-		
-		--Name: vani4 | 2022-01-26T21:50:39Z
-		vani4 = PolyZone:Create({
-			vector2(727.59857177734, -233.55166625977),
-			vector2(725.10559082031, -239.1104888916),
-			vector2(792.82885742188, -274.17495727539),
-			vector2(796.154296875, -268.60934448242)
-		}, {
-			name="vani4",
-			--minZ = 65.96297454834,
-			--maxZ = 66.627540588379
-		})
-		
-		--Name: vani5 | 2022-01-26T21:51:34Z
-		vani5 = PolyZone:Create({
-			vector2(792.51214599609, -266.68005371094),
-			vector2(796.0078125, -268.29458618164),
-			vector2(804.20465087891, -253.71546936035),
-			vector2(800.11260986328, -251.97682189941)
-		}, {
-			name="vani5",
-			--minZ = 65.915916442871,
-			--maxZ = 66.096611022949
-		})
-		
-		--Name: vani6 | 2022-01-26T21:52:21Z
-		vani6 = PolyZone:Create({
-			vector2(810.33905029297, -232.22758483887),
-			vector2(814.70727539062, -234.35900878906),
-			vector2(807.39721679688, -247.03788757324),
-			vector2(803.51525878906, -245.35041809082)
-		}, {
-			name="vani6",
-			--minZ = 65.915901184082,
-			--maxZ = 66.114273071289
-		})
-		
-		--Name: gol1 | 2022-01-26T21:53:43Z
-		gol1 = PolyZone:Create({
-			vector2(807.74987792969, -247.04742431641),
-			vector2(805.00341796875, -254.11936950684),
-			vector2(800.12377929688, -251.95057678223),
-			vector2(803.52575683594, -245.37042236328)
-		}, {
-			name="gol1",
-			--minZ = 65.915885925293,
-			--maxZ = 66.094314575195
-		})
-		
-		--Name: gol2 | 2022-01-26T21:54:58Z
-		gol2 = PolyZone:Create({
-			vector2(734.88439941406, -220.15863037109),
-			vector2(738.16870117188, -213.6103515625),
-			vector2(742.49066162109, -215.27342224121),
-			vector2(739.17004394531, -221.94694519043)
-		}, {
-			name="gol2",
-			--minZ = 66.11449432373,
-			--maxZ = 66.114517211914
-		})
-		StartProvjeru()
+		--StartProvjeru()
 	end
 end)
 
@@ -487,17 +495,10 @@ Citizen.CreateThread(function()
 						Citizen.Wait(0)
 					end
 					local cordsa = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 3.0 , 0.0)
-					local fcor = cor-cordsa
 					local forceType = forceTypes.MaxForceRot2
 					local direction = vector3(cordsa.x-cor.x, cordsa.y-cor.y, 0.0)
 					local rotation = vector3(0.0, 0.0, 0.0)
-					local boneIndex = 0
-					local isDirectionRel = false
-					local ignoreUpVec = true
-					local isForceRel = true
-					local p12 = false
-					local p13 = true
-					ApplyForceToEntity(NLopta,forceType,direction,rotation,boneIndex,isDirectionRel,ignoreUpVec,isForceRel,p12,p13)
+					ApplyForceToEntity(NLopta,forceType,direction,rotation,0,false,true,true,false,true)
 				end
 			end
 			if IsDisabledControlJustPressed(0, 24) then
@@ -509,23 +510,16 @@ Citizen.CreateThread(function()
 							NetworkRequestControlOfEntity(NLopta)
 							Citizen.Wait(0)
 						end
-						local cordsa = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 22.0 , 0.0)
-						local fcor = cor-cordsa
+						local cordsa = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 42.0 , 0.0)
 						local forceType = forceTypes.MaxForceRot2
 						local direction = vector3(cordsa.x-cor.x, cordsa.y-cor.y, 0.0)
 						local rotation = vector3(0.0, 0.0, 0.0)
-						local boneIndex = 0
-						local isDirectionRel = false
-						local ignoreUpVec = true
-						local isForceRel = true
-						local p12 = false
-						local p13 = true
 						RequestAnimDict("melee@unarmed@streamed_variations")
 						while not HasAnimDictLoaded("melee@unarmed@streamed_variations") do
 							Citizen.Wait(1)
 						end
 						TaskPlayAnim(PlayerPedId(),"melee@unarmed@streamed_variations","vehicle_kick_var_a", 8.0, -8, 1300, 2, 0, 0, 0, 0)
-						ApplyForceToEntity(NLopta,forceType,direction,rotation,boneIndex,isDirectionRel,ignoreUpVec,isForceRel,p12,p13)
+						ApplyForceToEntity(NLopta,forceType,direction,rotation,0,false,true,true,false,true)
 						RemoveAnimDict("melee@unarmed@streamed_variations")
 					end
 				end
@@ -539,23 +533,16 @@ Citizen.CreateThread(function()
 							NetworkRequestControlOfEntity(NLopta)
 							Citizen.Wait(0)
 						end
-						local cordsa = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 22.0 , 7.0)
-						local fcor = cor-cordsa
+						local cordsa = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 42.0 , 17.0)
 						local forceType = forceTypes.MaxForceRot2
 						local direction = vector3(cordsa.x-cor.x, cordsa.y-cor.y, cordsa.z-cor.z)
 						local rotation = vector3(0.0, 0.0, 0.0)
-						local boneIndex = 0
-						local isDirectionRel = false
-						local ignoreUpVec = true
-						local isForceRel = true
-						local p12 = false
-						local p13 = true
 						RequestAnimDict("melee@unarmed@streamed_variations")
 						while not HasAnimDictLoaded("melee@unarmed@streamed_variations") do
 							Citizen.Wait(1)
 						end
 						TaskPlayAnim(PlayerPedId(),"melee@unarmed@streamed_variations","vehicle_kick_var_a", 8.0, -8, 1300, 2, 0, 0, 0, 0)
-						ApplyForceToEntity(NLopta,forceType,direction,rotation,boneIndex,isDirectionRel,ignoreUpVec,isForceRel,p12,p13)
+						ApplyForceToEntity(NLopta,forceType,direction,rotation,0,false,true,true,false,true)
 						RemoveAnimDict("melee@unarmed@streamed_variations")
 					end
 				end
@@ -564,11 +551,42 @@ Citizen.CreateThread(function()
 	end
 end)
 
-local Cekaj = false
+RegisterNetEvent("nogomet:LoptaVani")
+AddEventHandler("nogomet:LoptaVani", function()
+	if Tim > 0 then
+		ESX.ShowNotification("Lopta je izasla izvan terena! Spawnana je na sredini terena!")
+		FreezeEntityPosition(NLopta, true)
+		SetEntityCoords(NLopta, 771.25549316406, -233.44470214844, 65.214479064941, 0, 0, 0, true)
+		FreezeEntityPosition(NLopta, false)
+	end
+end)
 
-function StartProvjeru()
+RegisterNetEvent("nogomet:Gol")
+AddEventHandler("nogomet:Gol", function(br)
+	if Tim > 0 then
+		if br == 1 then
+			FreezeEntityPosition(NLopta, true)
+			SetEntityCoords(NLopta, 771.25549316406, -233.44470214844, 65.214479064941, 0, 0, 0, true)
+			FreezeEntityPosition(NLopta, false)
+			Tim2Score = Tim2Score+1
+			TriggerServerEvent("nogomet:SyncajScore", Tim1Score, Tim2Score)
+			ESX.ShowNotification("Gooool! Tim 2 je zabio timu 1!")
+		else
+			FreezeEntityPosition(NLopta, true)
+			SetEntityCoords(NLopta, 771.25549316406, -233.44470214844, 65.214479064941, 0, 0, 0, true)
+			FreezeEntityPosition(NLopta, false)
+			Tim1Score = Tim1Score+1
+			TriggerServerEvent("nogomet:SyncajScore", Tim1Score, Tim2Score)
+			ESX.ShowNotification("Gooool! Tim 1 je zabio timu 2!")
+		end
+	end
+end)
+
+--local Cekaj = false
+
+--[[function StartProvjeru()
 	while Tim > 0 do
-		Wait(500)
+		Wait(200)
 		if Cekaj == false then
 			local retval = NetworkHasControlOfEntity(NLopta)
 			local retval2 = IsEntityOnScreen(NLopta)
@@ -607,4 +625,4 @@ function StartProvjeru()
 			end
 		end
 	end
-end
+end]]
