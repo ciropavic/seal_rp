@@ -1781,6 +1781,201 @@ RegisterCommand("testkucu", function(source, args, rawCommandString)
 	--end)
 end, false)
 
+local Bijela = nil
+local Kugle = {}
+local Stap = nil
+
+function makeEntityFaceEntity( entity1, entity2 )
+    local p1 = GetEntityCoords(entity1, true)
+    local p2 = GetEntityCoords(entity2, true)
+
+    local dx = p2.x - p1.x
+    local dy = p2.y - p1.y
+
+    local heading = GetHeadingFromVector_2d(dx, dy)
+    SetEntityHeading( entity1, heading )
+end
+
+RegisterCommand("kugla", function(source, args, rawCommandString)
+	ESX.Game.SpawnObject('prop_poolball_5', {
+		x = -573.9778,
+		y = 288.2987,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_10', {
+		x = -574.0673,
+		y = 288.3078,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_6', {
+		x = -574.1579,
+		y = 288.317,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_15', {
+		x = -574.2495,
+		y = 288.3264,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_12', {
+		x = -574.3372,
+		y = 288.3376,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_9', {
+		x = -574.2853,
+		y = 288.4154,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_7', {
+		x = -574.1944,
+		y = 288.4062,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_11', {
+		x = -574.1035,
+		y = 288.3969,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_4', {
+		x = -574.0143,
+		y = 288.3879,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_14', {
+		x = -574.0536,
+		y = 288.4738,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_8', {
+		x = -574.1403,
+		y = 288.4826,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_3', {
+		x = -574.2297,
+		y = 288.4917,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_13', {
+		x = -574.1765,
+		y = 288.5623,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_2', {
+		x = -574.085,
+		y = 288.553,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_1', {
+		x = -574.1224,
+		y = 288.6299,
+		z = 79.10798-0.04
+	}, function(obj)
+		table.insert(Kugle, obj)
+	end)
+	ESX.Game.SpawnObject('prop_poolball_cue', {
+		x = -573.934,
+		y = 290.2414,
+		z = 79.10798-0.04
+	}, function(obj)
+		Bijela = obj
+	end)
+	ESX.Game.SpawnObject('prop_pool_cue', {
+		x = -573.934,
+		y = 291.2414,
+		z = 79.10798-0.7
+	}, function(obj)
+		Stap = obj
+	end)
+	Wait(500)
+	makeEntityFaceEntity(Bijela, Kugle[15])
+	makeEntityFaceEntity(Stap, Bijela)
+	local rot = GetEntityHeading(Stap)
+	SetEntityRotation(Stap, -90.0, 0.0, rot, 2)
+	FreezeEntityPosition(Stap, true)
+	Wait(500)
+	while true do
+		if IsControlJustPressed(0, 34) then
+			local koord = GetEntityCoords(Stap)
+			SetEntityCoords(Stap, koord.x+0.1, koord.y, koord.z)
+			makeEntityFaceEntity(Stap, Bijela)
+			local rot = GetEntityHeading(Stap)
+			SetEntityRotation(Stap, -90.0, 0.0, rot, 2)
+		end
+		if IsControlJustPressed(0, 35) then
+			local koord = GetEntityCoords(Stap)
+			SetEntityCoords(Stap, koord.x-0.1, koord.y, koord.z)
+			makeEntityFaceEntity(Stap, Bijela)
+			local rot = GetEntityHeading(Stap)
+			SetEntityRotation(Stap, -90.0, 0.0, rot, 2)
+		end
+		Wait(1)
+	end
+	makeEntityFaceEntity(Stap, Bijela)
+	local rot = GetEntityHeading(Stap)
+	SetEntityRotation(Stap, -90.0, 0.0, rot, 2)
+		SetObjectPhysicsParams(Bijela,   0.5, 5.0, 0.2, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0)
+	for i = 1, #Kugle do
+		SetObjectPhysicsParams(Kugle[i], 0.5, 1.0, 0.2, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0)
+	end
+end, false)
+
+RegisterCommand("opucaj", function(source, args, rawCommandString)
+	local forceTypes = {
+		MinForce = 0,
+		MaxForceRot = 1,
+		MinForce2 = 2,
+		MaxForceRot2 = 3,
+		ForceNoRot = 4,
+		ForceRotPlusForce = 5
+	}
+	local cor = GetEntityCoords(Bijela)
+	local cordsa = GetOffsetFromEntityInWorldCoords(Bijela, 0.0, 35.0 , 0.0)
+	local forceType = forceTypes.MaxForceRot2
+	local direction = vector3(cordsa.x-cor.x, cordsa.y-cor.y, 0.0)
+	local rotation = vector3(0.0, 0.0, 0.0)
+	ApplyForceToEntity(Bijela,forceType,direction,rotation,0,false,true,true,false,true)
+end, false)
+
+RegisterCommand("obrisi", function(source, args, rawCommandString)
+	for i = 1, #Kugle do
+		ESX.Game.DeleteObject(Kugle[i])
+	end
+	Kugle = {}
+	ESX.Game.DeleteObject(Bijela)
+	ESX.Game.DeleteObject(Stap)
+	Bijela = nil
+end, false)
+
 RegisterCommand("testumor", function(source, args, rawCommandString)
 	--ESX.TriggerServerCallback('esx-races:DohvatiPermisiju', function(br)
 		if perm == 1 then
