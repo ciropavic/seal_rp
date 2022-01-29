@@ -13,6 +13,7 @@ server_scripts {
 }
 
 client_scripts {
+  '@PolyZone/client.lua',
   '@es_extended/locale.lua',
   'client/main.lua'
 }
