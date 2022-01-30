@@ -131,7 +131,13 @@ end)
 
 ESX.RegisterServerCallback('status:dohvatiStatuse', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(source)
-	cb(xPlayer.getStatus())
+	local tablica = xPlayer.getStatus()
+	if tablica == nil then
+		tablica = {}
+		table.insert(tablica, {val = 0, percent = 100, name = "hunger"})
+		table.insert(tablica, {val = 0, percent = 100, name = "thirst"})
+	end
+	cb(tablica)
 end)
 
 RegisterServerEvent('status:SpremiStatuse')

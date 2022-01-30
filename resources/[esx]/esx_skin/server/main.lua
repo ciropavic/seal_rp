@@ -5,10 +5,27 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 RegisterServerEvent('esx_skin:save')
 AddEventHandler('esx_skin:save', function(skin)
 	local xPlayer = ESX.GetPlayerFromId(source)
-
-	MySQL.Async.execute('UPDATE users SET skin = @skin WHERE identifier = @identifier', {
+	local spol
+	if skin.skin == 0 then
+		spol = "m"
+	else
+		spol = "z"
+	end
+	MySQL.Async.execute('UPDATE users SET skin = @skin, sex = @spol WHERE ID = @identifier', {
 		['@skin'] = json.encode(skin),
-		['@identifier'] = xPlayer.identifier
+		['@spol'] = spol,
+		['@identifier'] = xPlayer.getID()
+	})
+end)
+
+RegisterServerEvent('skin:SpremiPodatke')
+AddEventHandler('skin:SpremiPodatke', function(data)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	MySQL.Async.execute('UPDATE users SET firstname = @first, lastname = @last, dateofbirth = @dat WHERE ID = @identifier', {
+		['@first'] = data.ime,
+		['@last'] = data.prezime,
+		['@dat'] = data.datum,
+		['@identifier'] = xPlayer.getID()
 	})
 end)
 
@@ -34,8 +51,8 @@ end)
 ESX.RegisterServerCallback('esx_skin:getPlayerSkin', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
-	MySQL.Async.fetchScalar('SELECT skin FROM users WHERE identifier = @identifier', {
-		['@identifier'] = xPlayer.identifier
+	MySQL.Async.fetchScalar('SELECT skin FROM users WHERE ID = @identifier', {
+		['@identifier'] = xPlayer.getID()
 	}, function(users)
 		local skin
 

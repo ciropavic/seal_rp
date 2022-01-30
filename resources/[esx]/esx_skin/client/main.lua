@@ -252,7 +252,8 @@ function OpenSaveableMenu(submitCb, cancelCb, restrict)
 			TriggerServerEvent('esx_skin:save', skin)
 			DoScreenFadeOut(1)
 			TriggerEvent("MakniHud", true)
-			CreatePlane(-2598.599609375, -2432.763671875, 500.94445800782, 241.49998474122, "AIRP")
+			--CreatePlane(-2598.599609375, -2432.763671875, 500.94445800782, 241.49998474122, "AIRP")
+			PokreniIntro()
 			if submitCb ~= nil then
 				submitCb(data, menu)
 			end
@@ -260,6 +261,154 @@ function OpenSaveableMenu(submitCb, cancelCb, restrict)
 
 	end, cancelCb, restrict)
 end
+
+function PokreniIntro()
+	local randa = math.random(1, 63)
+	TriggerServerEvent("spawn:SetajBucket", randa)
+	SetEntityCoords(PlayerPedId(), 1732.8271484375, 3321.4763183594, 41.223526000977, 1, 0, 0, 1)
+	SetEntityHeading(PlayerPedId(), 53.82)
+	Wait(1000)
+	DoScreenFadeIn(500)
+	ESX.ShowNotification("Odite do kutije da ju pokupite!")
+	local prop_name = "gr_prop_gr_rsply_crate02a"
+	Kutija = CreateObject(GetHashKey(prop_name), 1727.1405029297, 3325.1672363281, 40.223522186279,  false,  false, false)
+	SetEntityHeading(Kutija, 17.59)
+	ESX.Streaming.RequestModel("GBurrito")
+	Vehic = CreateVehicle(GetHashKey("GBurrito"), 1730.6667480469, 3313.1159667969, 41.038261413574, 193.35, false, false)
+	while not DoesEntityExist(Vehic) do
+		Wait(100)
+	end
+	SetVehicleDoorOpen(Vehic, 2, false, false)
+	SetVehicleDoorOpen(Vehic, 3, false, false)
+	local model = GetHashKey("g_m_m_chicold_01")
+	RequestModel(model)
+	
+	while not HasModelLoaded(model) do
+		Wait(1)
+	end
+	Peda1 = CreatePed(1, model, 1732.1832275391, 3316.3127441406, 40.223461151123, 49.197257995605, false, false)
+	Peda2 = CreatePed(1, model, 1728.2711181641, 3315.3139648438, 40.223461151123, 343.51797485352, false, false)
+	TaskSetBlockingOfNonTemporaryEvents(Peda1, true)
+	TaskSetBlockingOfNonTemporaryEvents(Peda2, true)
+	local corda = vector3(1727.1405029297, 3325.1672363281, 40.223522186279)
+	while #(GetEntityCoords(PlayerPedId())-corda) > 2.0 do
+		DrawMarker(1, corda, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 3.0, 1.0, 204, 204, 0, 100, false, true, 2, false, false, false, false)
+		Wait(0)
+	end
+	DeleteEntity(Kutija)
+	ESX.ShowNotification("Ostavite kutiju u kombi!")
+	local playerPed = PlayerPedId()
+	local x,y,z = table.unpack(GetEntityCoords(playerPed))
+	RequestAnimDict("anim@heists@box_carry@")
+	while not HasAnimDictLoaded("anim@heists@box_carry@") do
+		Citizen.Wait(100)
+	end
+	TaskPlayAnim(PlayerPedId(),"anim@heists@box_carry@","idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
+	RemoveAnimDict("anim@heists@box_carry@")
+	Obj = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, false, false, false)
+	local boneIndex = GetPedBoneIndex(playerPed, 24818)
+	AttachEntityToEntity(Obj, playerPed, boneIndex, 0.0, 0.4, 0.0, -20.0, 90.0, 0.0, true, true, false, true, 1, true)
+	corda = vector3(1729.8563232422, 3316.2946777344, 40.223503112793)
+	while #(GetEntityCoords(PlayerPedId())-corda) > 2.0 do
+		DrawMarker(1, corda, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 3.0, 1.0, 204, 204, 0, 100, false, true, 2, false, false, false, false)
+		Wait(0)
+	end
+	DetachEntity(GetPlayerPed(-1), true, false)
+	DetachEntity(Obj, true, false)
+	DeleteEntity(Obj)
+	local ent = GetEntityBoneIndexByName(Vehic, "boot")
+	local playerPed = PlayerPedId()
+	local x,y,z = table.unpack(GetEntityCoords(playerPed))
+	Obj = CreateObject(GetHashKey(prop_name), x, y, z + 0.2, false, false, false)
+	AttachEntityToEntity(Obj, Vehic, ent, -0.03, -2.2, -0.1, 0.0, 0.0, 0.0, 1, 0, 0, 0, 2, 1)
+	ClearPedTasksImmediately(PlayerPedId())
+	RequestAnimDict("random@mugging3")
+	while not HasAnimDictLoaded("random@mugging3") do
+		Citizen.Wait(100)
+	end
+	local ped = PlayerPedId()
+	local hashVehicule = "police"
+	local pilotModel = GetHashKey("s_m_y_sheriff_01")
+	RequestModel(pilotModel)
+	while not HasModelLoaded(pilotModel) do
+		Citizen.Wait(0)
+	end
+	if HasModelLoaded(pilotModel) then
+		ESX.Streaming.RequestModel(hashVehicule)
+		local retval = GetHashKey(hashVehicule)
+		voza = CreateVehicle(hashVehicule, 1741.4053955078, 3425.8811035156, 37.464553833008, 207.61898803711, false, false)
+		SetVehicleSiren(voza, true)
+		--SetHornEnabled(voza, true)
+		pilot = CreatePedInsideVehicle(voza, 6, pilotModel, -1, false, false)
+		SetDriverAbility(pilot, 1.0)
+		SetVehicleDoorsLocked(voza, 4)
+		TaskVehicleDriveToCoord(pilot, voza, 1743.0380859375, 3294.1877441406, 40.714263916016, 26.0, 0, GetEntityModel(voza), 4 | 16 | 32| 262144, 5.0)
+		SetPedKeepTask(pilot, true)
+
+		voza2 = CreateVehicle(hashVehicule, 1892.4281005859, 3198.3754882812, 45.501605987549, 41.619846343994, false, false)
+		SetVehicleSiren(voza2, true)
+		--SetHornEnabled(voza, true)
+		pilot2 = CreatePedInsideVehicle(voza2, 6, pilotModel, -1, false, false)
+		SetDriverAbility(pilot2, 1.0)
+		SetVehicleDoorsLocked(voza2, 4)
+		TaskVehicleDriveToCoord(pilot2, voza2, 1736.5233154297, 3291.9738769531, 40.760066986084, 26.0, 0, GetEntityModel(voza2), 16777216 | 32, 15.0)
+		SetPedKeepTask(pilot2, true)
+
+		voza3 = CreateVehicle(hashVehicule, 1681.9339599609, 3227.9865722656, 40.258232116699, 284.48159790039, false, false)
+		SetVehicleSiren(voza3, true)
+		--SetHornEnabled(voza, true)
+		pilot3 = CreatePedInsideVehicle(voza3, 6, pilotModel, -1, false, false)
+		SetDriverAbility(pilot3, 1.0)
+		SetVehicleDoorsLocked(voza3, 4) 
+		TaskVehicleDriveToCoord(pilot3, voza3, 1730.7194824219, 3289.8779296875, 40.759120941162, 26.0, 0, GetEntityModel(voza3), 4 | 16 | 32| 4194304, 10.0)
+		SetPedKeepTask(pilot3, true)
+		SetModelAsNoLongerNeeded(hashVehicule)
+		SetModelAsNoLongerNeeded(pilotModel)
+	end
+	Wait(3000)
+	TaskPlayAnim(PlayerPedId(),"random@mugging3","handsup_standing_base", 8.0, -8, -1, 17, 0, 0, 0, 0)
+	TaskPlayAnim(Peda1,"random@mugging3","handsup_standing_base", 8.0, -8, -1, 17, 0, 0, 0, 0)
+	TaskPlayAnim(Peda2,"random@mugging3","handsup_standing_base", 8.0, -8, -1, 17, 0, 0, 0, 0)
+	RemoveAnimDict("random@mugging3")
+	Wait(15000)
+	DeleteEntity(voza)
+	DeleteEntity(pilot)
+	DeleteEntity(voza2)
+	DeleteEntity(pilot2)
+	DeleteEntity(voza3)
+	DeleteEntity(pilot3)
+	DeleteEntity(Obj)
+	DeleteEntity(Peda1)
+	DeleteEntity(Peda2)
+	DeleteEntity(Vehic)
+	SetModelAsNoLongerNeeded("gr_prop_gr_rsply_crate02a")
+	SetModelAsNoLongerNeeded("GBurrito")
+	SetModelAsNoLongerNeeded("g_m_m_chicold_01")
+	ClearPedTasksImmediately(PlayerPedId())
+	SetEntityCoords(PlayerPedId(), 1853.6134033203, 3688.0207519531, 34.267055511475)
+	SetEntityHeading(PlayerPedId(), 29.00)
+	local prop_name = "hei_prop_hei_monitor_police_01"
+	tablet = CreateObject(GetHashKey(prop_name), 1853.315, 3688.125, 34.16407+0.15, 0.0,  false,  false, false)
+	FreezeEntityPosition(tablet, true)
+	SetEntityRotation(tablet, -85.0, 0.0, 30.0, 2)
+	SetModelAsNoLongerNeeded("hei_prop_hei_monitor_police_01")
+	local MugShot = exports["MugShotBase64"]:GetMugShotBase64(PlayerPedId(), false)
+	SendNUIMessage({
+		prikaziintro = true,
+		slika = MugShot
+	})
+	SetNuiFocus(true, true)
+end
+
+RegisterNUICallback('intro', function(data, cb)
+	cb('ok')
+	TriggerServerEvent("skin:SpremiPodatke", data)
+	SetEntityCoords(PlayerPedId(), 1851.0897216797, 2585.8100585938, 45.672004699707)
+	SendNUIMessage({
+		zatvoriintro = true
+	})
+	SetNuiFocus(false)
+end)
 
 function CreatePlane(xa, ya, za, heading, destination)
 
@@ -318,9 +467,6 @@ function CreatePlane(xa, ya, za, heading, destination)
 		AttachCamToEntity(cam, AirPlane, -0.3,1.7,0.4, true)
 		--AttachCamToEntity(cam, AirPlane, 0.0,-25.0,0.0, true)
 		DoScreenFadeIn(500)
-		SendNUIMessage({
-					prikaziintro = true
-					})
 		Citizen.CreateThread(function()
 		  while PrviCam == true do
 			local retval = GetEntityRotation(AirPlane, 2)
@@ -396,6 +542,7 @@ AddEventHandler('playerSpawned', function()
 
 							SetModelAsNoLongerNeeded(characterModel)
 						end)
+						TriggerEvent('esx_skin:openSaveableMenu')
 						--TriggerEvent('skinchanger:loadDefaultModel', true, cb)
 						--TriggerEvent('skinchanger:loadSkin', {sex = 0}, OpenSaveableMenu)
 				else

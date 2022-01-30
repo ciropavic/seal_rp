@@ -12,7 +12,7 @@ local ZadnjaPoz = nil
 local Tablica = nil
 local glad = 0
 local zedj = 0
-local Statusi = nil
+local Statusi = {}
 local IsDead = false
 local IsAnimated = false
 local ZabraniCmd = false
@@ -1282,6 +1282,7 @@ function Status()
 	playerStatus = { action = 'setStatus', status = {} }
 	local glad = 0
 	local zedj = 0
+
 	for i=1, #Statusi, 1 do
 		if Statusi[i].name == "hunger" then
 			glad = math.floor(Statusi[i].percent)

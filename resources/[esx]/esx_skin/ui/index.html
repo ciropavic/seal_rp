@@ -22,8 +22,56 @@
     {
         width: 86px;
     }
-    #container{
+    body{
         display:none;
+    }
+    #container{
+        background: #4856edee;
+        width: 408px;
+        height: 245px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 10px;
+        text-align: center;
+        border-radius: 10px;
+        color:white;
+        display: none;
+    }
+    #slikica{
+        background: #FFFF00;
+        width: 100px;
+        height: 100px;
+        float: left;
+        position: relative;
+        left: 40px;
+    }
+    #butt{
+        position: absolute;
+        bottom: 0px;
+        right: 0;
+        border: none;
+        width: 60px;
+        height: 35px;
+        background: #ffffff;
+        color: black;
+    }
+    #butt:hover{
+        background: #dadada;
+    }
+    #forma{
+        width: 245px;
+        position: relative;
+        text-align: center;
+        float: right;
+        top: -8px;
+    }
+    #cont{
+        position: absolute;
+        bottom: 25px;
+        width: 100%;
+        height: 125px;
     }
     #izb{
         margin: 0;
@@ -131,16 +179,21 @@
     }
 </style>
 </head>
-<body id="body" style="margin: 0;display:none;background-color: transparent;">
+<body id="body" style="margin: 0;background-color: transparent;">
 <div id ="container">
-    <div class="jumbotron text-center">
-    <img src="logo.png" class="logo" style="float: left;margin-top: -20px;"><img src="logo.png" class="logo" style="float: right;margin-top: -20px;"><h2 style="font-size: 40px;">Dobrodosli na Hugo Roleplay</h2>
+    <font style="font-size: 35px;">Upis u registar</font>
+    <div id="cont">
+        <div id="slikica">
+            <img id="mug" style="width: 100%;" src="https://cdn.discordapp.com/avatars/319628026251837442/c14daa0acb27bcb184fee0a60bf9ff52.webp">
+        </div>
+        <div id="forma">
+            <b>Upišite vaše ime i prezime:</b> <br>
+            <input type="text" placeholder="Tony Sikora" required id="ime" style="margin-bottom: 15px; color:black;"><br>
+            <b>Upišite vaš datum rođenja:</b><br>
+            <input type="date" required id="datum" style="color:black;"><br>
+        </div>
     </div>
-    <div class="jumbotron text-center" style="position: absolute;width: 100%;bottom: 0;margin-bottom: 0;height: 219px;">
-    <h3 style="float:left;margin-left: 30px;text-align: left;margin-top: 21px;">Skripteri<br>- Sikora<br>- Razz</h3>
-    <h3 style="float:right;margin-right: 24px;margin-top: -9px;text-align: left;"><font>Vlasnici</font><br>- chame<br>- Razz<br>- Sikora</h3>
-    <h2 style="margin-top: 27px;"><img src="discord.png"> https://discord.gg/rAWxYmp</h2>
-    </div>
+    <button id="butt" onclick="Regaj()">Upiši</button>
 </div>
 <div id="izb">
     <div id="izbor">Izbor spawna</div>
@@ -157,6 +210,32 @@ function Spawn(br){
         izbor: br
     }));
 }
+function Regaj(){
+    var ime = document.getElementById("ime");
+    var datum = document.getElementById("datum");
+    if(ime.value){
+        if(datum.value){
+            var d1 = new Date(datum.value);
+            var kurac = d1.getDate()+"."+(d1.getMonth()+1)+"."+d1.getFullYear();
+            let arr = ime.value.split(/ (.*)/);
+            arr[0].replace(/\s/g, '');
+            arr[1].replace(/\s/g, '');
+            //var rpime = ime.value.substr(0,ime.value.indexOf(' '));
+            //var rpprezime = ime.value.substr(ime.value.indexOf(' ')+1);
+            $.post("https://esx_skin/intro", JSON.stringify({
+                ime: arr[0],
+                prezime: arr[1],
+                datum: kurac
+            }));
+        }else{
+            console.log("Niste popunili datum!");
+            datum.style.borderColor = "#ff0000b3";
+        }
+    }else{
+        console.log("Niste popunili ime!");
+        ime.style.borderColor = "#ff0000b3";
+    }
+}
 window.addEventListener('message', function(event) {
     var item = event.data;
     var x = document.getElementById("container");
@@ -165,6 +244,8 @@ window.addEventListener('message', function(event) {
     if (item.prikaziintro) {
         x.style.display = "block";
         y.style.display = "block";
+        var sl = document.getElementById("mug");
+        mug.src = item.slika;
     }
     else if (item.zatvoriintro) {
         x.style.display = "none";
