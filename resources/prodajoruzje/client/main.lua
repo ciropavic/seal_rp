@@ -2075,6 +2075,44 @@ RegisterCommand("kugla", function(source, args, rawCommandString)
 	Kugla()
 end, false)
 
+RegisterCommand("testvrata", function(source, args, rawCommandString)
+	if not IsDoorRegisteredWithSystem("test_hash") then
+		AddDoorToSystem("test_hash", "v_ilev_ph_door01", 434.7479, -980.6183, 30.83926,
+			false,
+			true, -- Force closed when locked?
+			false
+		)
+		DoorSystemSetDoorState("test_hash", 4, true, true)
+
+		AddDoorToSystem("test_hash2", "v_ilev_ph_door002", 434.7479, -983.215, 30.83926,
+			false,
+			true, -- Force closed when locked?
+			false
+		)
+		DoorSystemSetDoorState("test_hash2", 4, true, true)
+		ESX.ShowNotification("lockana");
+	else
+		ESX.ShowNotification("Regana vec!")
+	end
+end, false)
+
+RegisterCommand("lockvrata", function(source, args, rawCommandString)
+	if IsDoorRegisteredWithSystem("test_hash") then
+		local state = DoorSystemGetDoorState("test_hash")
+		if state == 4 then
+			DoorSystemSetDoorState("test_hash", 0, true, true)
+			DoorSystemSetDoorState("test_hash2", 0, true, true)
+			ESX.ShowNotification("unlockana");
+		else
+			DoorSystemSetDoorState("test_hash", 4, true, true)
+			DoorSystemSetDoorState("test_hash2", 4, true, true)
+			ESX.ShowNotification("lockana");
+		end
+	else
+		ESX.ShowNotification("Nisu regana!")
+	end
+end, false)
+
 RegisterCommand("obrisi", function(source, args, rawCommandString)
 	FreezeEntityPosition(PlayerPedId(), false)
 	for i = 1, #Kugle do
